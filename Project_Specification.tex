@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 
 \usepackage[a4paper,tmargin=0.5in]{geometry}
-\usepackage{pgfgantt}
+\usepackage{pgfgantt/pgfgantt}
 
 \title{Extending just-in-time compilation for OP2}
 \author{Nathan Dunne - u1604486}
@@ -39,8 +39,19 @@ Initally and throughout development I will be using the airfoil\cite{airfoil} ex
 Once progress has been made, there are more complex OP2 applications available to assess what performance benefits can be provided.
 
 \section*{Timetable}
-\begin{ganttchart
 
+
+\begin{ganttchart}{1}{12}
+\gantttitle{2011}{12} \\
+\gantttitlelist{1,...,12}{1} \\
+\ganttgroup{Group 1}{1}{7} \\
+\ganttbar{Task 1}{1}{2} \\
+\ganttlinkedbar{Task 2}{3}{7} \ganttnewline
+\ganttmilestone{Milestone}{7} \ganttnewline
+\ganttbar{Final Task}{8}{12}
+\ganttlink{elem2}{elem3}
+\ganttlink{elem3}{elem4}
+\end{ganttchart}
 
 \begin{thebibliography}{unsrt}
 
