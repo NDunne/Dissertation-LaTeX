@@ -2,6 +2,7 @@
 
 \usepackage[a4paper,tmargin=0.5in]{geometry}
 \usepackage{pgfgantt/pgfgantt}
+\usepackage{bibtopic}
 
 \title{Extending just-in-time compilation for OP2}
 \author{Nathan Dunne - u1604486}
@@ -9,91 +10,94 @@
 \begin{document}
 \maketitle
 \section*{Problem Statement}
-OP2 is an Embedded Domain Specific Language for solving unstructured mesh based applications. It exists to provide a level of abstraction to scientists and domain application developers, allowing utilisation of the high performance benefits of advancements in hardware, without requiring them to maintain an high level of knowledge on any new technologies and architectures. As the high-level application written using the OP2 API no longer requires any platform specific optimisations, it can be used on any platform supported by OP2; saving the time and financial costs of rewritting the application with different hardware optimisations.
+OP2 is an Embedded Domain Specific Language for solving unstructured mesh based applications. It exists to provide a level of abstraction to scientists and domain application developers, allowing utilisation of the high performance benefits of advancements in hardware, without requiring them to maintain a high level of knowledge on any new technologies and architectures. As the high-level application written using the OP2 API no longer requires any platform specific optimisations, it can be used on any platform supported by OP2; without the time and financial costs of rewritting the application with different hardware optimisations.
 \newline
 \par
-One way to improve the performance of an application such as the unstructured meshes targetted by OP2 is using Just-In-Time (JIT) compilation, whereby performance sensitive sections of the application are re-compiled at runtime to apply additional optimisations once the parameters of execution are known. The performance gain must be sufficient to offset the extra time taken to recompile in order for this technique to be effective. There is exisiting work implemented already for some JIT optimisations, however there is still space for further performance gain. The aim of this project is to implement additional optimisations in this area, such as replacing library operatuibs with constants, hard coding loop bounds, and applying loop fission/fusion.
+One way to improve the performance of an application such as the unstructured meshes targetted by OP2 is to use Just-In-Time (JIT) compilation, whereby performance sensitive sections of the application are re-compiled at runtime to apply additional optimisations once the parameters of execution are known. The performance gain must be sufficient to offset the extra time taken to recompile in order for this technique to be effective. There is exisiting work implemented already for some JIT optimisations, however there is still space for further performance gain. The aim of this project is to implement additional optimisations in this area, such as replacing library functions and other slow operations with constants where possible, hard coding loop bounds, and applying loop fission/fusion at runtime.
 \newline
 \par
-There are a number of High Performance Computing applications already written in the OP2 api, from smaller example projects to production applications. Since the API itself will not be altered, it will be easy to apply my additions to the OP2 translator, and determine whether there is permformance benefit using benchmarks.
+There are a number of High Performance Computing applications already written in the OP2 api, from smaller example projects to production applications. Since the API itself will not be altered, it will be easy to apply my additions to the OP2 translator, and determine whether there is performance benefit.
 \section*{Project Goals}
  \begin{itemize}
-  \item[-]{To gain an understanding of the existing work in the OP2 library, and how it benefits unstructured mesh applications.}
-  \item[-]{Apply my knowledge of optimisation techniques to implement and test further JIT optimisations.}\\
-- There are a number of optimisations possible, so the time to implement each one will determine how many can be included in the project
-\\
-- The primary optimisation will be replacing time consuming operations with constants where possible. Ideally the project will also extend to the optimisation of loops.
-  \item[-]{To benchmark the performance of existing OP2 applications with and without the additions, and determine whether it provides benefit.}
+  \item{To gain an understanding of the existing work in the OP2 library, and how it benefits unstructured mesh applications.}
+  \item{Apply my knowledge of optimisation techniques to implement and test further JIT optimisations.}\
+\begin{itemize}
+\item{A number of optimisations are possible, so the time to implement each one will determine how many can be included in the project}
+\item{The primary optimisation will be replacing time consuming operations with constants where possible. Ideally the project will also extend to the optimisation of loops.}
+\end{itemize}  
+\item{To benchmark the performance of existing OP2 applications with and without the additions, and determine whether it provides benefit.}
  \end{itemize}
 \section*{Methods}
 \subsection*{Research}
-In order to contribute to the OP2 project, I will first read a number of papers on the op-dsl homepage to ensure I understand the existing work, and am able to provide useful addition to the project. Some of the papers suggested are listed in the Further Reading section. Also, In order to increase my familiarity with the exisiting work I will make sure I can recreate the exisiting sequential work for JIT.
+In order to contribute to the OP2 project, I will first read a number of papers on the op-dsl homepage to gain an understanding of the purpose and implementation of the existing work, and ensure I am able to provide useful addition to the project. Some of the papers suggested are listed in the Further Reading section. Also, In order to increase my familiarity with the exisiting work I will initially be reproducing the exisiting sequential JIT work. This should put me in a comfortable position to begin contributing to the project.
 \subsection*{Implementation}
-The implementation will be divided into four rounds of implementation, with the content of each depending on the testing of the work done. If the results are successful the next implementation period will be to attempt a new optimisation. New code will constantly be micro-tested during development, then integration tested and benchmarked once work is complete.
+The implementation will be divided into four rounds of development. Each round will be followed by some detailed testing and analysis of the work completed, which will determine if the next round will be further work on the same optimisation, or beginning to implement a further optimisation. I have selected this process as I am as yet unsure of the complexity of what I intend to implement.
 \subsubsection*{Version Control}
-The OP2 project is Open Source, and hosted on github. I will work on a branch of the repository, and hopefully the completed work can be merged once it is complete.
-\subsection*{Development}
-As any progress made will be pushed to the remote github branch, I am not limited to a single workstation or system to work on. Depending on convenience I will either be using my personal laptop.\\
-This laptop does have a cuda enabled graphics card, and I also have access to a remote machine with a hpc grade nvidia card should there be any issues with using my device.
+The OP2 project is Open Source, and hosted on github\cite{github}, so I will work on a branch of the remote repository. Hopefully the completed work will be merged once it is complete.
 \subsection*{Benchmarking}
-Initally and throughout development I will be using the airfoil\cite{airfoil} example program written using the OP2 api as a testbed for my work. This should be small enough as to be easy to understand, but not so simple that it does not adequately exercise my additions to the OP2 librarary.\\
-Once progress has been made, there are more complex OP2 applications available to assess what performance benefits can be provided.
-
+Initally and throughout development I will be using the airfoil\cite{airfoil} example program written using the OP2 api as a testbed for my work. This should be small enough as to be easy to understand, but not so simple that it does not adequately exercise my additions to the OP2 library.\\
+For more rigorous benchmarking, more representative of the expected use case, there are a number of more complex OP2 applications available to assess what performance benefits can be provided.
+\subsection*{Documentation}
+Throughout the project I will keep notes of progress, setbacks and modifcations to the project. Combined with the git history of versions this should mean writing a report on my process will be fairly simple.
+%\clearpage
 \section*{Timetable}
-
-\newcommand\w{30}
-\hspace{-1in}
+The timetable for the project is described below. The sections above have been divided into 25 slots of approximately 12 hours of work. This corresponds with there being 28 weeks until the submission of the final report, to allow 12 hours of work a week, and 3 weeks of contingency. 
+\clearpage
+\newcommand\w{25}
+\begin{figure}[h]
+\centering
+\makebox[0pt]{
 \begin{ganttchart}[
 expand chart=1.3\textwidth,
-vgrid={*4{white},*1{dotted}, *{14}{white}, *1{dotted}, *2{white}, *1{dotted}, *7{white}},
+vgrid={*3{white},*1{dotted}, *{14}{white}, *1{dotted}, *1{white}, *1{dotted}, *5{white}},
 hgrid=true,
 y unit chart=0.8cm,
 inline,
-]{1}{\w}
+]{0}{\w}
 
- \gantttitle{Timeline}{\w} \\
- \gantttitlelist{1,...,\w}{1} \\
+ \gantttitle{Timeline}{26} \\
+ \gantttitlelist{0,...,\w}{1} \\
 
- \ganttgroup{Research}{1}{5} \\ %0%
+ \ganttgroup{Research}{1}{3} \\ %0%
  
  \ganttset{inline=false}
  \ganttbar{Read Papers}{1}{2}          %1%
  \ganttset{inline=true}
 
- \ganttgroup{Implementation}{6}{20} \\ %2%
+ \ganttgroup{Implementation}{4}{18} \\ %2%
 
  \ganttset{inline=false}
- \ganttbar{Familiarity Work}{2}{5}     %3%
+ \ganttbar{Familiarity Work}{2}{3}     %3%
  \ganttset{inline=true}
 
- \ganttgroup{Benchmarking}{21}{23} \\  %4%
+ \ganttgroup{Benchmarking}{19}{20} \\  %4%
 
  \ganttset{inline=false} 
- \ganttbar{Feature Development}{6}{7}  %5%
- \ganttbar{} {9}{10}                   %6%
- \ganttbar{} {12}{13}                  %7%
- \ganttbar{} {15}{16}                  %8%
- \ganttbar{} {18}{19}                  %9%
+ \ganttbar{Feature Development}{4}{5}  %5%
+ \ganttbar{} {7}{8}                   %6%
+ \ganttbar{} {10}{11}                  %7%
+ \ganttbar{} {13}{14}                  %8%
+ \ganttbar{} {16}{17}                  %9%
  \ganttset{inline=true}
- \ganttgroup{Documentation}{24}{30} \\ %10%
+ \ganttgroup{Documentation}{21}{25} \\ %10%
 
  \ganttset{inline=false} 
 
- \ganttbar{Feature Testing}{8}{8}      %11%
- \ganttbar{}{11}{11}                   %12%
- \ganttbar{}{14}{14}                   %13%
- \ganttbar{}{17}{17}                   %14%
- \ganttbar{}{20}{20}                   %15%
+ \ganttbar{Feature Testing}{6}{6}      %11%
+ \ganttbar{}{9}{9}                   %12%
+ \ganttbar{}{12}{12}                   %13%
+ \ganttbar{}{15}{15}                   %14%
+ \ganttbar{}{18}{18}                   %15%
 
 \\
  
- \ganttbar{Results Gathering}{21}{22}  %16%
+ \ganttbar{Results Gathering}{19}{19}  %16%
  \\
- \ganttbar{Results Processing}{22}{23} %17%
+ \ganttbar{Results Processing}{19}{20} %17%
  \\  
  
- \ganttbar{Final Report}{24}{30} \\    %18
- \ganttbar{Presentation}{28}{29}       %19
+ \ganttbar{Final Report}{21}{25} \\    %18
+ \ganttbar{Presentation}{21}{22}       %19
 
  \ganttlink{elem3}{elem5}
  \ganttlink{elem5}{elem11}
@@ -106,21 +110,29 @@ inline,
  \ganttlink{elem14}{elem9}
  \ganttlink{elem9}{elem15}
  \ganttlink{elem15}{elem16}
+ \ganttset{link mid=0.25}
+ \ganttlink{elem15}{elem17}
+ \ganttset{link mid=0.5}
  \ganttlink{elem17}{elem18}
- \ganttlink[link type=dr]{elem18}{elem19}
+ \ganttset{link mid=0.25}
+ \ganttlink{elem17}{elem19}
+ \ganttset{link mid=0.5}
  \ganttlink{elem1}{elem3}
 \end{ganttchart}
-
+}
+\end{figure}
 %TODO explain sections, resources used, risks/ethics
 
-\begin{thebibliography}{unsrt}
+\section*{Resources}
+For the majority of the development work I will be using my personal laptop, however as any changes will be pushed to a remote repository I will be able to work on it from any desirable workstation. This also alleviates concerns of losing work from any failure in my device. In order to complete the cuda sections of the project I will need access to a suitable graphics card. My laptop does have an NVidia graphics card, but should it prove insufficent I will have access to a remote machine to use instead. There is also possibility of extending the JIT capabilities to the ARM aarch64 architecture, in which case this will also require remote hardware.
 
-\bibitem{airfoil}
-G.R. Mudalige, I Reguly, M.B. Giles. Airfoil Example Guide
-Airfoil Example Guide, 2013
-
-\bibitem{op2-main}
-G.R. Mudalige, I. Reguly, M.B. Giles, C. Bertolli and P.H.J. Kelly. OP2: An Active Library Framework for Solving Unstructured Mesh-based Applications on Multi-Core and Many-Core Architectures. In Proceedings of Innovative Parallel Computing (InPar), 2012
-\end{thebibliography}
-
+\section*{Potential Issues}
+I do not see any potential ethical or social issues, as the project will not require the collection or storage of any personal data. 
+\bibliographystyle{plain}
+\begin{btSect}{spec}
+\section*{References}
+\btPrintCited
+\section*{Further Reading}
+\btPrintNotCited
+\end{btSect}
 \end{document}
