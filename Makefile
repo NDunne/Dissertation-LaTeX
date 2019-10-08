@@ -7,3 +7,5 @@ ProjSpec: Project_Specification.tex
 	bibtex Project_Specification1
 	pdflatex Project_Specification
 	pdflatex Project_Specification
+	pdftotext Project_Specification.pdf
+	wc -w Project_Specification.txt
