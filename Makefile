@@ -9,3 +9,6 @@ ProjSpec: Project_Specification.tex
 	pdflatex Project_Specification
 	pdftotext Project_Specification.pdf
 	wc -w Project_Specification.txt
+
+clean:
+	git clean -xdf
