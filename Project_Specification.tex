@@ -1,6 +1,6 @@
 \documentclass[11pt]{article}
 
-\usepackage[a4paper,tmargin=0.5in]{geometry}
+\usepackage[a4paper,tmargin=0.3in]{geometry}
 \usepackage{pgfgantt/pgfgantt}
 \usepackage{bibtopic}
 
@@ -13,7 +13,7 @@
 OP2 is an Embedded Domain Specific Language for solving unstructured mesh based applications. It exists to provide a level of abstraction to scientists and domain application developers, allowing utilisation of the high performance benefits of advancements in hardware, without requiring them to maintain a high level of knowledge on any new technologies and architectures. As the high-level application written using the OP2 API no longer requires any platform specific optimisations, it can be used on any platform supported by OP2; without the time and financial costs of rewritting the application with different hardware optimisations.
 \newline
 \par
-One way to improve the performance of an application such as the unstructured meshes targetted by OP2 is to use Just-In-Time (JIT) compilation, whereby performance sensitive sections of the application are re-compiled at runtime to apply additional optimisations once the parameters of execution are known. The performance gain must be sufficient to offset the extra time taken to recompile in order for this technique to be effective. There is exisiting work implemented already for some JIT optimisations, however there is still space for further performance gain. The aim of this project is to implement additional optimisations in this area, such as replacing library functions and other slow operations with constants where possible, hard coding loop bounds, and applying loop fission/fusion at runtime.
+One way to improve the performance of an application such as the unstructured meshes targetted by OP2 is to use Just-In-Time (JIT) compilation, whereby performance sensitive sections of the application are re-compiled at runtime to apply additional optimisations once the parameters of execution are known. The performance gain must be sufficient to offset the extra time taken to recompile in order for this technique to be effective. There is exisiting work implemented already for some JIT optimisations, however there is still space for further performance gain through further parallisation by targetting GPU architecture. This will require generation of cuda intrinsics at runtime. The aim of this project is to implement additional optimisations in this area, such as replacing library functions and other slow operations with constants where possible, hard coding loop bounds, and applying loop fission/fusion at runtime.
 \newline
 \par
 There are a number of High Performance Computing applications already written in the OP2 api, from smaller example projects to production applications. Since the API itself will not be altered, it will be easy to apply my additions to the OP2 translator, and determine whether there is performance benefit.
@@ -30,8 +30,10 @@ There are a number of High Performance Computing applications already written in
 \section*{Methods}
 \subsection*{Research}
 In order to contribute to the OP2 project, I will first read a number of papers on the op-dsl homepage to gain an understanding of the purpose and implementation of the existing work, and ensure I am able to provide useful addition to the project. Some of the papers suggested are listed in the Further Reading section. Also, In order to increase my familiarity with the exisiting work I will initially be reproducing the exisiting sequential JIT work. This should put me in a comfortable position to begin contributing to the project.
+Also, as the content of my addition will require good knowledge of the cuda toolkit for GPUs, I will spend some time improving my familiarity with cuda.
 \subsection*{Implementation}
-The implementation will be divided into four rounds of development. Each round will be followed by some detailed testing and analysis of the work completed, which will determine if the next round will be further work on the same optimisation, or beginning to implement a further optimisation. I have selected this process as I am as yet unsure of the complexity of what I intend to implement.
+The implementation of GPU optimisations will require modification so that code is regenerated, probably by OP2's Python generator, then recompiling the newly generated code before it is executed.\par
+The allocated time for this stage will be divided into four rounds of development. Each round will be followed by some detailed testing and analysis of the work completed, which will determine if the next round will be further work on the same optimisation, or beginning to implement a further optimisation. I have selected this process as I am as yet unsure of the complexity of what I intend to implement.
 \subsubsection*{Version Control}
 The OP2 project is Open Source, and hosted on github\cite{github}, so I will work on a branch of the remote repository. Hopefully the completed work will be merged once it is complete.
 \subsection*{Benchmarking}
@@ -121,14 +123,14 @@ inline,
 \end{ganttchart}
 }
 \end{figure}
-%TODO explain sections, resources used, risks/ethics
 
 \section*{Resources}
 For the majority of the development work I will be using my personal laptop, however as any changes will be pushed to a remote repository I will be able to work on it from any desirable workstation. This also alleviates concerns of losing work from any failure in my device. In order to complete the cuda sections of the project I will need access to a suitable graphics card. My laptop does have an NVidia graphics card, but should it prove insufficent I will have access to a remote machine to use instead. There is also possibility of extending the JIT capabilities to the ARM aarch64 architecture, in which case this will also require remote hardware.
 
 \section*{Potential Issues}
-I do not see any potential ethical or social issues, as the project will not require the collection or storage of any personal data. 
+I do not see any potential ethical or social issues, as the project will not require the collection or storage of any personal data. There is however a legal consideration of the lisence under which the open source project is held. The 2-Clause BSD license permits redistribution of source and binary, as long as it contains the copyright disclaimer, so I will ensure to uphold this requirement. 
 \bibliographystyle{plain}
+\clearpage
 \begin{btSect}{spec}
 \section*{References}
 \btPrintCited
