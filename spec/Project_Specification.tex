@@ -1,10 +1,17 @@
 \documentclass[11pt]{article}
 
-\usepackage[a4paper,tmargin=0.3in]{geometry}
-\usepackage{pgfgantt/pgfgantt}
+\usepackage{arxiv}
+
+%\usepackage[a4paper,tmargin=0.3in]{geometry}
+\usepackage{pgfgantt}
 \usepackage{bibtopic}
 
-\title{Extending just-in-time compilation for OP2}
+\usepackage{setspace}
+
+\renewcommand{\baselinestretch}{1.333}
+
+\title{Extending Just-in-Time Compilation for OP2}
+ 
 \author{Nathan Dunne - u1604486}
 
 \begin{document}
@@ -27,6 +34,7 @@ There are a number of High Performance Computing applications already written in
 \end{itemize}  
 \item{To benchmark the performance of existing OP2 applications with and without the additions, and determine whether it provides benefit.}
  \end{itemize}
+
 \section*{Methods}
 \subsection*{Research}
 In order to contribute to the OP2 project, I will first read a number of papers on the op-dsl homepage to gain an understanding of the purpose and implementation of the existing work, and ensure I am able to provide useful addition to the project. Some of the papers suggested are listed in the Further Reading section. Also, In order to increase my familiarity with the exisiting work I will initially be reproducing the exisiting sequential JIT work. This should put me in a comfortable position to begin contributing to the project.
@@ -50,7 +58,7 @@ The timetable for the project is described below. The sections above have been d
 \centering
 \makebox[0pt]{
 \begin{ganttchart}[
-expand chart=1.3\textwidth,
+expand chart=1.22\textwidth,
 vgrid={*3{white},*1{dotted}, *{14}{white}, *1{dotted}, *1{white}, *1{dotted}, *5{white}},
 hgrid=true,
 y unit chart=0.8cm,
