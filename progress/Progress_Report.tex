@@ -60,10 +60,168 @@ The code generator can then loop through the kernels, and generate a function to
 
 \subsection*{Implementation}
 At time of writing the implementation of cuda JIT code generation has just started. The op2.py script has been modified to call a cuda\_jit code generation file, and added to the makefile of airfoil to include an airfoil\_cuda\_jit entry, however the codegeneration itself is still sequential. To complete the cuda JIT implentation I will use the AoT cuda implementation as a guide to speed up the process.
+
 \section*{Timetable}
+\newcommand\w{25}
+\begin{figure}[h!]
+\centering
+\makebox[0pt]{
+\begin{ganttchart}[
+expand chart=1.22\textwidth,
+vgrid={*3{white},*1{dotted}, *{14}{white}, *1{dotted}, *1{white}, *1{dotted}, *5{white}},
+hgrid=true,
+y unit chart=0.8cm,
+inline,
+today=6,
+today label=Expected Progress,
+today label font=\itshape,
+]{0}{\w}
 
-\section*{Plan}
+ \gantttitle{Timeline}{26} \\
+ \gantttitlelist{0,...,\w}{1} \\
 
+ \ganttgroup{Research}{1}{3} \\ %0%
+ 
+ \ganttset{inline=false}
+ \ganttbar{Read Papers}{1}{2}          %1%
+ \ganttset{inline=true}
+
+ \ganttgroup{Implementation}{4}{18} \\ %2%
+
+ \ganttset{inline=false}
+ \ganttbar{Familiarity Work}{2}{3}     %3%
+ \ganttset{inline=true}
+
+ \ganttgroup{Benchmarking}{19}{20} \\  %4%
+
+ \ganttset{inline=false} 
+ \ganttbar{Feature Development}{4}{5}  %5%
+ \ganttbar{} {7}{8}                   %6%
+ \ganttbar{} {10}{11}                  %7%
+ \ganttbar{} {13}{14}                  %8%
+ \ganttbar{} {16}{17}                  %9%
+ \ganttset{inline=true}
+ \ganttgroup{Documentation}{21}{25} \\ %10%
+
+ \ganttset{inline=false} 
+
+ \ganttbar{Feature Testing}{6}{6}      %11%
+ \ganttbar{}{9}{9}                   %12%
+ \ganttbar{}{12}{12}                   %13%
+ \ganttbar{}{15}{15}                   %14%
+ \ganttbar{}{18}{18}                   %15%
+
+\\
+ 
+ \ganttbar{Results Gathering}{19}{19}  %16%
+ \\
+ \ganttbar{Results Processing}{19}{20} %17%
+ \\  
+ 
+ \ganttbar{Final Report}{21}{25} \\    %18
+ \ganttbar{Presentation}{21}{22}       %19
+
+ \ganttlink{elem3}{elem5}
+ \ganttlink{elem5}{elem11}
+ \ganttlink{elem11}{elem6}
+ \ganttlink{elem6}{elem12}
+ \ganttlink{elem12}{elem7}
+ \ganttlink{elem7}{elem13}
+ \ganttlink{elem13}{elem8}
+ \ganttlink{elem8}{elem14}
+ \ganttlink{elem14}{elem9}
+ \ganttlink{elem9}{elem15}
+ \ganttlink{elem15}{elem16}
+ \ganttset{link mid=0.25}
+ \ganttlink{elem15}{elem17}
+ \ganttset{link mid=0.5}
+ \ganttlink{elem17}{elem18}
+ \ganttset{link mid=0.25}
+ \ganttlink{elem17}{elem19}
+ \ganttset{link mid=0.5}
+ \ganttlink{elem1}{elem3}
+\end{ganttchart}
+}
+\caption{Original Timetable}
+\label{fig:orig}
+\end{figure}
+The timetable from the project specification (Figure \ref{fig:orig}) shows the expected level of progress at this stage. It is clear that the project has not run quite to time. While I am still confident that the cuda JIT code generation can be done by the end of the 8th week of the project, implementations of 2 weeks simply doesn't provide sufficient time to produce something work benchmarking. Therefore, I have reworked the timetable to three iterations of four weeks implementation and one testing, rather than five rounds of 3 week blocks (Figure \ref{fig:new}).
+\par As well as aligning with the end of the Autumn term, this also allows for two more weeks development of time overall.
+
+\begin{figure}[h!]
+\centering
+\makebox[0pt]{
+\begin{ganttchart}[
+expand chart=1.22\textwidth,
+vgrid={*3{white},*1{dotted}, *{14}{white}, *1{dotted}, *1{white}, *1{dotted}, *5{white}},
+hgrid=true,
+y unit chart=0.8cm,
+inline,
+today=6,
+today label=Expected Progress,
+today label font=\itshape,
+]{0}{\w}
+
+ \gantttitle{Timeline}{26} \\
+ \gantttitlelist{0,...,\w}{1} \\
+
+ \ganttgroup{Research}{1}{3} \\ %0%
+ 
+ \ganttset{inline=false}
+ \ganttbar{Read Papers}{1}{2}          %1%
+ \ganttset{inline=true}
+
+ \ganttgroup{Implementation}{4}{18} \\ %2%
+
+ \ganttset{inline=false}
+ \ganttbar{Familiarity Work}{2}{3}     %3%
+ \ganttset{inline=true}
+
+ \ganttgroup{Benchmarking}{19}{20} \\  %4%
+
+ \ganttset{inline=false} 
+ \ganttbar{Feature Development}{4}{7}  %5%
+ \ganttbar{} {9}{12}                   %6%
+ \ganttbar{} {14}{17}                  %7%
+ \ganttset{inline=true}
+ \ganttgroup{Documentation}{21}{25} \\ %8%
+
+ \ganttset{inline=false} 
+
+ \ganttbar{Feature Testing}{8}{8}      %9%
+ \ganttbar{}{13}{13}                   %10%
+ \ganttbar{}{18}{18}                   %11%
+
+\\
+ 
+ \ganttbar{Results Gathering}{19}{19}  %12%
+ \\
+ \ganttbar{Results Processing}{19}{20} %13%
+ \\  
+ 
+ \ganttbar{Final Report}{21}{25} \\    %14
+ \ganttbar{Presentation}{21}{22}       %15
+
+ \ganttlink{elem1}{elem3}
+ \ganttlink{elem3}{elem5}
+ \ganttlink{elem5}{elem9}
+ \ganttlink{elem9}{elem6}
+ \ganttlink{elem6}{elem10}
+ \ganttlink{elem10}{elem7}
+ \ganttlink{elem7}{elem11}
+ \ganttlink{elem11}{elem12}
+ \ganttset{link mid=0.25}
+ \ganttlink{elem11}{elem13}
+ \ganttset{link mid=0.5}
+ \ganttlink{elem13}{elem14}
+ \ganttset{link mid=0.25}
+ \ganttlink{elem13}{elem15}
+ \ganttset{link mid=0.5}
+\end{ganttchart}
+}
+\caption{Modified Timetable}
+\label{fig:new}
+\end{figure}
 \section*{Reflection}
 
 \section*{Ethics}

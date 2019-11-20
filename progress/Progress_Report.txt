@@ -97,12 +97,160 @@ however the codegeneration itself is still sequential. To complete the cuda JIT 
 implementation as a guide to speed up the process.
 
 Timetable
-Plan
+The timetable from the project specification (Figure 1) shows the expected level of progress at this stage. It is clear
+that the project has not run quite to time. While I am still confident that the cuda JIT code generation can be done
+by the end of the 8th week of the project, implementations of 2 weeks simply doesn’t provide sufficient time to
+produce something work benchmarking. Therefore, I have reworked the timetable to three iterations of four weeks
+implementation and one testing, rather than five rounds of 3 week blocks (Figure 2).
+As well as aligning with the end of the Autumn term, this also allows for two more weeks development of time overall.
+
 Reflection
 Ethics
 Project Management
 
 3
+
+Extending Just-in-Time Compilation for OP2
+
+CS310
+
+Timeline
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+10
+
+11
+
+12
+
+13
+
+14
+
+15
+
+16
+
+17
+
+18
+
+19
+
+20
+
+21
+
+22
+
+23
+
+24
+
+25
+
+Research
+Implementation
+Read Papers
+Benchmarking
+Familiarity Work
+Documentation
+Feature Development
+Feature Testing
+Results Gathering
+Results Processing
+Final Report
+Presentation
+Expected Progress
+Figure 1: Original Timetable
+
+Timeline
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+10
+
+11
+
+12
+
+13
+
+14
+
+15
+
+16
+
+17
+
+18
+
+19
+
+20
+
+21
+
+22
+
+23
+
+24
+
+25
+
+Research
+Implementation
+Read Papers
+Benchmarking
+Familiarity Work
+Documentation
+Feature Development
+Feature Testing
+Results Gathering
+Results Processing
+Final Report
+Presentation
+Expected Progress
+Figure 2: Modified Timetable
+
+4
 
 Extending Just-in-Time Compilation for OP2
 
@@ -112,7 +260,7 @@ References
 *
 Further Reading
 
-4
+5
 
 CS310
 
