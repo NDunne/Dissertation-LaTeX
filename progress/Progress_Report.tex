@@ -1,20 +1,49 @@
 \documentclass[11pt]{article}
 
-\usepackage[a4paper,tmargin=0.3in]{geometry}
-\usepackage{pgfgantt}
-\usepackage{bibtopic}
+\usepackage{../styles/arxiv}
 
-\title{Extending just-in-time compilation for OP2}
+\usepackage{../styles/pgfgantt}
+\usepackage{../styles/bibtopic}
+
+\usepackage{setspace}
+
+\renewcommand{\baselinestretch}{1.333}
+
+\newcommand{\undertitle}{Progress Report}
+
+\title{Extending Just-in-Time Compilation for OP2}
+
 \author{Nathan Dunne - u1604486}
 
 \begin{document}
 \maketitle
+
+\section*{Introduction}
+The aim of this project is to contribute to the OP2 open-source project, an Embedded Domain Specific Langauge for describing unstructed mesh based applications. It provides an abstraction from the hardware to allow hardware specific performance benefits, such as SIMD vectorisation and GPU high levels of parallelism, to be gained without the programmer needing to understand the latest implementations, as well as allowing portability between different systems.
+\par Specifically, there is space for greater performance to be gained through the use of Just-In-Time compilation: re-compiling the source code at run-time once the parameters are known, to allow expensive operations to be replaced with static constants where possible. The sequential implementation has already been done, so the primary goal is to target the NVida GPU architecture using cuda, attempting to reach a performance improvement over Ahead-of-Time compiled cuda generation.
+\par Since the OP2 API is in use, and the API itself will not be modified by the project, existing applications can be used to benchmark performance.
+\subsection*{Motivations}
+The motivations behind this project are a desire to use and expand on knowledge of optimisations and high-performance computing gained in the second year \textit{Advanced Computer Architecture} module, as well as an interest in compilers and code generation. It will also be personally beneficial to gain experience contributing to a real open-source project, with an existing code bae to deal with. It is gratifying to know that if the project is completed to a high standard, it could be merged into the master branch and used beyond the submission for a module.
+\section*{Research}
+
+\section*{Technical Content}
+
+\section*{Timetable}
+
+\section*{Plan}
+
+\section*{Reflection}
+
+\section*{Ethics}
+
+\section*{Project Management}
+
 \bibliographystyle{plain}
 \clearpage
 \begin{btSect}{progress}
-\section*{References}
+\section**{References}
 \btPrintCited
-\section*{Further Reading}
+\section**{Further Reading}
 \btPrintNotCited
 \end{btSect}
 \end{document}

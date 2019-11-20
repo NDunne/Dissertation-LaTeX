@@ -1,0 +1,51 @@
+E XTENDING J UST- IN -T IME C OMPILATION FOR OP2
+P ROGRESS R EPORT
+Nathan Dunne - u1604486
+
+Introduction
+
+The aim of this project is to contribute to the OP2 open-source project, an Embedded Domain Specific Langauge
+for describing unstructed mesh based applications. It provides an abstraction from the hardware to allow hardware
+specific performance benefits, such as SIMD vectorisation and GPU high levels of parallelism, to be gained without
+the programmer needing to understand the latest implementations, as well as allowing portability between different
+systems.
+Specifically, there is space for greater performance to be gained through the use of Just-In-Time compilation: recompiling the source code at run-time once the parameters are known, to allow expensive operations to be replaced
+with static constants where possible. The sequential implementation has already been done, so the primary goal is to
+target the NVida GPU architecture using cuda, attempting to reach a performance improvement over Ahead-of-Time
+compiled cuda generation.
+Since the OP2 API is in use, and the API itself will not be modified by the project, existing applications can be used
+to benchmark performance.
+
+Motivations
+
+The motivations behind this project are a desire to use and expand on knowledge of optimisations and highperformance computing gained in the second year Advanced Computer Architecture module, as well as an interest
+in compilers and code generation. It will also be personally beneficial to gain experience contributing to a real opensource project, with an existing code bae to deal with. It is gratifying to know that if the project is completed to a high
+standard, it could be merged into the master branch and used beyond the submission for a module.
+
+Extending Just-in-Time Compilation for OP2
+
+Research
+Technical Content
+Timetable
+Plan
+Reflection
+Ethics
+Project Management
+
+2
+
+CS310
+
+Extending Just-in-Time Compilation for OP2
+
+*
+References
+
+*
+Further Reading
+
+3
+
+CS310
+
+

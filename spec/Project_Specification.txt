@@ -1,6 +1,6 @@
 E XTENDING J UST- IN -T IME C OMPILATION FOR OP2
+P ROJECT S PECIFICATION
 Nathan Dunne - u1604486
-October 9, 2019
 
 Problem Statement
 OP2 is an Embedded Domain Specific Language for solving unstructured mesh based applications. It exists to provide
