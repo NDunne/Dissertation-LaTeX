@@ -3,58 +3,62 @@ P ROGRESS R EPORT
 Nathan Dunne - u1604486
 
 Introduction
-The aim of this project is to contribute to the OP2 open-source project, an Embedded Domain Specific Langauge
-for describing unstructured mesh based applications. It provides an abstraction from the hardware to allow hardware
-specific performance benefits, such as SIMD vectorisation and GPU high levels of parallelism, to be gained without
-the programmer needing to understand the latest implementations, as well as allowing portability between different
-systems. The API has the added benefit of only having to update OP2 to include support for the newest hardware
-optimisations, and all applications written using it will be able to benefit.
+The aim of this project is to contribute to the OP2 open-source project[2], an Embedded Domain Specific Langauge
+for developing unstructured mesh based applications. It provides a programmer access to greater performace using an
+abstraction from hardware specific optimisations, OP2 also provides the further benefit of allowing portability between
+different platforms, allowing all programs written using the API to utilise the latest hardware generation by simply
+updating the OP2 code generation.
 On top of the existing work, there is space for greater performance to be gained through the use of Just-In-Time
-compilation: re-compiling the source code at run-time once the parameters are known, to allow expensive operations
-to be replaced with static constants where possible. This can provide significant benefit, especially over a large
-number of iterations as a small improvement can compound to better offset the one-time cost of the re-compilation.
-The sequential implementation has already been done, so the primary goal is to target the NVida GPU architecture
-using cuda, attempting to reach a performance improvement over Ahead-of-Time compiled cuda generation.
-Since the OP2 API is in use, and the API itself will not be modified by the project, existing applications can be used
-to benchmark performance. Primarily this will be airfoil, an industrially representative computational fluid dynamics
-(CFD) program.
+(JIT) compilation: re-compiling the source code at run-time once the inputs are known, to allow expensive repeated
+operations to be replaced with static constants where possible, expanding the ability of the compiler to optimise
+through constant propogation and other methods. This can provide significant benefit, especially over a large number
+of iterations as a small improvement per-iteration can compound to better offset the one-time cost of the re-compilation.
+The inputs to the program will be the description of the unstructured mesh as an input file, which is read at runtime.
+Since this information is not known to the compiler ahead of time, it is only possible to optimise based on this
+information ”Just In Time”, or immediately before execution.
+The sequential JIT code generator has already been completed, so the primary goal is to target the NVIDIA GPU
+architecture using CUDA, attempting to reach a performance improvement over Ahead-of-Time compiled CUDA
+generation. Since the OP2 API itself will not be modified by the project, existing applications can be used to benchmark performance. Primarily this will be Airfoil [8], an industrially representative computational fluid dynamics
+(CFD) program, and later VOLNA[7], a non-linear shallow water equation solver. Both use the C OP2 API.
 Motivations
 The motivations behind this project are a desire to use and expand on knowledge of optimisations and highperformance computing gained in the second year Advanced Computer Architecture module, as well as an interest
-in compilers and code generation. It will also be personally beneficial to gain experience contributing to a real opensource project, with an existing code bae to deal with. It is gratifying to know that if the project is completed to a high
-standard, it could be merged into the master branch and used beyond the submission for a module.
-
-Research
-In order to begin contributing to the OP2 I needed to build an understanding of the existing work. There are 2 main
-sources for this information:
-• Papers publish on the OP2 website
-• Analysis of existing source code
-While academic papers are useful to understand the context of the project and the motivations behind it; the existing
-code gives a more concrete understanding of the implementation, and the form my contributions will take. Under-
+in compilers and code generation. It will also be personally beneficial to gain experience contributing to a real opensource project, with an existing code base to deal with. It is gratifying to know that if the project is completed to a
+high standard, it could be merged into the master branch and used beyond the submission for a module.
+The decision to target GPUs is as a result of the increased need for parallelism in high performance computing systems
+and applications. GPUs are in nature aimed at graphics processing, which requires many operations to be performed
+in parallel, but similarly many HPC programs (including unstructed mesh apps like CFD programs) can benefit from
+this architecture now that they are capable of double precision.
 
 Extending Just-in-Time Compilation for OP2
 
 CS310
 
-standing the basic structure of an OP2 program, where data is divided into sets and mappings between them - and
-loops can be defined as a seperate ”kernel” of operations, is critical to making a useful contribution.
-There is a significant amount of literature already on performance engineering for GPUs, so it will mostly be a case of
-implementing the theory rather than investigating the possibility of performance benefit from further parallelism. The
-case for Just-In-Time compilation is made by its applications for performance from Java to LLVM.
+Research
+In order to begin contributing to the OP2 source, I needed to build an understanding of the existing work. There are 2
+main sources for this information:
+• Papers publish on the OP2 website
+• Analysis and Benchmarking of existing source code
+While academic papers are useful to understand the context of the project and the motivations behind it [6] [5] [9];
+the existing code gives a more concrete understanding of the implementation, and the form my contributions will take.
+Understanding the basic structure of an OP2 program, where data is divided into sets and mappings between them and loops can be defined as a seperate ”kernel” of operations, is critical to making a useful contribution.
 
 Technical Content
 As well as the research above, the following work has been completed so far.
-Prerequisites
-OP2 utilises two well established parallel mesh partitioning libraries: ParMetis and PT-Scotch. As I intend to work
-mainly on my personal laptop, a version of each had to be retrieved and built with the correct build arguments. The
-work with cuda also required the NVidia toolkit and drivers for the Nvidia MX250 card I have available. Finally, the
-airfoil example application makes use of HDF5 file I/O operations, so a build of that library was required as well.
+Prerequisites and Tools
+OP2 utilises two well established parallel mesh partitioning libraries: ParMetis[3] and PT-Scotch[4]. As I intend to
+work mainly on my personal laptop, a version of each had to be retrieved and built with the correct build arguments.
+The work with CUDA also required the CUDA Software Development Kit[1], and drivers for the Nvidia MX250 card
+I have available. Finally, the airfoil example application makes use of HDF5 file I/O operations, so a build of that
+library was required as well.
+The project is hosted on GitHub, with a branch created to manage my contributions. This will allow me some saftey
+in the case of
 CUDA familiarity
-Since the cuda c++ api is not something I have used before, I experimented with writing small programs to run on a
-gpu, as well as referencing the Nvidia CUDA C Programming Guide to build my Understanding. Knowledge of how
-cuda programs can solve common problems in parallelism, such as local and global shared memory, and the use of
+Since the CUDA c++ API is not something I have used before, I experimented with writing small programs to run on
+a gpu, as well as referencing the Nvidia CUDA C Programming Guide to build my Understanding. Knowledge of how
+CUDA programs can solve common problems in parallelism, such as local and global shared memory, and the use of
 syncthreads() will undoubtably be necessary to complete this project.
 Hardware Resource
-The graphics card in my personal laptop is sufficent to execute the generated cuda code, and ensure correctness, however the system will be too noisy to gather representative benchmarks. To this end, I applied for and have been granted
+The graphics card in my personal laptop is sufficent to execute the generated CUDA code, and ensure correctness, however the system will be too noisy to gather representative benchmarks. To this end, I applied for and have been granted
 access to the Orac Hight Performance Computing node in the department, which will be used only for benchmarking.
 Existing code familiarity
 The existing JIT work was done in the branch lazy-execution of the Git repository. In order to extend this work, I’ve
@@ -62,6 +66,13 @@ rebased the branch onto the master branch in order to benefit from the many chan
 diverged.
 Once this was done, I could begin to understand what the existing code does and how my code fits in. I was already
 aware that the bulk of my work will be done in the ”translator” folder, with C as the target and python as the script
+
+2
+
+Extending Just-in-Time Compilation for OP2
+
+CS310
+
 language. Starting here with the main op2.py script makes sense. This script parses the input file for API calls such
 as op decl set(), op decl const, and op par loop(); for declaring sets, constants and loops respectively. These are
 sections that will need to be replaced for a normal compiler to accept them.
@@ -70,13 +81,6 @@ important for loops, where the number of arguments and the type of each argument
 it is optional, and stored in the list of ”kernels”. In order to be valid, each kernel must also have a definition of the
 operations to perform on each iteration, which for the example application airfoil is a seperate header file of the same
 name, but this is not required.
-
-2
-
-Extending Just-in-Time Compilation for OP2
-
-CS310
-
 The original input file is then written out, with declarations for functions representin each loop with the right number
 of parameters, and in the place of the loops: calls to these function. The definitions will be generated by the code
 generation scripts.
@@ -91,24 +95,34 @@ the state of the file when the code I write is called, and the parameters that i
 The code generator can then loop through the kernels, and generate a function to call for each one based on the target
 hardware.
 Implementation
-At time of writing the implementation of cuda JIT code generation has just started. The op2.py script has been
-modified to call a cuda jit code generation file, and added to the makefile of airfoil to include an airfoil cuda jit entry,
-however the codegeneration itself is still sequential. To complete the cuda JIT implentation I will use the AoT cuda
-implementation as a guide to speed up the process.
+At time of writing the implementation of CUDA JIT code generation has just started. The op2.py script has been
+modified to call a CUDA jit code generation file, and added to the makefile of airfoil to include an airfoil CUDA jit
+entry, however the codegeneration itself is still sequential. To complete the CUDA JIT implentation I will use the AoT
+CUDA implementation as a guide to speed up the process. The work is available in my feature/jit branch of the remote
+repository.
 
-Timetable
-The timetable from the project specification (Figure 1) shows the expected level of progress at this stage. It is clear
-that the project has not run quite to time. While I am still confident that the cuda JIT code generation can be done
-by the end of the 8th week of the project, implementations of 2 weeks simply doesn’t provide sufficient time to
-produce something work benchmarking. Therefore, I have reworked the timetable to three iterations of four weeks
-implementation and one testing, rather than five rounds of 3 week blocks (Figure 2).
+Reflection and Project Management
+The timetable from the project specification (Figure 1) shows the expected level of progress at this stage. In retrospect,
+It is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident
+that the CUDA JIT code generation can be done by the end of the end of the autumn term as originally agreed
+with my supervisor, implementations of 2 weeks simply doesn’t provide sufficient time to produce something work
+benchmarking. Therefore, I have reworked the timetable with a greater allocation of time given to research, and three
+iterations of longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now
+having a greater understanding of the project, I think it unreasonable to suggest there would a feature worth spending
+a week testing and benchmarking completed every 2 weeks of development. See Figure 2.
 As well as aligning with the end of the Autumn term, this also allows for two more weeks development of time overall.
 
-Reflection
-Ethics
-Project Management
-
 3
+
+Extending Just-in-Time Compilation for OP2
+
+The timetable aside, other elements of the project haven’t provided any significant unexpected issues.
+
+Ethics
+
+4
+
+CS310
 
 Extending Just-in-Time Compilation for OP2
 
@@ -247,21 +261,43 @@ Results Gathering
 Results Processing
 Final Report
 Presentation
-Expected Progress
+Actual Progress
 Figure 2: Modified Timetable
 
-4
+5
 
 Extending Just-in-Time Compilation for OP2
 
+CS310
+
 *
 References
+[1] Cuda sdk. https://developer.nvidia.com/cuda-toolkit.
+[2] Op2-common. https://github.com/OP-DSL/OP2-Common.
+[3] Parmetis. http://glaros.dtc.umn.edu/gkhome/metis/parmetis/overview.
+[4] Pt-scotch. https://www.labri.fr/perso/pelegrin/scotch/.
+[5] I.Z. Reguly G.R. Mudalige and M.B. Giles. Auto-vectorizing a large-scale production unstructured-mesh cfd
+application, 20. https://www.oerc.ox.ac.uk/sites/default/files/uploads/profile-pages/Gihan/GRM-WPMVP.pdf.
+[6] M.B. Giles G.R. Mudalige, I. Reguly.
+Op2:
+An active library framework for solving unstructured mesh-based applications on multi-core and many-core architectures,
+20.
+https://www.oerc.ox.ac.uk/sites/default/files/uploads/profile-pages/Gihan/InPar20.pdf.
+[7] et al. Istvan Z. Reguly, Daniel Giles. The volna-op2 tsunami code, 2018.
+dev.net/11/4621/2018/gmd-11-4621-2018.pdf.
+
+https://www.geosci-model-
+
+[8] Istvan Reguly Mike Giles, Gihan Mudalige. Op2 airfoil example, 2012. https://op-dsl.github.io/docs/OP2/airfoildoc.pdf.
+[9] I.Z. Reguly et al.
+Acceleration of a full-scale industrial cfd 30 application with op2,
+https://www.oerc.ox.ac.uk/sites/default/files/uploads/profile-pages/Gihan/OP2-Hydra.pdf.
 
 *
 Further Reading
 
-5
+6
 
-CS310
+20.
 
 
