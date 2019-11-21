@@ -18,8 +18,8 @@ Since this information is not known to the compiler ahead of time, it is only po
 information ”Just In Time”, or immediately before execution.
 The sequential JIT code generator has already been completed, so the primary goal is to target the NVIDIA GPU
 architecture using CUDA, attempting to reach a performance improvement over Ahead-of-Time compiled CUDA
-generation. Since the OP2 API itself will not be modified by the project, existing applications can be used to benchmark performance. Primarily this will be Airfoil [8], an industrially representative computational fluid dynamics
-(CFD) program, and later VOLNA[7], a non-linear shallow water equation solver. Both use the C OP2 API.
+generation. Since the OP2 API itself will not be modified by the project, existing applications can be used to benchmark performance. Primarily this will be Airfoil [9], an industrially representative computational fluid dynamics
+(CFD) program, and later VOLNA[8], a non-linear shallow water equation solver. Both use the C OP2 API.
 Motivations
 The motivations behind this project are a desire to use and expand on knowledge of optimisations and highperformance computing gained in the second year Advanced Computer Architecture module, as well as an interest
 in compilers and code generation. It will also be personally beneficial to gain experience contributing to a real opensource project, with an existing code base to deal with. It is gratifying to know that if the project is completed to a
@@ -38,7 +38,7 @@ In order to begin contributing to the OP2 source, I needed to build an understan
 main sources for this information:
 • Papers publish on the OP2 website
 • Analysis and Benchmarking of existing source code
-While academic papers are useful to understand the context of the project and the motivations behind it [6] [5] [9];
+While academic papers are useful to understand the context of the project and the motivations behind it [7] [6] [10];
 the existing code gives a more concrete understanding of the implementation, and the form my contributions will take.
 Understanding the basic structure of an OP2 program, where data is divided into sets and mappings between them and loops can be defined as a seperate ”kernel” of operations, is critical to making a useful contribution.
 
@@ -104,25 +104,33 @@ repository.
 Reflection and Project Management
 The timetable from the project specification (Figure 1) shows the expected level of progress at this stage. In retrospect,
 It is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident
-that the CUDA JIT code generation can be done by the end of the end of the autumn term as originally agreed
-with my supervisor, implementations of 2 weeks simply doesn’t provide sufficient time to produce something work
-benchmarking. Therefore, I have reworked the timetable with a greater allocation of time given to research, and three
-iterations of longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now
-having a greater understanding of the project, I think it unreasonable to suggest there would a feature worth spending
-a week testing and benchmarking completed every 2 weeks of development. See Figure 2.
-As well as aligning with the end of the Autumn term, this also allows for two more weeks development of time overall.
+that the CUDA JIT code generation can be done by the end of the end of the autumn term (as originally agreed with my
+supervisor), I have reworked the timetable with a greater allocation of time given to research, and three iterations of
+longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now having a greater
+understanding of the project, I think it unreasonable to suggest there would a feature worth spending a week testing
+and benchmarking completed every 2 weeks of development. See Figure 2. As well as aligning with the end of the
+Autumn term, this also allows for two more weeks development of time overall.
 
 3
 
 Extending Just-in-Time Compilation for OP2
 
+CS310
+
+I would attribute the need for an extension to research time to taking an ad hoc approach to working on the project,
+which has resulted in not putting as much time in as I had planned, instead focussing on closer deadlines. As such I
+have decided that for next term I will set a weekly timetable of allocated time to work on the project.
 The timetable aside, other elements of the project haven’t provided any significant unexpected issues.
 
-Ethics
+Ethics and Risks
+As mentioned in the Project Specification, there are no obvious social or ethical issues with the project, as it will
+not require the collection or storage of any personal data. It is important to consider the lisence under which the
+open source project is held, which permits redistribution of the source and binary, as long as it contains the copyright
+disclaimer.
+I am also now aware of the Acceptable Use Policy[5] for the computing facilities provided bt the SCRTP, so I will also
+ensure to abide by this when benchmarking using Orac.
 
 4
-
-CS310
 
 Extending Just-in-Time Compilation for OP2
 
@@ -270,34 +278,28 @@ Figure 2: Modified Timetable
 
 CS310
 
-*
 References
 [1] Cuda sdk. https://developer.nvidia.com/cuda-toolkit.
 [2] Op2-common. https://github.com/OP-DSL/OP2-Common.
 [3] Parmetis. http://glaros.dtc.umn.edu/gkhome/metis/parmetis/overview.
 [4] Pt-scotch. https://www.labri.fr/perso/pelegrin/scotch/.
-[5] I.Z. Reguly G.R. Mudalige and M.B. Giles. Auto-vectorizing a large-scale production unstructured-mesh cfd
+[5] Scientific computing rtp acceptable use policy. https://warwick.ac.uk/research/rtp/sc/policies/aup.
+[6] I.Z. Reguly G.R. Mudalige and M.B. Giles. Auto-vectorizing a large-scale production unstructured-mesh cfd
 application, 20. https://www.oerc.ox.ac.uk/sites/default/files/uploads/profile-pages/Gihan/GRM-WPMVP.pdf.
-[6] M.B. Giles G.R. Mudalige, I. Reguly.
+[7] M.B. Giles G.R. Mudalige, I. Reguly.
 Op2:
-An active library framework for solving unstructured mesh-based applications on multi-core and many-core architectures,
-20.
+An active library framework for solving unstructured mesh-based applications on multi-core and many-core architectures, 20.
 https://www.oerc.ox.ac.uk/sites/default/files/uploads/profile-pages/Gihan/InPar20.pdf.
-[7] et al. Istvan Z. Reguly, Daniel Giles. The volna-op2 tsunami code, 2018.
+[8] et al. Istvan Z. Reguly, Daniel Giles. The volna-op2 tsunami code, 2018.
 dev.net/11/4621/2018/gmd-11-4621-2018.pdf.
 
 https://www.geosci-model-
 
-[8] Istvan Reguly Mike Giles, Gihan Mudalige. Op2 airfoil example, 2012. https://op-dsl.github.io/docs/OP2/airfoildoc.pdf.
-[9] I.Z. Reguly et al.
-Acceleration of a full-scale industrial cfd 30 application with op2,
+[9] Istvan Reguly Mike Giles, Gihan Mudalige. Op2 airfoil example, 2012. https://op-dsl.github.io/docs/OP2/airfoildoc.pdf.
+[10] I.Z. Reguly et al.
+Acceleration of a full-scale industrial cfd 30 application with op2, 20.
 https://www.oerc.ox.ac.uk/sites/default/files/uploads/profile-pages/Gihan/OP2-Hydra.pdf.
 
-*
-Further Reading
-
 6
-
-20.
 
 

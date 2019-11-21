@@ -64,9 +64,14 @@ The code generator can then loop through the kernels, and generate a function to
 At time of writing the implementation of CUDA JIT code generation has just started. The op2.py script has been modified to call a CUDA\_jit code generation file, and added to the makefile of airfoil to include an airfoil\_CUDA\_jit entry, however the codegeneration itself is still sequential. To complete the CUDA JIT implentation I will use the AoT CUDA implementation as a guide to speed up the process. The work is available in my \textit{feature/jit} branch of the remote repository.
 
 \section*{Reflection and Project Management}
-The timetable from the project specification (Figure \ref{fig:orig}) shows the expected level of progress at this stage. In retrospect, It is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident that the CUDA JIT code generation can be done by the end of the end of the autumn term as originally agreed with my supervisor, implementations of 2 weeks simply doesn't provide sufficient time to produce something work benchmarking. Therefore, I have reworked the timetable with a greater allocation of time given to research, and three iterations of longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now having a greater understanding of the project, I think it unreasonable to suggest there would a feature worth spending a week testing and benchmarking completed every 2 weeks of development. See Figure \ref{fig:new}.
-\par As well as aligning with the end of the Autumn term, this also allows for two more weeks development of time overall.
+The timetable from the project specification (Figure \ref{fig:orig}) shows the expected level of progress at this stage. In retrospect, It is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident that the CUDA JIT code generation can be done by the end of the end of the autumn term (as originally agreed with my supervisor), I have reworked the timetable with a greater allocation of time given to research, and three iterations of longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now having a greater understanding of the project, I think it unreasonable to suggest there would a feature worth spending a week testing and benchmarking completed every 2 weeks of development. See Figure \ref{fig:new}. As well as aligning with the end of the Autumn term, this also allows for two more weeks development of time overall.
+\par I would attribute the need for an extension to research time to taking an ad hoc approach to working on the project, which has resulted in not putting as much time in as I had planned, instead focussing on closer deadlines. As such I have decided that for next term I will set a weekly timetable of allocated time to work on the project.
 \par The timetable aside, other elements of the project haven't provided any significant unexpected issues. 
+
+\section*{Ethics and Risks}
+As mentioned in the Project Specification, there are no obvious social or ethical issues with the project, as it will not require the collection or storage of any personal data. It is important to consider the lisence under which the open source project is held, which permits redistribution of the source and binary, as long as it contains the copyright disclaimer.
+\par I am also now aware of the Acceptable Use Policy\cite{aup} for the computing facilities provided bt the SCRTP, so I will also ensure to abide by this when benchmarking using Orac.
+
 \newcommand\w{25}
 \begin{figure}[p]
 \centering
@@ -225,15 +230,14 @@ today label font=\itshape,
 \label{fig:new}
 \end{figure}
 
-\section*{Ethics}
 
 \bibliographystyle{plain}
 \clearpage
 \begin{btSect}{progress}
-\section**{References}
+\section*{References}
 \btPrintCited
-\section**{Further Reading}
-\btPrintNotCited
+%\section*{Further Reading}
+%\btPrintNotCited
 \end{btSect}
 \end{document}
 
