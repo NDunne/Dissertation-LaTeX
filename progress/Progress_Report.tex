@@ -5,6 +5,18 @@
 \usepackage{../styles/pgfgantt}
 \usepackage{../styles/bibtopic}
 
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows, fit}
+
+\tikzstyle{block} = [rectangle, draw, fill=black!10,
+  text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{file} = [rectangle, draw, fill=black!20, minimum height=2em,
+  text width=5em, text centered]
+\tikzstyle{bin} = [circle, draw, fill=black!30, minimum height=3em,
+  text width=5em, text centered, inner sep=0pt]
+
 \usepackage{setspace}
 
 \renewcommand{\baselinestretch}{1.333}
@@ -34,7 +46,54 @@ In order to begin contributing to the OP2 source, I needed to build an understan
  \item{Analysis and Benchmarking of existing source code}
 \end{itemize}
 While academic papers are useful to understand the context of the project and the motivations behind it \cite{op2main} \cite{autoVector} \cite{industrial}; the existing code gives a more concrete understanding of the implementation, and the form my contributions will take. Understanding the basic structure of an OP2 program, where data is divided into sets and mappings between them - and loops can be defined as a seperate "kernel" of operations, is critical to making a useful contribution. 
+
+
 \section*{Technical Content}
+\subsection*{Existing Work}
+It should be noted, the term "Just-In-Time Compilation" in the case of this project doesn't strictly mean the same thing it's usual definition, for example in the JVM where the intermediate representation bytecode is compiled to native machine code at run time, allowing optimisation of bytecode to take the inputs into account. In this project, the Ahead-Of-Time compiled executable issues a make command during the run of the program, so that loop functions can be generated with constants defined in the input file as a macro that can be expanded by the preprocessor. This can only be done at runtime, and should provide perfomance benefit over retrieving a value from memory.
+
+\begin{tikzpicture}[node distance=3cm, auto]
+
+  \node [file] (source) {SourceFiles};
+  \node [block, below of=source] (op2py) {CodeGen script};
+  \node [file, right of=op2py] (sourceOp) {Modified SourceFiles};
+  \node [file, above of=sourceOp] (Kernels) {Kernels};
+  \node [file, below of=sourceOp] (recKernels) {Kernels\_rec};
+  \node [block, right of=sourceOp] (aot) {AOT Compiler};
+
+  \node [bin, right of=aot] (binary) {Program Binary};
+  \node [file, above of=binary] (input) {Input Map};
+  \node [file, below of=binary] (consts) {Constants};
+  \node [block, below of=consts] (jit) {JIT Compiler};
+  \node [bin, right of= consts] (so) {Shared Object};
+  \node [block, right of=binary] (result) {Program Result};
+
+  \path [line, dashed] (source) -- (op2py);
+  \path [line, dashed] (op2py) -- (recKernels);
+  \path [line, dashed] (op2py) -- (sourceOp);
+  \path [line, dashed] (op2py) -- (Kernels);
+  \path [line, dashed] (sourceOp) -- (aot);
+  \path [line, dashed] (Kernels) -- (aot);
+  \path [line, dashed] (aot) -- (binary);
+  \path [line, dashed] (input) -- (binary);
+  \path [line, dashed] (binary) -- (consts);
+  \path [line, dashed] (recKernels) |- (jit);
+  \path [line, dashed] (consts) -- (jit);
+  \path [line, dashed] (jit) -| (so);
+  \path [line, dashed] (so) -- (binary);
+  \path [line, dashed] (binary) -- (result);
+
+  \tikzset{dotted box1/.style={draw=black!100, line width=1pt, dash pattern=on 8pt off 2pt,
+    inner sep=4mm, rectangle, rounded corners}};
+
+  \tikzset{dotted box2/.style={draw=black!70, line width=1pt, dash pattern=on 8pt off 2pt,
+    inner sep=2mm, rectangle, rounded corners}};
+
+  \node (runtime) [dotted box1, fit = (input) (jit) (result)] {};
+  \node (runtime) [dotted box2, fit = (recKernels) (so) (jit)] {};
+
+\end{tikzpicture}
+
 As well as the research above, the following work has been completed so far.
 \subsection*{Prerequisites and Tools}
 OP2 utilises two well established parallel mesh partitioning libraries: ParMetis\cite{metis} and PT-Scotch\cite{scotch}. As I intend to work mainly on my personal laptop, a version of each had to be retrieved and built with the correct build arguments. The work with CUDA also required the CUDA Software Development Kit\cite{cuda}, and drivers for the Nvidia MX250 card I have available. Finally, the airfoil example application makes use of HDF5 file I/O operations, so a build of that library was required as well. 
@@ -66,7 +125,7 @@ At time of writing the implementation of CUDA JIT code generation has just start
 \section*{Reflection and Project Management}
 The timetable from the project specification (Figure \ref{fig:orig}) shows the expected level of progress at this stage. In retrospect, It is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident that the CUDA JIT code generation can be done by the end of the end of the autumn term (as originally agreed with my supervisor), I have reworked the timetable with a greater allocation of time given to research, and three iterations of longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now having a greater understanding of the project, I think it unreasonable to suggest there would a feature worth spending a week testing and benchmarking completed every 2 weeks of development. See Figure \ref{fig:new}. As well as aligning with the end of the Autumn term, this also allows for two more weeks development of time overall.
 \par I would attribute the need for an extension to research time to taking an ad hoc approach to working on the project, which has resulted in not putting as much time in as I had planned, instead focussing on closer deadlines. As such I have decided that for next term I will set a weekly timetable of allocated time to work on the project.
-\par The timetable aside, other elements of the project haven't provided any significant unexpected issues. 
+\par The timetable aside, other elements of the project haven't provided any significant unexpected issues. All tools and libraries are functioning and compatible.
 
 \section*{Ethics and Risks}
 As mentioned in the Project Specification, there are no obvious social or ethical issues with the project, as it will not require the collection or storage of any personal data. It is important to consider the lisence under which the open source project is held, which permits redistribution of the source and binary, as long as it contains the copyright disclaimer.
