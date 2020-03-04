@@ -1,13 +1,14 @@
 E XTENDING J UST- IN -T IME C OMPILATION FOR OP2
 P ROGRESS R EPORT
-Nathan Dunne - u1604486
+Nathan Dunne - 1604486
 
 Introduction
-The aim of this project is to contribute to the OP2 open-source project[2], an Embedded Domain Specific Langauge
-for developing unstructured mesh based applications. It provides a programmer access to greater performace using
-an abstraction from hardware specific optimisations, as well as the further benefit of allowing portability between
-different platforms. This portability means that all programs written using the API will be able to utilise the latest
-hardware generation by updating only the OP2 library, a regenerating the platform specific codes.
+The aim of this project is to contribute to the Oxford Parallel library for Unstructured mesh solvers (OP2) open-source
+project[2], an Embedded Domain Specific Langauge for developing unstructured mesh based applications. It provides
+a programmer access to greater performace using an abstraction from hardware specific optimisations, as well as the
+further benefit of allowing portability between different platforms. This portability means that all programs written
+using the Application Program Interface (API) will be able to utilise the latest hardware generation by updating only
+the OP2 library, a regenerating the platform specific codes.
 On top of the existing work, there is space for greater performance to be gained through the use of Just-In-Time
 (JIT) compilation: re-compiling the source code at run-time once the inputs are known, to allow expensive repeated
 operations to be replaced with static constants where possible, expanding the ability of the compiler to optimise
@@ -16,10 +17,11 @@ of iterations as a small improvement per-iteration can compound to better offset
 The inputs to an OP2 program will usually be the description of the unstructured mesh, as a file which is read at
 runtime. Since this information is not known to the ahead-of-time compiler, it is only possible to optimise based on
 this information ”Just-In-Time”, or immediately before execution.
-The sequential JIT code generator has already been completed, so the primary goal is to target the NVIDIA GPU
-architecture using CUDA, attempting to reach a performance improvement over ahead-of-time compiled CUDA generation. Since the OP2 API itself will not be modified by the project, existing applications can be used to benchmark
-performance. Primarily this will be Airfoil [9], an small but industrially representative computational fluid dynamics
-(CFD) program, and later VOLNA[8], a non-linear shallow water equation solver. Both use the C OP2 API.
+The sequential JIT code generator has already been completed, so the primary goal is to target the NVIDIA Graphical
+Processing Unit (GPU) architecture using CUDA, attempting to reach a performance improvement over ahead-oftime compiled CUDA generation. Since the OP2 API itself will not be modified by the project, existing applications
+can be used to benchmark performance. Primarily this will be Airfoil [9], an small but industrially representative
+computational fluid dynamics (CFD) program, and later VOLNA[8], a non-linear shallow water equation solver. Both
+use the OP2 API for C.
 
 Motivations
 The motivations behind this project are a desire to use and expand on knowledge of optimisations and highperformance computing gained in the second year Advanced Computer Architecture module, as well as an interest
@@ -27,17 +29,17 @@ in compilers and code generation. It will also be personally beneficial to gain 
 high standard, it could be merged into the master branch and used beyond the submission for a module.
 The decision to target GPUs is as a result of the increased need for parallelism in high performance computing systems
 and applications. GPUs are in nature aimed at graphics processing, which requires many operations to be performed
-in parallel, but similarly many HPC programs (including unstructed mesh apps like CFD programs) can benefit from
-this architecture now that they are capable of double precision.
+in parallel, but similarly many High Performance Computing programs (including unstructed mesh apps like CFD
+programs) can benefit from this architecture now that they are capable of double precision.
 
 Extending Just-in-Time Compilation for OP2
 
 CS310
 
 Research
-In order to begin contributing to the OP2 source, I needed to build an understanding of the existing work. There are 2
-main sources for this information:
-• Papers publish on the OP2 website
+In order to begin contributing to the OP2 source, an understanding of the existing work is required. There are 2 main
+sources for this information:
+• Papers published on the OP2 website
 • Analysis and Benchmarking of existing source code
 While academic papers are useful to understand the context of the project and the motivations behind it [7] [6] [10];
 the existing code gives a more concrete understanding of the implementation, and the form my contributions will take.
@@ -45,11 +47,11 @@ Understanding the basic structure of an OP2 program, where data is divided into 
 
 Technical Content
 Prerequisites
-OP2 utilises two well established parallel mesh partitioning libraries: ParMetis[3] and PT-Scotch[4]. As I intend to
-work mainly on my personal laptop, a version of each had to be retrieved and built with the correct build arguments.
+OP2 utilises two well established parallel mesh partitioning libraries: ParMetis[3] and PT-Scotch[4]. As the intention is
+to work mainly on my personal laptop, a version of each had to be retrieved and built with the correct build arguments.
 The work with CUDA also required the CUDA Software Development Kit[1], and drivers for the Nvidia MX250 card
-I have available. Finally, the airfoil example application makes use of HDF5 file I/O operations, so a build of that
-library was required as well.
+available. Finally, the Airfoil example application makes use of HDF5 file I/O operations, so a build of that library
+was required as well.
 
 Tools
 The main tool used in development is GitHub as a remote repository. OP2 has a number of feature branches already,
@@ -60,14 +62,14 @@ resiliance to failures on my local machine, as changes can be preserved by pushi
 easier version control, and potentially further extension to my work from other contributors in the future.
 
 Existing Work
-In gaining an understanding of the previously completed sequential JIT code generation, it became clear that ”Just-InTime Compilation” in the case of this project doesn’t strictly mean the same thing it’s usual definition, for example
-in the JVM where the intermediate representation bytecode is compiled to native machine code at run time, allowing
-optimisation of bytecode to take the inputs into account. In this project, the Ahead-Of-Time compiled executable
-issues a make command during the run of the program, so that loop functions can be generated using constants which
-are supplied in the input file defined as macros that can be expanded by the compiler’s preprocessor. This can only be
-done at runtime. The regeneration of loop functions using constants should provide perfomance benefit over equivalent
-ahead of time backends, as long as the performance gain is sufficient to offset the time cost of recompiling. The process
-is shown below, with the operations unique to the JIT branch encircled.
+In gaining an understanding of the previously completed sequential JIT code generation, it became clear that ”Just-InTime Compilation” in the case of this project doesn’t strictly mean the same thing as it’s usual definition, for example
+in the Java Virtual Machine where the intermediate representation bytecode is compiled to native machine code at run
+time, allowing optimisation of bytecode to take the inputs into account. In this project, the Ahead-Of-Time compiled
+executable issues a make command during the run of the program, so that loop functions can be generated using
+constants which are supplied in the input file defined as macros that can be expanded by the compiler’s preprocessor.
+This can only be done at runtime. The regeneration of loop functions using constants should provide perfomance
+benefit over equivalent ahead of time backends, as long as the performance gain is sufficient to offset the time cost of
+recompiling. The process is shown below, with the operations unique to the JIT branch encircled.
 
 2
 
@@ -91,7 +93,8 @@ Input Map
 AOT
 Compiler
 
-Kernels rec
+Modified
+Kernels
 
 Program
 Binary
@@ -115,19 +118,19 @@ To write a new code generator script, the arguments passed to existing code gene
 3. consts: master list of declared constants in source file
 4. kernels: master list of loop kernels declared in source file
 Where consts is populated from calls to op decl const in the original source files, ensuring there are no duplicates; and
-kernels comes from calls to op par llop (also uniqued), where each parallel loop becomes a function with the required
+kernels comes from calls to op par loop (also uniqued), where each parallel loop becomes a function with the required
 number of parameters, and a function definition based on the desired backend. Each loop also requires a definition of
-what needs to be done on each iteration, which for the example application airfoil is a seperate header file of the same
+what needs to be done on each iteration, which for the example application Airfoil is a seperate header file of the same
 name, but this is not required.
 The code generator script will iterate over the list of kernels generating the required backend inside a folder for
 neatness. When the executable is built it will be linked against a backend folder to link the correct definitions for each
 parallel loop function.
 As well as the research above, the following work has been completed so far.
-CUDA familiarity
-Since the CUDA c++ API is not something I have used before, I experimented with writing small programs to run on
-a gpu, as well as referencing the Nvidia CUDA C Programming Guide to build my Understanding. Knowledge of how
-CUDA programs can solve common problems in parallelism, such as local and global shared memory, and the use of
-syncthreads() will undoubtably be necessary to complete this project.
+CUDA
+As the developer previously did not have experience using the CUDA c++ API, small programs were written to build
+familiarity, as well as referencing the Nvidia CUDA C Programming Guide. Knowledge of how CUDA programs can
+solve common problems in parallelism, such as local and global shared memory, and the use of syncthreads() will
+undoubtably be necessary to complete this project.
 
 3
 
@@ -136,18 +139,19 @@ syncthreads() will undoubtably be necessary to complete this project.
 CS310
 
 Hardware Resource
-The graphics card in my personal laptop is sufficent to execute the generated CUDA code, and ensure correctness, however the system will be too noisy to gather representative benchmarks. To this end, I applied for and have been granted
-access to the Orac Hight Performance Computing node in the department, which will be used only for benchmarking.
+The graphics card in my personal laptop is sufficent to execute the generated CUDA code, and ensure correctness,
+however the system will be too noisy to gather representative benchmarks. To this end, an application for access to the
+Orac Hight Performance Computing node in the department was granted, which will be used only for benchmarking.
 Implementation
 At time of writing the implementation of CUDA JIT code generation has just started. The op2.py script has been
-modified to call a CUDA jit code generation file, and added to the makefile of airfoil to include an airfoil CUDA jit
-entry, however the codegeneration itself is still sequential. To complete the CUDA JIT implentation I will use the AoT
-CUDA implementation as a guide to speed up the process. The work is available in my feature/jit branch of the remote
-repository.
+modified to call a CUDA jit code generation file, and added to the makefile of Airfoil to include an airfoil CUDA jit
+entry, however the codegeneration itself is still sequential. To complete the CUDA JIT implentation the AoT CUDA
+implementation will be used as a guide to speed up the process. The work is available in my feature/jit branch of the
+remote repository.
 
 Reflection and Project Management
 The timetable from the project specification (Figure 1) shows the expected level of progress at this stage. In retrospect,
-It is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident
+it is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident
 that the CUDA JIT code generation can be done by the end of the end of the autumn term (as originally agreed with
 my supervisor), I have reworked the timetable with a greater allocation of time given to research, and three iterations
 of longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now that I have a
@@ -161,7 +165,7 @@ The timetable aside, other elements of the project haven’t provided any signif
 libraries are functioning and compatible.
 Ethics and Risks
 As mentioned in the Project Specification, there are no obvious social or ethical issues with the project, as it will
-not require the collection or storage of any personal data. It is important to consider the lisence under which the
+not require the collection or storage of any personal data. It is important to consider the licence under which the
 open source project is held, which permits redistribution of the source and binary, as long as it contains the copyright
 disclaimer.
 I am also now aware of the Acceptable Use Policy[5] for the computing facilities provided bt the SCRTP, so I will also

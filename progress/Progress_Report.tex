@@ -9,13 +9,29 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows, fit}
 
-\tikzstyle{block} = [rectangle, draw, fill=black!10,
-  text width=5em, text centered, rounded corners, minimum height=4em]
+
 \tikzstyle{line} = [draw, -latex']
-\tikzstyle{file} = [rectangle, draw, fill=black!20, minimum height=2em,
-  text width=5em, text centered]
-\tikzstyle{bin} = [circle, draw, fill=black!30, minimum height=3em,
-  text width=5em, text centered, inner sep=0pt]
+
+\tikzstyle{block} = [rectangle, draw, fill=blue!10,%black!10,
+  text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{file} = [rectangle, draw, fill=blue!20,%black!20,
+  minimum height=2em, text width=5em, text centered]
+\tikzstyle{bin} = [circle, draw, fill=blue!30,%black!30,
+  minimum height=3em, text width=5em, text centered, inner sep=0pt]
+
+\tikzstyle{jblock} = [rectangle, draw, fill=red!20,%black!10,
+  text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{jfile} = [rectangle, draw, fill=red!30,%black!20,
+  minimum height=2em, text width=5em, text centered]
+\tikzstyle{jbin} = [circle, draw, fill=red!40,%black!30,
+  minimum height=3em, text width=5em, text centered, inner sep=0pt]
+
+  \tikzstyle{rblock} = [rectangle, draw, fill=green!20,%black!10,
+    text width=5em, text centered, rounded corners, minimum height=4em]
+  \tikzstyle{rfile} = [rectangle, draw, fill=green!30,%black!20,
+    minimum height=2em, text width=5em, text centered]
+  \tikzstyle{rbin} = [circle, draw, fill=green!40,%black!30,
+    minimum height=3em, text width=5em, text centered, inner sep=0pt]
 
 \usepackage{setspace}
 
@@ -25,35 +41,35 @@
 
 \title{Extending Just-in-Time Compilation for OP2}
 
-\author{Nathan Dunne - u1604486}
+\author{Nathan Dunne - 1604486}
 
 \begin{document}
 \maketitle
 
 \section*{Introduction}
-The aim of this project is to contribute to the OP2 open-source project\cite{OP2rep}, an Embedded Domain Specific Langauge for developing unstructured mesh based applications. It provides a programmer access to greater performace using an abstraction from hardware specific optimisations, as well as the further benefit of allowing portability between different platforms. This portability means that all programs written using the API will be able to utilise the latest hardware generation by updating only the OP2 library, a regenerating the platform specific codes.
-\par On top of the existing work, there is space for greater performance to be gained through the use of Just-In-Time (JIT) compilation: re-compiling the source code at run-time once the inputs are known, to allow expensive repeated operations to be replaced with static constants where possible, expanding the ability of the compiler to optimise through constant propogation and other methods. This can provide significant benefit, especially over a large number of iterations as a small improvement per-iteration can compound to better offset the one-time cost of the re-compilation. 
+The aim of this project is to contribute to the Oxford Parallel library for Unstructured mesh solvers (OP2) open-source project\cite{OP2rep}, an Embedded Domain Specific Langauge for developing unstructured mesh based applications. It provides a programmer access to greater performace using an abstraction from hardware specific optimisations, as well as the further benefit of allowing portability between different platforms. This portability means that all programs written using the Application Program Interface (API) will be able to utilise the latest hardware generation by updating only the OP2 library, a regenerating the platform specific codes.
+\par On top of the existing work, there is space for greater performance to be gained through the use of Just-In-Time (JIT) compilation: re-compiling the source code at run-time once the inputs are known, to allow expensive repeated operations to be replaced with static constants where possible, expanding the ability of the compiler to optimise through constant propogation and other methods. This can provide significant benefit, especially over a large number of iterations as a small improvement per-iteration can compound to better offset the one-time cost of the re-compilation.
 \par The inputs to an OP2 program will usually be the description of the unstructured mesh, as a file which is read at runtime. Since this information is not known to the ahead-of-time compiler, it is only possible to optimise based on this information "Just-In-Time", or immediately before execution.
-\par The sequential JIT code generator has already been completed, so the primary goal is to target the NVIDIA GPU architecture using CUDA, attempting to reach a performance improvement over ahead-of-time compiled CUDA generation. Since the OP2 API itself will not be modified by the project, existing applications can be used to benchmark performance. Primarily this will be Airfoil \cite{airfoil}, an small but industrially representative computational fluid dynamics (CFD) program, and later VOLNA\cite{volna}, a non-linear shallow water equation solver. Both use the C OP2 API.
+\par The sequential JIT code generator has already been completed, so the primary goal is to target the NVIDIA Graphical Processing Unit (GPU) architecture using CUDA, attempting to reach a performance improvement over ahead-of-time compiled CUDA generation. Since the OP2 API itself will not be modified by the project, existing applications can be used to benchmark performance. Primarily this will be Airfoil \cite{airfoil}, an small but industrially representative computational fluid dynamics (CFD) program, and later VOLNA\cite{volna}, a non-linear shallow water equation solver. Both use the OP2 API for C.
 \subsection*{Motivations}
 The motivations behind this project are a desire to use and expand on knowledge of optimisations and high-performance computing gained in the second year \textit{Advanced Computer Architecture} module, as well as an interest in compilers and code generation. It will also be personally beneficial to gain experience contributing to a real open-source project, with an existing code base to deal with. It is gratifying to know that if the project is completed to a high standard, it could be merged into the master branch and used beyond the submission for a module.
-\par The decision to target GPUs is as a result of the increased need for parallelism in high performance computing systems and applications. GPUs are in nature aimed at graphics processing, which requires many operations to be performed in parallel, but similarly many HPC programs (including unstructed mesh apps like CFD programs) can benefit from this architecture now that they are capable of double precision.
+\par The decision to target GPUs is as a result of the increased need for parallelism in high performance computing systems and applications. GPUs are in nature aimed at graphics processing, which requires many operations to be performed in parallel, but similarly many High Performance Computing programs (including unstructed mesh apps like CFD programs) can benefit from this architecture now that they are capable of double precision.
 %\clearpage
 \section*{Research}
-In order to begin contributing to the OP2 source, I needed to build an understanding of the existing work. There are 2 main sources for this information:
+In order to begin contributing to the OP2 source, an understanding of the existing work is required. There are 2 main sources for this information:
 \begin{itemize}
- \item{Papers publish on the OP2 website}
+ \item{Papers published on the OP2 website}
  \item{Analysis and Benchmarking of existing source code}
 \end{itemize}
-While academic papers are useful to understand the context of the project and the motivations behind it \cite{op2main} \cite{autoVector} \cite{industrial}; the existing code gives a more concrete understanding of the implementation, and the form my contributions will take. Understanding the basic structure of an OP2 program, where data is divided into sets and mappings between them - and loops can be defined as a seperate "kernel" of operations, is critical to making a useful contribution. 
+While academic papers are useful to understand the context of the project and the motivations behind it \cite{op2main} \cite{autoVector} \cite{industrial}; the existing code gives a more concrete understanding of the implementation, and the form my contributions will take. Understanding the basic structure of an OP2 program, where data is divided into sets and mappings between them - and loops can be defined as a seperate "kernel" of operations, is critical to making a useful contribution.
 
 \section*{Technical Content}
 \subsection*{Prerequisites}
-OP2 utilises two well established parallel mesh partitioning libraries: ParMetis\cite{metis} and PT-Scotch\cite{scotch}. As I intend to work mainly on my personal laptop, a version of each had to be retrieved and built with the correct build arguments. The work with CUDA also required the CUDA Software Development Kit\cite{cuda}, and drivers for the Nvidia MX250 card I have available. Finally, the airfoil example application makes use of HDF5 file I/O operations, so a build of that library was required as well. 
+OP2 utilises two well established parallel mesh partitioning libraries: ParMetis\cite{metis} and PT-Scotch\cite{scotch}. As the intention is to work mainly on my personal laptop, a version of each had to be retrieved and built with the correct build arguments. The work with CUDA also required the CUDA Software Development Kit\cite{cuda}, and drivers for the Nvidia MX250 card available. Finally, the Airfoil example application makes use of HDF5 file I/O operations, so a build of that library was required as well.
 \subsection*{Tools}
-The main tool used in development is GitHub as a remote repository. OP2 has a number of feature branches already, with he existing JIT work was done in the branch \textit{feature/lazy-execution} of the Git repository. In order to extend this work, I've rebased the branch onto the master branch in order to benefit from the many changes commited to master since they diverged, and created a new branch \textit{feature/jit} to track my work. Using a remote git allows for some resiliance to failures on my local machine, as changes can be preserved by pushing them to the remote. It also allows easier version control, and potentially further extension to my work from other contributors in the future. 
+The main tool used in development is GitHub as a remote repository. OP2 has a number of feature branches already, with he existing JIT work was done in the branch \textit{feature/lazy-execution} of the Git repository. In order to extend this work, I've rebased the branch onto the master branch in order to benefit from the many changes commited to master since they diverged, and created a new branch \textit{feature/jit} to track my work. Using a remote git allows for some resiliance to failures on my local machine, as changes can be preserved by pushing them to the remote. It also allows easier version control, and potentially further extension to my work from other contributors in the future.
 \subsection*{Existing Work}
- In gaining an understanding of the previously completed sequential JIT code generation, it became clear that "Just-In-Time Compilation" in the case of this project doesn't strictly mean the same thing it's usual definition, for example in the JVM where the intermediate representation bytecode is compiled to native machine code at run time, allowing optimisation of bytecode to take the inputs into account. In this project, the Ahead-Of-Time compiled executable issues a make command during the run of the program, so that loop functions can be generated using constants which are supplied in the input file defined as macros that can be expanded by the compiler's preprocessor. This can only be done at runtime. The regeneration of loop functions using constants should provide perfomance benefit over equivalent ahead of time backends, as long as the performance gain is sufficient to offset the time cost of recompiling. The process is shown below, with the operations unique to the JIT branch encircled.
+ In gaining an understanding of the previously completed sequential JIT code generation, it became clear that "Just-In-Time Compilation" in the case of this project doesn't strictly mean the same thing as it's usual definition, for example in the Java Virtual Machine where the intermediate representation bytecode is compiled to native machine code at run time, allowing optimisation of bytecode to take the inputs into account. In this project, the Ahead-Of-Time compiled executable issues a make command during the run of the program, so that loop functions can be generated using constants which are supplied in the input file defined as macros that can be expanded by the compiler's preprocessor. This can only be done at runtime. The regeneration of loop functions using constants should provide perfomance benefit over equivalent ahead of time backends, as long as the performance gain is sufficient to offset the time cost of recompiling. The process is shown below, with the operations unique to the JIT branch encircled.
 
 \begin{center}
 \begin{tikzpicture}[node distance=2.8cm, auto]
@@ -61,42 +77,42 @@ The main tool used in development is GitHub as a remote repository. OP2 has a nu
   \node [block, below of=source] (op2py) {CodeGen script};
   \node [file, right of=op2py] (sourceOp) {Modified SourceFiles};
   \node [file, above of=sourceOp] (Kernels) {Kernels};
-  \node [file, below of=sourceOp] (recKernels) {Kernels\_rec};
+  \node [jfile, below of=sourceOp] (recKernels) {Modified Kernels};
   \node [block, right of=sourceOp] (aot) {AOT Compiler};
 
-  \node [bin, right of=aot] (binary) {Program Binary};
-  \node [file, above of=binary] (input) {Input Map};
-  \node [file, below of=binary] (consts) {Constants};
-  \node [block, below of=consts] (jit) {JIT Compiler};
-  \node [bin, right of= consts] (so) {Shared Object};
-  \node [block, right of=binary] (result) {Program Result};
+  \node [rbin, right of=aot] (binary) {Program Binary};
+  \node [rfile, above of=binary] (input) {Input Map};
+  \node [jfile, below of=binary] (consts) {Constants};
+  \node [jblock, below of=consts] (jit) {JIT Compiler};
+  \node [jbin, right of= consts] (so) {Shared Object};
+  \node [rblock, right of=binary] (result) {Program Result};
 
-  \path [line, dashed] (source) -- (op2py);
-  \path [line, dashed] (op2py) -- (recKernels);
-  \path [line, dashed] (op2py) -- (sourceOp);
-  \path [line, dashed] (op2py) -- (Kernels);
-  \path [line, dashed] (sourceOp) -- (aot);
-  \path [line, dashed] (Kernels) -- (aot);
-  \path [line, dashed] (aot) -- (binary);
-  \path [line, dashed] (input) -- (binary);
-  \path [line, dashed] (binary) -- (consts);
-  \path [line, dashed] (recKernels) |- (jit);
-  \path [line, dashed] (consts) -- (jit);
-  \path [line, dashed] (jit) -| (so);
-  \path [line, dashed] (so) -- (binary);
-  \path [line, dashed] (binary) -- (result);
-
-  \tikzset{dotted box1/.style={draw=black!100, line width=1pt, dash pattern=on 8pt off 2pt,
+  \tikzset{dotted box1/.style={draw=black!100, line width=2pt, dash pattern=on 8pt off 2pt,
     inner sep=4mm, rectangle, rounded corners}};
 
-  \tikzset{dotted box2/.style={draw=black!40, line width=1pt, dash pattern=on 8pt off 2pt,
+  \tikzset{dotted box2/.style={draw=black!40, line width=2pt, dash pattern=on 8pt off 2pt,
     inner sep=2mm, rectangle, rounded corners}};
 
-  \node (runtime) [dotted box1, fit = (input) (jit) (result)] {};
-  \node (jitbox) [dotted box2, fit = (recKernels) (so) (jit)] {};
+  \node (runtime) [dotted box1, fit = (input) (result), color=green!50!black] {};
+  \node (jitbox) [dotted box2, fit = (recKernels) (so) (jit), color=red!50!black] {};
 
   \node at (runtime.north east) [below left=2mm] (rtbox) {\textbf{Runtime}};
   \node at (jitbox.south west) [above right=2mm] (corner) {\textbf{OP2 "JIT"}};
+
+  \path [line, dashed,line width=2pt, color=blue!50!black] (source) -- (op2py);
+  \path [line, line width=2pt, color=red!70!black] (op2py) -- (recKernels);
+  \path [line, line width=2pt, color=blue!50!black] (op2py) -- (sourceOp);
+  \path [line, line width=2pt, color=blue!50!black] (op2py) -- (Kernels);
+  \path [line, dashed,line width=2pt, color=blue!50!black] (sourceOp) -- (aot);
+  \path [line, dashed,line width=2pt, color=blue!50!black] (Kernels) -- (aot);
+  \path [line, line width=2pt, color=green!50!black] (aot) -- (binary);
+  \path [line, dashed,line width=2pt, color=green!50!black] (input) -- (binary);
+  \path [line, dashed,line width=2pt, color=green!50!black] (binary) -- (consts);
+  \path [line, dashed,line width=2pt, color=red!70!black] (recKernels) |- (jit);
+  \path [line, dashed,line width=2pt, color=green!50!black] (consts) -- (jit);
+  \path [line, line width=2pt, color=green!50!black] (jit) -| (so);
+  \path [line, dashed,line width=2pt, color=green!50!black] (so) -- (binary);
+  \path [line, line width=2pt, color=green!50!black] (binary) -- (result);
 
 \end{tikzpicture}
 \end{center}
@@ -107,26 +123,26 @@ The main tool used in development is GitHub as a remote repository. OP2 has a nu
 \item{consts: master list of declared constants in source file}
 \item{kernels: master list of loop kernels declared in source file}
 \end{enumerate}
-Where \textit{consts} is populated from calls to \textit{op\_decl\_const} in the original source files, ensuring there are no duplicates; and \textit{kernels} comes from calls to \textit{op\_par\_llop} (also uniqued), where each parallel loop becomes a function with the required number of parameters, and a function definition based on the desired backend. Each loop also requires a definition of what needs to be done on each iteration, which for the example application \textit{airfoil} is a seperate header file of the same name, but this is not required.
+Where \textit{consts} is populated from calls to \textit{op\_decl\_const} in the original source files, ensuring there are no duplicates; and \textit{kernels} comes from calls to \textit{op\_par\_loop} (also uniqued), where each parallel loop becomes a function with the required number of parameters, and a function definition based on the desired backend. Each loop also requires a definition of what needs to be done on each iteration, which for the example application \textit{Airfoil} is a seperate header file of the same name, but this is not required.
 \par The code generator script will iterate over the list of kernels generating the required backend inside a folder for neatness. When the executable is built it will be linked against a backend folder to link the correct definitions for each parallel loop function.
 
 As well as the research above, the following work has been completed so far.
-\subsection*{CUDA familiarity}
-Since the CUDA c++ API is not something I have used before, I experimented with writing small programs to run on a gpu, as well as referencing the \textit{Nvidia CUDA C Programming Guide} to build my Understanding. Knowledge of how CUDA programs can solve common problems in parallelism, such as local and global shared memory, and the use of \textit{syncthreads()} will undoubtably be necessary to complete this project.
+\subsection*{CUDA}
+As the developer previously did not have experience using the CUDA c++ API, small programs were written to build familiarity, as well as referencing the \textit{Nvidia CUDA C Programming Guide}. Knowledge of how CUDA programs can solve common problems in parallelism, such as local and global shared memory, and the use of \textit{syncthreads()} will undoubtably be necessary to complete this project.
 
 \subsection*{Hardware Resource}
-The graphics card in my personal laptop is sufficent to execute the generated CUDA code, and ensure correctness, however the system will be too noisy to gather representative benchmarks. To this end, I applied for and have been granted access to the Orac Hight Performance Computing node in the department, which will be used only for benchmarking.
+The graphics card in my personal laptop is sufficent to execute the generated CUDA code, and ensure correctness, however the system will be too noisy to gather representative benchmarks. To this end, an application for access to the Orac Hight Performance Computing node in the department was granted, which will be used only for benchmarking.
 
 \subsection*{Implementation}
-At time of writing the implementation of CUDA JIT code generation has just started. The op2.py script has been modified to call a CUDA\_jit code generation file, and added to the makefile of airfoil to include an airfoil\_CUDA\_jit entry, however the codegeneration itself is still sequential. To complete the CUDA JIT implentation I will use the AoT CUDA implementation as a guide to speed up the process. The work is available in my \textit{feature/jit} branch of the remote repository.
+At time of writing the implementation of CUDA JIT code generation has just started. The op2.py script has been modified to call a CUDA\_jit code generation file, and added to the makefile of Airfoil to include an airfoil\_CUDA\_jit entry, however the codegeneration itself is still sequential. To complete the CUDA JIT implentation the AoT CUDA implementation will be used as a guide to speed up the process. The work is available in my \textit{feature/jit} branch of the remote repository.
 
 \section*{Reflection and Project Management}
-The timetable from the project specification (Figure \ref{fig:orig}) shows the expected level of progress at this stage. In retrospect, It is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident that the CUDA JIT code generation can be done by the end of the end of the autumn term (as originally agreed with my supervisor), I have reworked the timetable with a greater allocation of time given to research, and three iterations of longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now that I have a greater understanding of the project, it seems unreasonable to suggest there would a feature worth spending a week testing and benchmarking completed every 2 weeks of development. See Figure \ref{fig:new}. As well as aligning with the end of the Autumn term, the modified timetable still allows for the same amount of total development time.
+The timetable from the project specification (Figure \ref{fig:orig}) shows the expected level of progress at this stage. In retrospect, it is clear that the original timetable was ambitious, as the project has not run quite to time. While I am still confident that the CUDA JIT code generation can be done by the end of the end of the autumn term (as originally agreed with my supervisor), I have reworked the timetable with a greater allocation of time given to research, and three iterations of longer implementation blocks with one week testing, rather than five rounds of 3 week blocks. Now that I have a greater understanding of the project, it seems unreasonable to suggest there would a feature worth spending a week testing and benchmarking completed every 2 weeks of development. See Figure \ref{fig:new}. As well as aligning with the end of the Autumn term, the modified timetable still allows for the same amount of total development time.
 \par I would attribute the need for an extension to research time to taking an ad hoc approach to working on the project, which has resulted in not putting as much time in as I had planned, instead focussing on closer deadlines. As such I have decided that for next term I will set a weekly timetable of allocated time to work on the project.
 \par The timetable aside, other elements of the project haven't provided any significant unexpected issues. All tools and libraries are functioning and compatible.
 
 \subsection*{Ethics and Risks}
-As mentioned in the Project Specification, there are no obvious social or ethical issues with the project, as it will not require the collection or storage of any personal data. It is important to consider the lisence under which the open source project is held, which permits redistribution of the source and binary, as long as it contains the copyright disclaimer.
+As mentioned in the Project Specification, there are no obvious social or ethical issues with the project, as it will not require the collection or storage of any personal data. It is important to consider the licence under which the open source project is held, which permits redistribution of the source and binary, as long as it contains the copyright disclaimer.
 \par I am also now aware of the Acceptable Use Policy\cite{aup} for the computing facilities provided bt the SCRTP, so I will also ensure to abide by this when benchmarking using Orac.
 
 \newcommand\w{25}
@@ -148,7 +164,7 @@ today label font=\itshape,
  \gantttitlelist{0,...,\w}{1} \\
 
  \ganttgroup{Research}{1}{3} \\ %0%
- 
+
  \ganttset{inline=false}
  \ganttbar{Read Papers}{1}{2}          %1%
  \ganttset{inline=true}
@@ -161,7 +177,7 @@ today label font=\itshape,
 
  \ganttgroup{Benchmarking}{19}{20} \\  %4%
 
- \ganttset{inline=false} 
+ \ganttset{inline=false}
  \ganttbar{Feature Development}{4}{5}  %5%
  \ganttbar{} {7}{8}                   %6%
  \ganttbar{} {10}{11}                  %7%
@@ -170,7 +186,7 @@ today label font=\itshape,
  \ganttset{inline=true}
  \ganttgroup{Documentation}{21}{25} \\ %10%
 
- \ganttset{inline=false} 
+ \ganttset{inline=false}
 
  \ganttbar{Feature Testing}{6}{6}      %11%
  \ganttbar{}{9}{9}                   %12%
@@ -179,12 +195,12 @@ today label font=\itshape,
  \ganttbar{}{18}{18}                   %15%
 
 \\
- 
+
  \ganttbar{Results Gathering}{19}{19}  %16%
  \\
  \ganttbar{Results Processing}{19}{20} %17%
- \\  
- 
+ \\
+
  \ganttbar{Final Report}{21}{25} \\    %18
  \ganttbar{Presentation}{21}{22}       %19
 
@@ -230,7 +246,7 @@ today label font=\itshape,
  \gantttitlelist{0,...,\w}{1} \\
 
  \ganttgroup{Research}{1}{5} \\ %0%
- 
+
  \ganttset{inline=false}
  \ganttbar{Read Papers}{1}{2}          %1%
  \ganttset{inline=true}
@@ -243,26 +259,26 @@ today label font=\itshape,
 
  \ganttgroup{Benchmarking}{19}{20} \\  %4%
 
- \ganttset{inline=false} 
+ \ganttset{inline=false}
  \ganttbar{Feature Development}{6}{8}  %5%
  \ganttbar{} {10}{12}                   %6%
  \ganttbar{} {14}{17}                  %7%
  \ganttset{inline=true}
  \ganttgroup{Documentation}{21}{25} \\ %8%
 
- \ganttset{inline=false} 
+ \ganttset{inline=false}
 
  \ganttbar{Feature Testing}{9}{9}      %9%
  \ganttbar{}{13}{13}                   %10%
  \ganttbar{}{18}{18}                   %11%
 
 \\
- 
+
  \ganttbar{Results Gathering}{19}{19}  %12%
  \\
  \ganttbar{Results Processing}{19}{20} %13%
- \\  
- 
+ \\
+
  \ganttbar{Final Report}{21}{25} \\    %14
  \ganttbar{Presentation}{21}{22}       %15
 
@@ -297,4 +313,3 @@ today label font=\itshape,
 %\btPrintNotCited
 \end{btSect}
 \end{document}
-
