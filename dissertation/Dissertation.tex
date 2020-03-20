@@ -1,0 +1,57 @@
+\documentclass[11pt]{article}
+
+\usepackage{../styles/arxiv}
+
+\usepackage{../styles/pgfgantt}
+\usepackage{../styles/bibtopic}
+
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows, fit}
+
+
+\tikzstyle{line} = [draw, -latex']
+
+\tikzstyle{block} = [rectangle, draw, fill=blue!10,%black!10,
+  text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{file} = [rectangle, draw, fill=blue!20,%black!20,
+  minimum height=2em, text width=5em, text centered]
+\tikzstyle{bin} = [circle, draw, fill=blue!30,%black!30,
+  minimum height=3em, text width=5em, text centered, inner sep=0pt]
+
+\tikzstyle{jblock} = [rectangle, draw, fill=red!20,%black!10,
+  text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{jfile} = [rectangle, draw, fill=red!30,%black!20,
+  minimum height=2em, text width=5em, text centered]
+\tikzstyle{jbin} = [circle, draw, fill=red!40,%black!30,
+  minimum height=3em, text width=5em, text centered, inner sep=0pt]
+
+  \tikzstyle{rblock} = [rectangle, draw, fill=green!20,%black!10,
+    text width=5em, text centered, rounded corners, minimum height=4em]
+  \tikzstyle{rfile} = [rectangle, draw, fill=green!30,%black!20,
+    minimum height=2em, text width=5em, text centered]
+  \tikzstyle{rbin} = [circle, draw, fill=green!40,%black!30,
+    minimum height=3em, text width=5em, text centered, inner sep=0pt]
+
+\usepackage{setspace}
+
+\renewcommand{\baselinestretch}{1.333}
+
+\newcommand{\undertitle}{Progress Report}
+
+\title{Extending Just-in-Time Compilation for OP2}
+
+\author{Nathan Dunne - 1604486}
+
+\begin{document}
+\maketitle
+
+\bibliographystyle{plain}
+\clearpage
+\begin{btSect}{diss}
+\section*{References}
+\btPrintCited
+%\section*{Further Reading}
+%\btPrintNotCited
+\end{btSect}`
+\end{document}
