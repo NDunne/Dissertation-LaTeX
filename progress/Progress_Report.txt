@@ -97,9 +97,6 @@ Modified
 Kernels
 
 Program
-Binary
-
-Program
 Result
 
 Constants
@@ -111,6 +108,20 @@ JIT
 Compiler
 
 OP2 ”JIT”
+Kernel
+Body
+
+Program
+Binary
+
+Kernel
+Args
+
+Kernel
+Attributes
+
+CodeGen
+script
 
 To write a new code generator script, the arguments passed to existing code generator scripts for each backend:
 1. masterFile: the name of the first file passed to op2.py
@@ -125,12 +136,6 @@ name, but this is not required.
 The code generator script will iterate over the list of kernels generating the required backend inside a folder for
 neatness. When the executable is built it will be linked against a backend folder to link the correct definitions for each
 parallel loop function.
-As well as the research above, the following work has been completed so far.
-CUDA
-As the developer previously did not have experience using the CUDA c++ API, small programs were written to build
-familiarity, as well as referencing the Nvidia CUDA C Programming Guide. Knowledge of how CUDA programs can
-solve common problems in parallelism, such as local and global shared memory, and the use of syncthreads() will
-undoubtably be necessary to complete this project.
 
 3
 
@@ -138,6 +143,12 @@ undoubtably be necessary to complete this project.
 
 CS310
 
+As well as the research above, the following work has been completed so far.
+CUDA
+As the developer previously did not have experience using the CUDA c++ API, small programs were written to build
+familiarity, as well as referencing the Nvidia CUDA C Programming Guide. Knowledge of how CUDA programs can
+solve common problems in parallelism, such as local and global shared memory, and the use of syncthreads() will
+undoubtably be necessary to complete this project.
 Hardware Resource
 The graphics card in my personal laptop is sufficent to execute the generated CUDA code, and ensure correctness,
 however the system will be too noisy to gather representative benchmarks. To this end, an application for access to the
@@ -168,10 +179,17 @@ As mentioned in the Project Specification, there are no obvious social or ethica
 not require the collection or storage of any personal data. It is important to consider the licence under which the
 open source project is held, which permits redistribution of the source and binary, as long as it contains the copyright
 disclaimer.
+
+4
+
+Extending Just-in-Time Compilation for OP2
+
+CS310
+
 I am also now aware of the Acceptable Use Policy[5] for the computing facilities provided bt the SCRTP, so I will also
 ensure to abide by this when benchmarking using Orac.
 
-4
+5
 
 Extending Just-in-Time Compilation for OP2
 
@@ -313,7 +331,7 @@ Presentation
 Actual Progress
 Figure 2: Modified Timetable
 
-5
+6
 
 Extending Just-in-Time Compilation for OP2
 
@@ -341,6 +359,6 @@ https://www.geosci-model-
 Acceleration of a full-scale industrial cfd 30 application with op2, 20.
 https://www.oerc.ox.ac.uk/sites/default/files/uploads/profile-pages/Gihan/OP2-Hydra.pdf.
 
-6
+7
 
 
