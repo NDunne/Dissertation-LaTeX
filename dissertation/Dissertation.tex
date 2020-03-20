@@ -1,57 +1,67 @@
-\documentclass[11pt]{article}
+\documentclass[pdftex,12pt,a4paper,oneside]{article}
 
-\usepackage{../styles/arxiv}
-
-\usepackage{../styles/pgfgantt}
-\usepackage{../styles/bibtopic}
-
-\usepackage[latin1]{inputenc}
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows, fit}
-
-
-\tikzstyle{line} = [draw, -latex']
-
-\tikzstyle{block} = [rectangle, draw, fill=blue!10,%black!10,
-  text width=5em, text centered, rounded corners, minimum height=4em]
-\tikzstyle{file} = [rectangle, draw, fill=blue!20,%black!20,
-  minimum height=2em, text width=5em, text centered]
-\tikzstyle{bin} = [circle, draw, fill=blue!30,%black!30,
-  minimum height=3em, text width=5em, text centered, inner sep=0pt]
-
-\tikzstyle{jblock} = [rectangle, draw, fill=red!20,%black!10,
-  text width=5em, text centered, rounded corners, minimum height=4em]
-\tikzstyle{jfile} = [rectangle, draw, fill=red!30,%black!20,
-  minimum height=2em, text width=5em, text centered]
-\tikzstyle{jbin} = [circle, draw, fill=red!40,%black!30,
-  minimum height=3em, text width=5em, text centered, inner sep=0pt]
-
-  \tikzstyle{rblock} = [rectangle, draw, fill=green!20,%black!10,
-    text width=5em, text centered, rounded corners, minimum height=4em]
-  \tikzstyle{rfile} = [rectangle, draw, fill=green!30,%black!20,
-    minimum height=2em, text width=5em, text centered]
-  \tikzstyle{rbin} = [circle, draw, fill=green!40,%black!30,
-    minimum height=3em, text width=5em, text centered, inner sep=0pt]
-
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amscd}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage[toc]{appendix}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\usepackage{multirow}
+\usepackage{pdfpages}
 \usepackage{setspace}
+\usepackage{verbatim}
+\usepackage{wrapfig}
+\usepackage{changepage}
+\usepackage{url}
+\usepackage{newclude}
+\usepackage{helvet}
+\usepackage{lipsum}
 
-\renewcommand{\baselinestretch}{1.333}
+% Use the margin size here to adjust text width!
+\usepackage[margin=3cm]{geometry}
 
-\newcommand{\undertitle}{Progress Report}
+\fancyhf{}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\abstractname}{\vspace{-\baselineskip}}
 
-\title{Extending Just-in-Time Compilation for OP2}
+% Styles can be Sonny, Lenny, Glenn, Conny, Rejne, Bjarne and Bjornstrup
+\usepackage[Sonny]{fncychap}
 
-\author{Nathan Dunne - 1604486}
+\graphicspath{ {./figures/} }
+\setlength{\parskip}{.5em}
+\linespread{1.5}
 
 \begin{document}
-\maketitle
 
-\bibliographystyle{plain}
-\clearpage
-\begin{btSect}{diss}
-\section*{References}
-\btPrintCited
-%\section*{Further Reading}
-%\btPrintNotCited
-\end{btSect}`
+%%TC:ignore
+\include{Preamble/FrontPage}
+\include{Preamble/Abstract}
+\include{Preamble/Contents}
+\include{Preamble/ChapterMods}
+%%TC:endignore
+
+\include*{Chapter1/Chapter1}
+\include*{Chapter2/Chapter2}
+\include*{Chapter3/Chapter3}
+\include*{Chapter4/Chapter4}
+\include*{Chapter5/Chapter5}
+\include*{Chapter6/Chapter6}
+\include*{Chapter7/Chapter7}
+\include*{Chapter8/Chapter8}
+
+\newpage
+
+%%TC:ignore
+\printbibliography
+\include{Appendices/Appendices}
+\include{Appendices/Acknowledgements}
+%%TC:endignore
+
 \end{document}

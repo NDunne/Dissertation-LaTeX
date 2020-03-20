@@ -2,3 +2,8 @@
 *.log
 *.bbl
 *.blg
+*.bcf
+*.loc
+*.toc
+*.lof
+*.run.xml
