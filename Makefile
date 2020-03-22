@@ -1,11 +1,11 @@
 
 BASEDIR = .
-FOLDERS = spec progress
+FOLDERS = spec progress dissertation
 
 export TEXINPUT=.:${BASEDIR}/styles/
 
-all: 
+all:
 	@for p in ${FOLDERS}; do cd $${p}; make; cd ..; done
 
 clean:
-	git clean -xdf	
+	git clean -xdf
