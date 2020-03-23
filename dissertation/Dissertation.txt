@@ -65,43 +65,73 @@ Motivations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 3
 
+2.1
+
+OP2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+3
+
+2.2
+
+JIT . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+3
+
+2.3
+
+CUDA . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+3
+
 3 Specification
 
 3
 
+3.1
+
+Runtime Assertions . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+
+3.2
+
+System Model . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+
 4 Implementation
 
-3
+6
 
 5 Testing
 
-3
+6
 
 6 Evaluation
 
-3
+6
 
 7 Future Work
 
-3
+6
 
 8 Conclusion
 
-3
+6
 
-Appendices
+Appendices
 
-4
+8
 
 A example
 
-4
+8
 
 Acknowledgements
 
-5
+9
 
-List of Figures
+List of Figures
 1
 
 Tri-Structured Mesh . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -113,6 +143,12 @@ Tri-Structured Mesh . . . . . . . . . . . . . . . . . . . . . . . . . . .
 Airfoil Tri-Unstructed Mesh . . . . . . . . . . . . . . . . . . . . . . .
 
 2
+
+3
+
+OP2 System Diagram with JIT Addition . . . . . . . . . . . . . . . .
+
+5
 
 1
 
@@ -130,9 +166,10 @@ it’s very high number of processing units, allows carrying out the same operat
 across a very large amount of data in parallel. This harware has been adapted in
 GPGPUs to perform non-specific operations that would normally have been done
 by the CPU.
-Furthermore, a large proportion of HPC workloads involve approximating Partial Differential Equations (PDEs) to simulate complex interactions in physics problems, for example the Navier-Stokes equations for computational fluid dynamics,
-prediciting weather patterns, or computational electro-magnetics. It is necessary to
-discretise such problems across some form of mesh, either structured (regular) or
+Furthermore, a large proportion of HPC workloads involve approximating Partial
+Differential Equations (PDEs) to simulate complex interactions in physics problems,
+for example the Navier-Stokes equations for computational fluid dynamics, prediciting weather patterns, or computational electro-magnetics. It is usually necessary
+to discretise such problems across some form of mesh, either structured (regular) or
 unstructured. Unstructured meshes will be discussed further in Section 1.1: Background Work.
 
 1.1
@@ -152,21 +189,21 @@ Figure 1: Tri-Structured Mesh
 
 Figure 2: Airfoil Tri-Unstructed Mesh
 
-The abstraction provided by OP2 allows scientists and engineers to focus on
-the description of the problem, and seperates the consideration for parallelism and
-efficiency into the back-end library. This is beneficial as it is unlikely that a single
-developer or team has the necessary expertise in both a niche area of physics with
+This abstraction allows scientists and engineers to focus on the description of
+the problem, and seperates the consideration for parallelism and efficiency into the
+back-end library and code generation. This is beneficial as it is unlikely that a single
+developer or team has the necessary expertise in both some niche area of physics with
 a non-trivial problem to be solved; and sufficient depth of knowledge in computer
 science to understand and utilise the latest generation of parallel hardware.
-A further benefit is that existing solutions which make use of the OP2 library to
-be ported onto a new generation of hardware, by modifying only the OP2 backend
-library, and not every application. This portability can save both time and money
-in development if multiple different hardware platforms are desired to be used.
-The OP2 library is already able to generate optimised code for a number of
-platforms, including the increasingly popular NVidia CUDA for parallel programming on NVidia GPGPUs. However, there is always space for further benefit to
-be gained, and this report details an investigation into applying a new optimisation to the CUDA code generation library subsection of OP2. The optimisation is
-named ”Just-In-Time Compilation” for its similarities to a comparable process often
-performed by compilers when runtime efficiency is desired.
+A further benefit is that existing solutions which make use of the OP2 library
+can be ported onto a new generation of hardware, by modifying only the OP2 backend library to support the new hardware, instead of every application individually.
+This portability can save both time and money in development if multiple different
+hardware platforms are desired to be used.
+The OP2 library is already able to generate optimised code for a number of platforms, including the increasingly popular NVidia CUDA for parallel programming on
+NVidia GPUs. However, there is always space for further benefit to be gained, and
+this report details an investigation into applying a new optimisation to the CUDA
+code generation library subsection of OP2. The optimisation is named ”Just-InTime Compilation” for its similarities to a comparable process often performed by
+compilers when runtime efficiency is desired.
 
 2
 
@@ -187,9 +224,123 @@ most university work is done largely within the confines of one’s own code.
 
 Related Work
 
+2.1
+
+OP2
+
+2.2
+
+JIT
+
+2.3
+
+CUDA
+
 3
 
 Specification
+
+The implementation will require work in two main areas: The python code generation script, and in the OP2 library itself which is implemented in both C and
+Fortran. Only the C library will be modified, due to developer familiarity.
+The python script will perform source-to-source translation. As input it will take
+the application files, which specify the structure of the program: declaring variables,
+and indicating where the loops parallelised by OP2 should be executed; and a kernel descriptor for each loop, which will describe the operation to be performed on
+each element of the set passed to the loop as a parameter. OP2 makes an important restriction that the order in which elements are processed must not affect the
+
+3
+
+final result, to within the limits of finite precision floating-point arithmetic[2, p3].
+This constraint allows the code generator freedom to not consider the ordering of
+iterations, and select an ordering based on performance.
+From this a set of valid C files must be generated, to be compiled by a normal
+C compiler. In the case of this project the compiler will be the NVidia C Compiler
+(nvcc), as the code generated will be include CUDA.
+It is important that the resulting executable compiled from the generated code
+produces outputs within some tolerance of the outputs generated by execting parallel
+loop iterations sequentially. Correctness is always a priority over performance for
+any compiler.
+Furthermore, it will be ensured that the OP2 API will not be altered by any
+modifications to the library, to ensure that all exisiting programs using the API are
+able to seemless use the updated version.
+
+3.1
+
+Runtime Assertions
+
+As discussed in Section 2.2 on Just-In-Time Compilation, the performance gain from
+this optimisation technique comes from making assertions at runtime which can only
+be made once the input is known. The application’s input will be a mesh over which
+to operate, which includes a large amount of data, and opens up a number of runtime optimisations. The primary target for this project is ”Constant Definition”:
+turning values specified in the input as constants into #define directives for the
+C-Preprocessor. Other possible optimisations will be discussed in Section 7, Future
+Work.
+
+3.2
+
+System Model
+
+Figure 3 describes the new workflow of the OP2 library, with the addition of Just-InTime compilation. As before, code generation takes the application and loop files as
+
+4
+
+input, and generates the Kernels and Modified Application Files. It also generates
+Optimised Kernels, where the code will only compile once the constants are known
+and defined by the pre-processor. These Kernel files are not used by the ahead of
+time compiler.
+Source
+Files
+
+Kernels
+
+CodeGen
+script
+
+Modified
+Application
+Files
+
+Input Map
+
+AOT
+Compiler
+
+Optimised
+Kernels
+
+Runtime
+
+Program
+Binary
+
+Program
+Result
+
+Constants
+
+Shared
+Object
+
+JIT
+Compiler
+
+OP2 ”JIT”
+
+Figure 3: OP2 System Diagram with JIT Addition
+The OP2 API function:
+void op decl const(int dim, char ∗type, T ∗dat, char ∗name)
+
+[1, p9]
+
+Will be modified so that when called by the Program Binary it will generate a
+header file, where each of the constant values is added as a C #define directive,
+where previously it needed to copy these values to the GPU device’s memory.
+At runtime, the executable invokes the nvcc compiler again, to compile the Optimised Kernels which semantically include the constants header file, and link them
+into a Shared Object (Dynamically Loaded Library). This object is then loaded
+
+5
+
+by the running executable, and the functions it provides are used instead of the
+unoptimised versions.
 
 4
 
@@ -211,18 +362,27 @@ Future Work
 
 Conclusion
 
-3
+6
+
+References
+[1] M.B. Giles G.R. Mudalige I. Reguly. OP2 C++ User Manual.
+https://op-dsl.github.io/docs/OP2/OP2_Users_Guide.pdf. 2013.
+[2] M.B. Giles G.R. Mudalige I. Reguly. OP2: An Active Library Framework for
+Solving Unstructured Mesh-based Applications on Multi-Core and Many-Core
+Architectures. 2012.
+
+7
 
 Appendices
 A
 
 example
 
-4
+8
 
 Acknowledgements
 TODO
 
-5
+9
 
 
