@@ -1,10 +1,22 @@
 % !TEX root =  ../report.tex
 
-\section{Related Work}
+\section{Research}
 
 \subsection{OP2}
+\par
+The OP2 library is already able to generate optimised code for a number of platforms, including the increasingly popular NVidia CUDA for parallel programming on NVidia GPUs. The current implementation is compiled entirely ahead of time however, and is not able to optimise based on the input mesh.
+\par
+The abstraction provided by OP2 allows scientists and engineers to focus on the description of the problem, and seperates the consideration for parallelism and efficiency into the back-end library and code generation.
+This is beneficial as it is unlikely that a single developer or team has the necessary expertise in both some niche area of physics with a non-trivial problem to be solved; and sufficient depth of knowledge in computer science to understand and utilise the latest generation of parallel hardware.
+\par
+A further benefit is that existing solutions which make use of the OP2 library can be ported onto a new generation of hardware, by modifying only the OP2 backend library to support the new hardware, instead of every application individually. This portability can save both time and money in development if multiple different hardware platforms are desired to be used.
 
-\subsection{JIT}
-\label{sec:rw_JIT}
 
 \subsection{CUDA}
+
+\subsection{Related Work}
+
+\subsubsection{JIT}
+\label{sec:rw_JIT}
+
+\subsubsection{Similar Libraries}

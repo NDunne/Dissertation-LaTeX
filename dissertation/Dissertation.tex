@@ -24,6 +24,7 @@
 \usepackage{lipsum}
 \usepackage{pgfplots}
 \usepackage{listings}
+\usepackage{array}
 
 % Use the margin size here to adjust text width!
 \usepackage[margin=3cm]{geometry}
@@ -64,6 +65,22 @@
 \graphicspath{ {./figures/} }
 \setlength{\parskip}{.5em}
 \linespread{1.5}
+
+\newcommand{\codeline}[2]{
+ \begin{center}
+ \vspace{-1em}
+ \lstinline{#1}
+ \\
+ \hspace*{\fill}\small{#2}
+ \end{center}
+ \vspace{-1em}
+}
+
+\newcommand{\pyline}[2]{
+  \lstset{language=Python}
+  \codeline{#1}{#2}
+  \lstset{language=C}
+}
 
 \begin{document}
 \lstset{language=C}
