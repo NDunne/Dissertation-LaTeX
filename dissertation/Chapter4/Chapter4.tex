@@ -21,3 +21,36 @@ Which is called from \verb|op2.py| in the parent directory - the same as the oth
   consts: & list of constants, with their type, dimension and name \\
   kernels: & \parbox[t]{.8\textwidth}{list of kernel descriptors, where each kernel is a map containing many fields describing the kernel, which may alter the way the code for that loop is generated.}
 \end{tabular}
+\\
+\par
+The code generator first performs a quick check across all kernels to see if any use the Struct of Arrays feature \cite[p9]{manual}, or if all are using the default data layout. Then iterates over each kernel, and generates both the Ahead Of Time (AOT) kernel file, and the Just In Time (JIT) kernel file simultaneously. A folder \verb|cuda| is created if it doesn't exist, and two files generated in it for each kernel:
+\begin{itemize}
+\item{\verb|AOT: cuda/[name]_kernel.cu|}
+\item{\verb|JIT: cuda/[name]_kernel_rec.cu|}
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}{.55\textwidth}
+Some sections of both files are the same. The examples in Figure \ref{fig:jit_include} show the progression of each file for an example kernel.
+\\\\ The first thing generated is simply the include directives required for the JIT compiled kernel. These are needed since they will be compiled seperately:
+\begin{footnotesize}
+\lstset{xleftmargin=.25in}
+\begin{lstlisting}
+#include "op_lib_cpp.h"
+#include "op_cuda_rt_support.h"
+#include "op_cuda_reduction.h"
+//global_constants
+#include "jit_const.h"
+\end{lstlisting}
+\end{footnotesize}
+The \verb|jit_const.h| file is also included, which will be generated at runtime (before the compiler is invoked) to \verb|#define| constants for the preprocessor.
+\end{minipage}
+\hfill
+\begin{minipage}{.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{jit_include}
+  \caption{JIT includes}
+  \label{fig:jit_include}
+\end{minipage}%
+\end{figure}

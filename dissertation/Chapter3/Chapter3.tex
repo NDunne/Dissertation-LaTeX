@@ -15,8 +15,6 @@ Furthermore, it will be ensured that the OP2 API is not be altered by any modifi
 As discussed in Section \ref{sec:rw_JIT} on Just-In-Time Compilation, the performance gain from this optimisation technique comes from making assertions at runtime which can only be made once the input is known. The application's input will be a mesh over which to operate, which includes a large amount of data, and opens up a number of runtime optimisations. The primary target for this project is "Constant Definition": turning values specified in the input as constants into \verb|#define| directives for the C-Preprocessor. Other possible optimisations will be discussed in Section \ref{fw}, Future Work.\\
 
 \subsection{System Model}
-Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with the addition of Just-In-Time compilation. As before, code generation takes the application and loop files as input, and generates the Kernels and Modified Application Files. It also generates Optimised Kernels, where the code will only compile once the constants are known and defined by the pre-processor. These Kernel files are not used by the ahead of time compiler.
-
 \begin{figure}[h!]
   \centering
   \begin{tikzpicture}[node distance=3cm, auto]
@@ -65,6 +63,8 @@ Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with the
   \caption{OP2 System Diagram with JIT Addition}
   \label{fig:jit_sys}
 \end{figure}
+
+Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with the addition of Just-In-Time compilation. As before, code generation takes the application and loop files as input, and generates the Kernels and Modified Application Files. It also generates Optimised Kernels, where the code will only compile once the constants are known and defined by the pre-processor. These Kernel files are not used by the ahead of time compiler.
 
 The OP2 API function:
 \begin{center}

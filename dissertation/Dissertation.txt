@@ -121,31 +121,31 @@ Code Generation . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 5 Testing
 
-7
+8
 
 6 Evaluation
 
-7
+8
 
 7 Future Work
 
-7
+8
 
 8 Conclusion
 
-7
+8
 
 Appendices
 
-9
+10
 
 A Getting Started with OP2
 
-9
+10
 
 Acknowledgements
 
-10
+11
 
 List of Figures
 1
@@ -164,7 +164,13 @@ Airfoil Tri-Unstructed Mesh . . . . . . . . . . . . . . . . . . . . . . .
 
 OP2 System Diagram with JIT Addition . . . . . . . . . . . . . . . .
 
-6
+5
+
+4
+
+JIT includes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+8
 
 1
 
@@ -315,26 +321,7 @@ Future Work.
 
 System Model
 
-Figure 3 describes the new workflow of the OP2 library, with the addition of Just-InTime compilation. As before, code generation takes the application and loop files as
-input, and generates the Kernels and Modified Application Files. It also generates
-Optimised Kernels, where the code will only compile once the constants are known
-and defined by the pre-processor. These Kernel files are not used by the ahead of
-time compiler.
-The OP2 API function:
-void op decl const(int dim, char ∗type, T ∗dat, char ∗name)
-
-[2, p9]
-
-Will be modified so that when called by the Program Binary it will generate a
-header file, where each of the constant values is added as a C #define directive,
-where previously it needed to copy these values to the GPU device’s memory.
-At runtime, the executable invokes the nvcc compiler again, to compile the Optimised Kernels which semantically include the constants header file, and link them
-into a Shared Object (Dynamically Loaded Library). This object is then loaded
-by the running executable, and the functions it provides are used instead of the
-unoptimised versions.
-5
-
-Source
+Source
 Files
 
 Kernels
@@ -373,6 +360,25 @@ Compiler
 OP2 ”JIT”
 
 Figure 3: OP2 System Diagram with JIT Addition
+Figure 3 describes the new workflow of the OP2 library, with the addition of Just5
+
+In-Time compilation. As before, code generation takes the application and loop files
+as input, and generates the Kernels and Modified Application Files. It also generates
+Optimised Kernels, where the code will only compile once the constants are known
+and defined by the pre-processor. These Kernel files are not used by the ahead of
+time compiler.
+The OP2 API function:
+void op decl const(int dim, char ∗type, T ∗dat, char ∗name)
+
+[2, p9]
+
+Will be modified so that when called by the Program Binary it will generate a
+header file, where each of the constant values is added as a C #define directive,
+where previously it needed to copy these values to the GPU device’s memory.
+At runtime, the executable invokes the nvcc compiler again, to compile the Optimised Kernels which semantically include the constants header file, and link them
+into a Shared Object (Dynamically Loaded Library). This object is then loaded
+by the running executable, and the functions it provides are used instead of the
+unoptimised versions.
 
 4
 
@@ -388,12 +394,13 @@ was rebased onto master before any other changes were made.
 The lazy-execution branch contained the beginnings of a system to execute
 parallel loops when values are required rather than when called. This is done through
 an internal library function:
-void op enqueue kernel(op kernel descriptor ∗desc)
-op2/c/src/core/op lazy.cpp [71-89]
 
 6
 
-Which currently simply executes the function straight away. This process for calling parallel loops is used similarly throughout work done to enable Just In Time
+void op enqueue kernel(op kernel descriptor ∗desc)
+op2/c/src/core/op lazy.cpp [71-89]
+
+Which currently simply executes the function straight away. This process for calling parallel loops is used similarly throughout work done to enable Just In Time
 Compilation for CUDA, so that future efforts towards lazy execution can continue
 in the future on top of the JIT implementation.
 
@@ -424,6 +431,37 @@ list of constants, with their type, dimension and name
 kernels: list of kernel descriptors, where each kernel is a map containing
 many fields describing the kernel, which may alter the way the
 code for that loop is generated.
+The code generator first performs a quick check across all kernels to see if any use
+the Struct of Arrays feature [2, p9], or if all are using the default data layout. Then
+iterates over each kernel, and generates both the Ahead Of Time (AOT) kernel file,
+and the Just In Time (JIT) kernel file simultaneously. A folder cuda is created if it
+doesn’t exist, and two files generated in it for each kernel:
+• AOT: cuda/[name]_kernel.cu
+• JIT: cuda/[name]_kernel_rec.cu
+
+7
+
+Some sections of both files are the same. The
+examples in Figure 4 show the progression of
+each file for an example kernel.
+The first thing generated is simply the
+include directives required for the JIT compiled kernel. These are needed since they will
+be compiled seperately:
+#include
+#include
+#include
+// g l o b a l
+#include
+
+” o p l i b c p p . h”
+” o p c u d a r t s u p p o r t . h”
+” o p c u d a r e d u c t i o n . h”
+constants
+” j i t c o n s t . h”
+
+The jit_const.h file is also included, which
+will be generated at runtime (before the compiler is invoked) to #define constants for the
+preprocessor.
 
 5
 
@@ -441,7 +479,9 @@ Future Work
 
 Conclusion
 
-7
+8
+
+Figure 4: JIT includes
 
 References
 [1] OP-DSL. OP2-Common. https://github.com/OP-DSL/OP2-Common.
@@ -451,18 +491,18 @@ https://op-dsl.github.io/docs/OP2/OP2_Users_Guide.pdf. 2013.
 Solving Unstructured Mesh-based Applications on Multi-Core and Many-Core
 Architectures. 2012.
 
-8
+9
 
 Appendices
 A
 
 Getting Started with OP2
 
-9
+10
 
 Acknowledgements
 TODO
 
-10
+11
 
 
