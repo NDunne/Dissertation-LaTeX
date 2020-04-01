@@ -11,20 +11,41 @@
 \addbibresource{diss.bib}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
-\usepackage{lipsum}
 \usepackage{multirow}
 \usepackage{pdfpages}
-\usepackage{setspace}
-\usepackage{verbatim}
+\usepackage{setspace}       % change padding
+\usepackage{verbatim}       % verb newenvironment
 \usepackage{wrapfig}
 \usepackage{changepage}
-\usepackage{url}
+\usepackage{url}            % clickable links
 \usepackage{newclude}
-\usepackage{helvet}
-\usepackage{lipsum}
-\usepackage{pgfplots}
-\usepackage{listings}
-\usepackage{array}
+\usepackage{helvet}         % font
+\usepackage{lipsum}         % placeholder text
+\usepackage{pgfplots}       % gantt
+\usepackage{listings}       % code listings
+\usepackage{array}          % default column format
+\usepackage[none]{hyphenat} % No broken words
+\usepackage{ifthen}         % conditionals
+
+\makeatletter
+\let\old@lstKV@SwitchCases\lstKV@SwitchCases
+\def\lstKV@SwitchCases#1#2#3{}
+\makeatother
+\usepackage{lstlinebgrd}
+\makeatletter
+\let\lstKV@SwitchCases\old@lstKV@SwitchCases
+
+\lst@Key{numbers}{none}{%
+    \def\lst@PlaceNumber{\lst@linebgrd}%
+    \lstKV@SwitchCases{#1}%
+    {none:\\%
+     left:\def\lst@PlaceNumber{\llap{\normalfont
+                \lst@numberstyle{\thelstnumber}\kern\lst@numbersep}\lst@linebgrd}\\%
+     right:\def\lst@PlaceNumber{\rlap{\normalfont
+                \kern\linewidth \kern\lst@numbersep
+                \lst@numberstyle{\thelstnumber}}\lst@linebgrd}%
+    }{\PackageError{Listings}{Numbers #1 unknown}\@ehc}}
+\makeatother
 
 % Use the margin size here to adjust text width!
 \usepackage[margin=3cm]{geometry}
@@ -64,14 +85,18 @@
 
 \graphicspath{ {./figures/} }
 \setlength{\parskip}{.5em}
-\linespread{1.5}
+\linespread{1.75}
 
 \newcommand{\codeline}[2]{
  \begin{center}
  \vspace{-1em}
  \lstinline{#1}
- \\
- \hspace*{\fill}\small{#2}
+
+ \ifthenelse{\equal{#2}{}}
+ {} %ignore if empty
+ {
+   \hspace*{\fill}\footnotesize{#2}
+ }
  \end{center}
  \vspace{-1em}
 }
@@ -82,8 +107,29 @@
   \lstset{language=C}
 }
 
+\newcounter{mini}[subsubsection]
+
+\newcommand{\minititle}[1]{\refstepcounter{mini}\vspace{\parskip}\hspace{-1\parindent}\textbf{~\themini. #1:}\hspace{3pt}}
+
+\newcommand{\tinytitle}[1]{\vspace{\parskip}\hspace{-1\parindent}\textbf{#1:}\hspace{3pt}}
+
+\newenvironment{minipageparskip}
+  {
+   \begin{minipage}{.67\textwidth}% open the minipage
+   \parskip 1em\relax% restore the value
+   \parindent 1.5em\relax% restore the value
+   \linespread{1.5}
+  }
+  {\end{minipage}}
+
 \begin{document}
-\lstset{language=C}
+
+\lstset{language=C, basicstyle=\linespread{1.1}\ttfamily\footnotesize,
+frame=tlbr,
+backgroundcolor=\color{lightgray!15},
+showspaces=false, showstringspaces=false,
+commentstyle=\ttfamily\footnotesize\color{gray},
+escapechar=|}
 
 %%TC:ignore
 \include{Preamble/FrontPage}
@@ -95,8 +141,8 @@
 \include*{Chapter1/Chapter1}
 \include*{Chapter2/Chapter2}
 \include*{Chapter3/Chapter3}
-\include*{Chapter4/Chapter4}
-\include*{Chapter5/Chapter5}
+\include{Chapter4/Chapter4}
+\include{Chapter5/Chapter5}
 \include*{Chapter6/Chapter6}
 \include*{Chapter7/Chapter7}
 \include*{Chapter8/Chapter8}
