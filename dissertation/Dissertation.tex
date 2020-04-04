@@ -1,4 +1,4 @@
-\documentclass[pdftex,12pt,a4paper,oneside]{article}
+\documentclass[pdftex,12pt,a4paper,twoside]{article}
 
 \usepackage{amsfonts}
 \usepackage{amsthm}
@@ -7,8 +7,6 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage[toc]{appendix}
-\usepackage[backend=biber]{biblatex}
-\addbibresource{diss.bib}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{multirow}
@@ -26,6 +24,13 @@
 \usepackage{array}          % default column format
 \usepackage[none]{hyphenat} % No broken words
 \usepackage{ifthen}         % conditionals
+\usepackage{changepage}     % modify lengths
+\usepackage{subfig}      % multiple images in on figure
+
+\usepackage[backend=biber,dateabbrev=false]{biblatex}
+\addbibresource{diss.bib}
+\DeclareFieldFormat{url}{\newline\mkbibacro{URL}\addcolon\nobreakspace\url{#1}}
+%URL on new line
 
 \makeatletter
 \let\old@lstKV@SwitchCases\lstKV@SwitchCases
@@ -88,17 +93,19 @@
 \linespread{1.75}
 
 \newcommand{\codeline}[2]{
+\begin{adjustwidth}{-.5in}{-.5in}
  \begin{center}
- \vspace{-1em}
  \lstinline{#1}
+
+ \end{center}
+\end{adjustwidth}
 
  \ifthenelse{\equal{#2}{}}
  {} %ignore if empty
  {
-   \hspace*{\fill}\footnotesize{#2}
+   \vspace{-1em}
+   \hspace*{\fill}\footnotesize{#2}\\
  }
- \end{center}
- \vspace{-1em}
 }
 
 \newcommand{\pyline}[2]{
@@ -142,8 +149,8 @@ escapechar=|}
 \include*{Chapter2/Chapter2}
 \include*{Chapter3/Chapter3}
 \include{Chapter4/Chapter4}
-\include{Chapter5/Chapter5}
-\include*{Chapter6/Chapter6}
+\include*{Chapter5/Chapter5}
+\include{Chapter6/Chapter6}
 \include*{Chapter7/Chapter7}
 \include*{Chapter8/Chapter8}
 

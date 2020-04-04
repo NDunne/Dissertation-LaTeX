@@ -7,9 +7,10 @@ The feature branch for this project, \verb|feature/jit| was branched from \\\ver
 \par
 This branch was created for developing a system to execute parallel loops when values are required rather than when called. This is done through an internal library function:
 \codeline{void op_enqueue_kernel(op_kernel_descriptor *desc)}{op2/c/src/core/op\_lazy.cpp [71-89]}
-Currently this function simply executes the queued loop straight away. This process for calling parallel loops is used similarly throughout work done to enable Just-In-Time Compilation for CUDA, so that future efforts towards lazy execution can continue in the future on top of the JIT implementation.
+Currently this function generates the constants header file, then executes the queued loop straight away. This process for calling parallel loops is used similarly throughout work done to enable Just-In-Time Compilation for CUDA, so that future efforts towards lazy execution can continue in the future on top of the JIT implementation.
 
 \subsection{Code Generation}
+\label{sec:codegen}
 The Python code generation script which forms the main body of the implementation can be found in: \verb|translator/c/python/jit/op2_gen_cuda_jit.py|
 \\
 Its entry point function is:
@@ -115,23 +116,16 @@ for nc in range(0,len(consts)):
   #At least one expression access
   if (numFound > 0):
     if CPP:
-      #line start
-      codeline = `__constant__ ' +
-                  consts[nc]['type'][1:-1] +
-                 ` op_const_' +
-                  varname +
-                 `['+consts[nc]['dim'] +
-                 `] = {'
+      #Line start
+      codeline = `__constant__ ' + consts[nc]['type'][1:-1] +
+                 ` op_const_' + varname + `[' +
+                  consts[nc]['dim'] + `] = {'
       #Add each value to line
-      for i in range(0,int(consts[nc]['dim'])):
-        codeline += "op_const_"+varname+"_"+str(i)+", "
-      #line end
-      codeline = codeline[:-2] + "};"
+      for i in range(0,int(consts[nc][`dim'])):
+          codeline += `op_const_' + varname + `_' + str(i) + `, '
+      codeline = codeline[:-2] + `};'
 
-      #Add list definition at top of function
-      jit_user_function = re.sub(``(\s){',
-                                 `\g<1>{\n\g<1>  ' + codeline,
-                                  jit_user_function, 1)
+      jit_user_function = codeline+'\n\n'+jit_user_function
 \end{lstlisting}
 \vspace{-1em}
 \hspace*{\fill}\footnotesize{translator/c/python/jit/op2\_gen\_cuda\_jit.py [931-944]}
@@ -270,20 +264,18 @@ for nc in range (0,len(consts)):
 \hspace*{\fill}\footnotesize{translator/c/python/jit/op2\_gen\_cuda\_jit.py [974-985]
 \\
 Following this, the file contains definitions for two functions. The first is \verb|op_decl_const_char|, which will be called from the application file to declare a constant identifier and value; and the second is \verb|jit_compile| which will invoke the runtime compiler, load the generated DLL and create a function pointer for each re-compiled loop.
+
 \minititle{op\_decl\_const\_char}
-This function is an OP2 library function for a user to declare a value that will not change over the course of execution. It has the following signature, defined by the OP2 API\cite[p9]{manual}.
-\vspace{-1cm}
+This function is an OP2 library function which allows users to declare a value that will not change over the course of execution. It has the following signature, defined by the OP2 API\cite[p9]{manual}:
 \codeline{void op_decl_const_char(int dim, char const *type, int size,
                                   char *dat, char const *name)}{}
  Two versions of the function are generated, one for AOT and one for JIT. The two functions are wrapped with pre-processor conditionals, so that only one of them will be visible to the compiler. As before, \verb|OP2_JIT| being defined is the test, so the JIT functionality can be enabled or disabled.
 \par
 The AOT version of the function copies the value passed to it to the corresponding device constant using:
-\vspace{-5pt}
 \codeline{cudaMemcpyToSymbol(const void* symbol, const void* src, size_t count)}{}
 The copy default direction for this function is from host memory to device memory.
 \par
 The JIT version instead invokes the internal library function:
-\vspace{-1cm}
 \codeline{void op_lazy_const(int dim, char const *type, int typeSize, char *data,
                         char const *name)}{op2/c/src/core/op\_lazy.cpp [100-101]}
 Which maintains a de-duplicated list of constants, so that once they all have been declared the header file defining their values can be generated. As can be seen in the generated C code below, constants containing more than one value are declared as single values due to the issues with \verb|extern __constant__| values described in Section \ref{ss:krnl_files} (2. User Function).
@@ -307,5 +299,35 @@ void op_decl_const_char(int dim, char const *type,
 \end{lstlisting}
 \vspace{-1em}
 \hspace*{\fill}\footnotesize{generated by translator/c/python/jit/op2\_gen\_cuda\_jit.py [1028-1046]}
+
+\minititle{jit\_compile}
+The other function generated is the \verb|jit_compile| function, which is responsible for the actual recompilation of the JIT kernels, and making their functions available to the binary. It also uses the same timing library functions which gather data on the time spent in each parallel loop to determine how long the binary spends re-compiling, as this is important for performance measuring later.
 \par
-The other function
+The compiler arguments, library paths, and other required parameters are in this implementation handled by a make file which would need to be generated by the user. The contents of the makefile will be covered in the next section.
+\par
+As can be seen below, the executable makes a system call to initiate a make command, and stores the result in a log file. If the compilation fails, an error message is printed, and the program exits early.
+\begin{lstlisting}[linewidth = \textwidth, framesep=0pt]
+if (op_is_root()) {
+  if (system("make -j [application]_cuda_rec &> jit_compile.log")) {
+    // 0 indicated success
+    printf("Error: JIT compile failed. \n
+            - see jit_compile.log for details\n");
+    exit(1);
+  }
+}
+\end{lstlisting}
+\vspace{-1em}
+\hspace*{\fill}\footnotesize{generated by translator/c/python/jit/op2\_gen\_cuda\_jit.py [1071-1077]}
+
+It is expected that the make file will generate a shared object file named \verb|cuda/airfoil_kernel_rec.so|. If this file does not exist the binary exits with an error, otherwise the recompiled function for each parallel loop is dynamically loaded using:
+\codeline{void *dlsym(void *restrict handle, const char *restrict name);}{dlfcn.h}
+The function \verb|op_par_loop_[name]_rec_execute| loaded, with the address stored in a void pointer with identifer \verb|[name]_function|. We have seen this pointer before in Section \ref{ss:krnl_files} (4. Host Function).
+\par
+Once this has been done for all loops, the wall clock time since the start of the \verb|jit_compile| function is printed to the terminal.
+
+\subsection{Makefile}
+This implementation relies on GNU Make\cite{make} to determine which compiler should be used, which parameters should be passed, and other options. There are a number of libraries required to build an OP2 binary, as covered in Appendix \ref{app:getStart}, so only the recompilation target will be discussed here.
+\par
+The binary expects there to be a Makefile in the directory it executes in, with a target: \verb|[application]_cuda_rec| in order to work correctly. This is the target which will be compiled at runtime. As mentioned in the previous section, the result of making this target needs to be a a shared object file named \verb|cuda/airfoil_kernel_rec.so|, which contains the recompiled loop functions.
+\par
+The library object is produced by compiling each of the kernels individually, using the NVidia compiler \verb|nvcc| from the NVidia CUDA Toolkit\cite{nvcc,toolkit} as the code contains CUDA, then linking them into a single object. It is necessary that the compiler flags include \verb|--compiler-options -fPIC|. This passes a list of arguments to the underlying compiler, since nvcc only handles the CUDA code, and passes all host code compilation on to a C compiler. The argument to be passed down is \verb|-fPIC|, to generate Position Independant Code, to allow the library function to execute correctly, regardless of the address at which it is loaded in memory.
