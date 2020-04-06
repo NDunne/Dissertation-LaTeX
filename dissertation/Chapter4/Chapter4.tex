@@ -241,6 +241,7 @@ To recap, the AOT and JIT kernel files are generated for each parallel loop, to 
 The \verb|jit_compile()| function has not yet been defined, but this will be covered in the next section on the master kernels file.
 \clearpage
 \subsubsection{Master Kernels File}
+\label{sss:mkf}
 The Master Kernels File: \verb|cuda/[application]_kernels.cu| is the last file to be generated, once the kernels for each parallel loop have been completed. It ties up most of the remaining loose ends, as it contains shared functions for invoking the runtime compiler, and declaring constants. It also contains \verb|#include| statements for each of the AOT kernel files, so that the application file can be linked against this file only at compile-time, and the linker will be able to find definitions for all the functions declared extern. The Makefile and compile process will be covered further in Section TODO.
 \par
 At the top, the master kernels file includes the requried OP2 library files. It then defines a CUDA constant for each constant the user has defined, generated using the following python code:
@@ -308,7 +309,8 @@ The compiler arguments, library paths, and other required parameters are in this
 As can be seen below, the executable makes a system call to initiate a make command, and stores the result in a log file. If the compilation fails, an error message is printed, and the program exits early.
 \begin{lstlisting}[linewidth = \textwidth, framesep=0pt]
 if (op_is_root()) {
-  if (system("make -j [application]_cuda_rec &> jit_compile.log")) {
+  if (system("make -j [application]_cuda_rec &> jit_compile.log"))
+  {
     // 0 indicated success
     printf("Error: JIT compile failed. \n
             - see jit_compile.log for details\n");
@@ -331,3 +333,15 @@ This implementation relies on GNU Make\cite{make} to determine which compiler sh
 The binary expects there to be a Makefile in the directory it executes in, with a target: \verb|[application]_cuda_rec| in order to work correctly. This is the target which will be compiled at runtime. As mentioned in the previous section, the result of making this target needs to be a a shared object file named \verb|cuda/airfoil_kernel_rec.so|, which contains the recompiled loop functions.
 \par
 The library object is produced by compiling each of the kernels individually, using the NVidia compiler \verb|nvcc| from the NVidia CUDA Toolkit\cite{nvcc,toolkit} as the code contains CUDA, then linking them into a single object. It is necessary that the compiler flags include \verb|--compiler-options -fPIC|. This passes a list of arguments to the underlying compiler, since nvcc only handles the CUDA code, and passes all host code compilation on to a C compiler. The argument to be passed down is \verb|-fPIC|, to generate Position Independant Code, to allow the library function to execute correctly, regardless of the address at which it is loaded in memory.
+\subsubsection{Optional Functionality}
+By default, the JIT compilation functionality is enabled in the Makefile by setting the value of \verb|$JIT| to \verb|TRUE|. However, if the variable is set to anything else in the parameters of the make command, JIT will be disabled in the resulting executable. This is done with the following lines:
+\begin{lstlisting}[linewidth = \textwidth, framesep=0pt]
+ifeq ($(JIT), TRUE)
+	CCFLAGS    := $(CCFLAGS) -DOP2_JIT
+	NVCCFLAGS  := $(NVCCFLAGS) -DOP2_JIT
+	SUFFIX     := _jit
+endif
+\end{lstlisting}
+Which adds a parameter to the C and CUDA compilers to define \verb|OP2_JIT| for the preprocessor, and appends "\_jit" to the name of the executable generated.
+\par
+The target \verb|cuda/airfoil_kernels_cu.o| is also declared PHONY, so that it is always recompiled even if the file already exists, otherwise this make flag would not function correctly, and a JIT enabled version of this file may be used when the user intended to recompile it with JIT disabled.

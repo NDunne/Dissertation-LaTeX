@@ -25,7 +25,9 @@
 \usepackage[none]{hyphenat} % No broken words
 \usepackage{ifthen}         % conditionals
 \usepackage{changepage}     % modify lengths
-\usepackage{subfig}      % multiple images in on figure
+\usepackage{subfig}         % multiple images in on figure
+\usepackage{multirow}       % multiple table rows
+\usepackage[export]{adjustbox}
 
 \usepackage[backend=biber,dateabbrev=false]{biblatex}
 \addbibresource{diss.bib}
@@ -119,6 +121,27 @@
 \newcommand{\minititle}[1]{\refstepcounter{mini}\vspace{\parskip}\hspace{-1\parindent}\textbf{~\themini. #1:}\hspace{3pt}}
 
 \newcommand{\tinytitle}[1]{\vspace{\parskip}\hspace{-1\parindent}\textbf{#1:}\hspace{3pt}}
+
+\newcommand{\testresult}[2]{
+\vspace{4pt}
+\begin{adjustwidth}{-.5in}{-.5in}
+  \begin{center}
+   \setlength{\fboxsep}{1em}
+   \fbox{%
+    \parbox{\textwidth}{%
+      \ifthenelse{\equal{#2}{pass}}
+      {
+        #1. The test is considered \textbf{\textcolor{green!20!black}{PASSED}}.
+      }
+      {
+        #1 The test is considered \textbf{\textcolor{red!20!black}{FAILED}}.
+      }
+    }%
+  }
+  \end{center}
+\end{adjustwidth}
+\vspace{2pt}
+}
 
 \newenvironment{minipageparskip}
   {

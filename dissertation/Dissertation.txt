@@ -132,6 +132,9 @@ Kernel Files . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 Master Kernels File . . . . . . . . . . . . . . . . . . . . . . . . 15
 
 Makefile . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+4.2.1
+
+Optional Functionality . . . . . . . . . . . . . . . . . . . . . . 18
 
 5 Testing
 
@@ -144,6 +147,9 @@ Test Plan . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
 5.2
 
 Test Results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+
+5.3
+
 5.2.1
 
 Code Generation . . . . . . . . . . . . . . . . . . . . . . . . . 20
@@ -154,37 +160,39 @@ Ahead-of-Time Compilation . . . . . . . . . . . . . . . . . . . 20
 
 5.2.3
 
-Just-in-Time Compilation . . . . . . . . . . . . . . . . . . . . 20
+Just-in-Time Compilation . . . . . . . . . . . . . . . . . . . . 21
 
 5.2.4
 
-Output . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+Output . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+
+Benchmarking . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
 
 6 Evaluation
 
-23
+26
 
 7 Future Work
 
-24
+27
 
 8 Conclusion
 
-24
+27
 
 Appendices
 
-26
+29
 
 A Getting Started with OP2
 
-26
+29
 
 Acknowledgements
 
-27
+30
 
-List of Figures
+List of Figures
 1
 
 Tri-Structured Mesh . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -197,7 +205,7 @@ Airfoil Tri-Unstructed Mesh . . . . . . . . . . . . . . . . . . . . . . .
 
 2
 
-3
+3
 
 OP2 System Diagram with JIT Addition . . . . . . . . . . . . . . . .
 
@@ -233,11 +241,15 @@ Kernel Flow . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
 
 10
 
-Files in Application Folder . . . . . . . . . . . . . . . . . . . . . . . . 21
+Console Output from both binaries . . . . . . . . . . . . . . . . . . . 22
 
-10
+11
 
-Files in Application Folder . . . . . . . . . . . . . . . . . . . . . . . . 22
+Files in Application Folder . . . . . . . . . . . . . . . . . . . . . . . . 23
+
+11
+
+Files in Application Folder . . . . . . . . . . . . . . . . . . . . . . . . 24
 
 1
 
@@ -837,7 +849,8 @@ As can be seen below, the executable makes a system call to initiate a make comm
 stores the result in a log file. If the compilation fails, an error message is printed, and the program
 exits early.
 if ( op_is_root ()) {
-if ( system ( " make -j [ application ] _cuda_rec & > jit_compile . log " )) {
+if ( system ( " make -j [ application ] _cuda_rec & > jit_compile . log " ))
+{
 // 0 indicated success
 printf ( " Error : JIT compile failed . \ n
 - see jit_compile . log for details \ n " );
@@ -867,17 +880,38 @@ The binary expects there to be a Makefile in the directory it executes in, with 
 [application]_cuda_rec in order to work correctly. This is the target which will be compiled
 at runtime. As mentioned in the previous section, the result of making this target needs to be
 a a shared object file named cuda/airfoil_kernel_rec.so, which contains the recompiled loop
-functions.
 
 17
 
-The library object is produced by compiling each of the kernels individually, using the NVidia
+functions.
+The library object is produced by compiling each of the kernels individually, using the NVidia
 compiler nvcc from the NVidia CUDA Toolkit[2, 1] as the code contains CUDA, then linking them
 into a single object. It is necessary that the compiler flags include --compiler-options -fPIC.
 This passes a list of arguments to the underlying compiler, since nvcc only handles the CUDA
 code, and passes all host code compilation on to a C compiler. The argument to be passed down is
 -fPIC, to generate Position Independant Code, to allow the library function to execute correctly,
 regardless of the address at which it is loaded in memory.
+
+4.2.1
+
+Optional Functionality
+
+By default, the JIT compilation functionality is enabled in the Makefile by setting the value of $JIT
+to TRUE. However, if the variable is set to anything else in the parameters of the make command,
+JIT will be disabled in the resulting executable. This is done with the following lines:
+ifeq ( $ ( JIT ) , TRUE )
+CCFLAGS
+:= $ ( CCFLAGS ) - DOP2_JIT
+NVCCFLAGS := $ ( NVCCFLAGS ) - DOP2_JIT
+SUFFIX
+:= _jit
+endif
+
+Which adds a parameter to the C and CUDA compilers to define OP2_JIT for the preprocessor,
+and appends ” jit” to the name of the executable generated.
+The target cuda/airfoil_kernels_cu.o is also declared PHONY, so that it is always recompiled
+even if the file already exists, otherwise this make flag would not function correctly, and a JIT
+enabled version of this file may be used when the user intended to recompile it with JIT disabled.
 
 18
 
@@ -911,7 +945,7 @@ With this in mind, the airfoil application code includes a test of the result af
 against the expected outcome, and prints the percentage difference. A difference of less than
 0.00001 is considered within tolerance due to the potential for minor floating point errors, and
 therefore a passing test.
-The initial state for the test is a folder with the files listed in Figure 10a (p21). The main
+The initial state for the test is a folder with the files listed in Figure 11a (p23). The main
 application file is airfoil.cpp which contains OP2 API calls, and the structure of the program.
 The 5 header files contain the user functions for the respective parallel loop with the same name,
 and new_grid.h5 is the input data in the Heterogenous Data Format (HDF5 [8]) file format.
@@ -919,17 +953,15 @@ and new_grid.h5 is the input data in the Heterogenous Data Format (HDF5 [8]) fil
 19
 
 5.2
-
-Test Results
-
 5.2.1
 
+Test Results
 Code Generation
 
 To test the code generation, the python script op2.py is called in the directory, passing the main
 application file airfoil.cpp as an argument, as well as the string JIT to make sure the correct
 code generation scripts are called.
-python2 $OP2_INSTALL_PATH/../translator/c/python/op2.py airfoil.cpp JIT
+> python2 \$OP2_INSTALL_PATH/../translator/c/python/op2.py airfoil.cpp JIT
 After running this command, the expected outcome is that a new file: airfoil_op.cpp is created
 in the directory, and a directory named cuda/ will be created with eleven files in it: Two for
 each of the five parallel loops, as described in Section 4.1; and a single master kernels file named
@@ -938,42 +970,151 @@ This test is considered a pass if these files exist, as their contents is valida
 next tests passing. A folder called seq/ is also created by the translator script
 translator/c/python/jit/op2_gen_seq_jit.py, which was not completed as part of this project,
 but part of the feature/lazy-execution, the parent branch of feature/jit.
-
-Figure 10b shows the folder after running the above command. The test is considered PASSED.
+Figure 11b shows the folder after running the above command. The test is considered PASSED.
 
 5.2.2
 
 Ahead-of-Time Compilation
 
+Compilation with both JIT enabled, and JIT disabled needs to be tested.
+1. JIT Enabled:
+Ahead of time compalation is considered a success if the compilation completes successful, without
+any errors. In the airfoil_JIT folder this is done using the Makefile and the airfoil_cuda target,
+and JIT is enabled in the Makefile by default, so the command to compile the JIT enabled version
+is simply:
+> make airfoil_cuda
+This target includes compiling all of the AOT kernel files into a single binary, then compiling
+the modified master application file airfoil_op.cpp and linking the two together to produce the
+executable, named airfoil_cuda_jit. The command executed by the Makefile is:
+
+20
+
+nvcc -gencode arch=compute_60,code=sm_60 -m64 -Xptxas=-v --use_fast_math -O3
+-lineinfo -DOP2_JIT -I/home/cs-dunn1/cs310/OP2-Common/op2//c/include
+-I/home/cs-dunn1/parlibs/phdf5/include -Icuda -I. -c
+-o cuda/airfoil_kernels_cu.o cuda/airfoil_kernels.cu
+
+Some warnings are generated, but there are no compilation errors. Figure 11c shows the folder
+after running the above command. The test is considered PASSED.
+
+2. JIT DISABLED:
+To build the executable with JIT compilation disabled a parameter needs to be added to the make
+command:
+
+> make airfoil_cuda JIT=FALSE
+
+Which will prevent cause the compiler to ignore the call to jit_compile() in the Host Function,
+and instead continue using the AOT kernel file. The only difference in expected outcome from the
+previous test is that the executable will be named airfoil_cuda, without the ” jit” suffix.
+Again some warnings are generated, but there are no compilation errors. The Figure is omitted
+due to similarity to Figure 11c . The test is considered PASSED.
+
 5.2.3
 
 Just-in-Time Compilation
+
+Testing Just-In-Time Compilation requires only that when executed the binary does not exit early
+with an error. As described previously in Section 4.1.2 there exists a check for success in the code,
+and the terminal output of the compilation is dumped to a file named jit_compile.log.
+The test can be considered successful if the executable prints the compilation duration to the
+console output, and confirmed as a success by checking the compiler log for errors.
+
+> ./airfoil_cuda_jit
+...
+JIT compiling op_par_loops
+Completed: 5.588549s
+
+21
+
+In Figure 11d, which shows the airfoil folder after JIT compilation has completed successfully, we
+can see that there is now an object file for each of the parallel loops, as well as a new shared
+object in the cuda/ folder. Some other miscellaneous files have also been generated, including the
+compilation log file and the optimisation report from icpc.
+The JIT compilation log file does not contain any errors, and the expected files have been generated,
+as can be seen in /Figure 11d . The test is considered PASSED.
 
 5.2.4
 
 Output
 
-20
+The final test is that the result of the execution is within tolerance of the expected outcome. This
+test confirms that the contents of the file not just valid but also correct. The outputs are shown
+below:
 
-Figure 10: Files in Application Folder
+Figure 10: Console Output from both binaries
+JIT
+100
+200
+300
+400
+500
+Iterations
+600
+700
+800
+900
+1000
+Accuracy
+
+Enabled
+5.02186 × 10−4
+3.41746 × 10−4
+2.63430 × 10−4
+2.16288 × 10−4
+1.84659 × 10−4
+1.60866 × 10−4
+1.42253 × 10−4
+1.27627 × 10−4
+1.15810 × 10−4
+1.06011 × 10−4
+
+Disabled
+5.02186 × 10−4
+3.41746 × 10−4
+2.63430 × 10−4
+2.16288 × 10−4
+1.84659 × 10−4
+1.60866 × 10−4
+1.42253 × 10−4
+1.27627 × 10−4
+1.15810 × 10−4
+1.06011 × 10−4
+
+2.484679129111100 × 10−11 %
+
+2.486899575160351 × 10−11 %
+
+The table shows the result every 100 iterations, as printed to the terminal by the binary, as well
+as the percentage difference from the exact expected value.
+Both outputs are well within the tolerance of 1 × 10−5 %. The test is considered PASSED.
+
+22
+
+Figure 11: Files in Application Folder
 (a) Input Files
 
 (b) After Code Generation
 
-21
+23
 
-Figure 10: Files in Application Folder
+Figure 11: Files in Application Folder
 (c) After AOT Compile
 
-(d) After Execution
+(d) After JIT Compile
 
-22
+24
+
+5.3
+
+Benchmarking
+
+25
 
 6
 
 Evaluation
 
-23
+26
 
 7
 
@@ -983,7 +1124,7 @@ Future Work
 
 Conclusion
 
-24
+27
 
 References
 [1] NVidia Corporation. CUDA toolkit.
@@ -1008,18 +1149,18 @@ url: https://www.hdfgroup.org/ (visited on 04/04/2020).
 [9] Free Software Foundation Inc. GNU Make.
 url: https://www.gnu.org/software/make/ (visited on 04/01/2020).
 
-25
+28
 
 Appendices
 A
 
 Getting Started with OP2
 
-26
+29
 
 Acknowledgements
 TODO
 
-27
+30
 
 

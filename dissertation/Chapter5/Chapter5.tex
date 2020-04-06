@@ -16,39 +16,104 @@ The initial state for the test is a folder with the files listed in Figure \ref{
 
 \subsubsection{Code Generation}
 To test the code generation, the python script \verb|op2.py| is called in the directory, passing the main application file \verb|airfoil.cpp| as an argument, as well as the string \verb|JIT| to make sure the correct code generation scripts are called.
-\codeline{ python2 \$OP2_INSTALL_PATH/../translator/c/python/op2.py airfoil.cpp JIT}{}
-\noindent After running this command, the expected outcome is that a new file: \verb|airfoil_op.cpp| is created in the directory, and a directory named \verb|cuda/| will be created with eleven files in it: Two for each of the five parallel loops, as described in Section \ref{sec:codegen}; and a single master kernels file named \verb|airfoil_kernels.cu|.
+\begin{verbatim}
+> python2 \$OP2_INSTALL_PATH/../translator/c/python/op2.py airfoil.cpp JIT
+\end{verbatim}
+After running this command, the expected outcome is that a new file: \verb|airfoil_op.cpp| is created in the directory, and a directory named \verb|cuda/| will be created with eleven files in it: Two for each of the five parallel loops, as described in Section \ref{sec:codegen}; and a single master kernels file named \verb|airfoil_kernels.cu|.
 \par
 This test is considered a pass if these files exist, as their contents is validated as correct by the next tests passing. A folder called \verb|seq/| is also created by the translator script\\
  \verb|translator/c/python/jit/op2_gen_seq_jit.py|, which was not completed as part of this project, but part of the \verb|feature/lazy-execution|, the parent branch of \verb|feature/jit|.
- \\\\
- \setlength{\fboxsep}{1em}
- \fbox{%
-  \parbox{\textwidth}{%
-    Figure \ref{fig:files_b} shows the folder after running the above command. The test is considered \textbf{\textcolor{green!20!black}{PASSED}}.
-  }%
-}
+
+\testresult{Figure \ref{fig:files_b} shows the folder after running the above command}{pass}
 
 \subsubsection{Ahead-of-Time Compilation}
+Compilation with both JIT enabled, and JIT disabled needs to be tested.
+
+\minititle{JIT Enabled}\\
+Ahead of time compalation is considered a success if the compilation completes successful, without any errors. In the \verb|airfoil_JIT| folder this is done using the Makefile and the \verb|airfoil_cuda| target, and JIT is enabled in the Makefile by default, so the command to compile the JIT enabled version is simply:
+\begin{verbatim}
+> make airfoil_cuda
+\end{verbatim}
+This target includes compiling all of the AOT kernel files into a single binary, then compiling the modified master application file \verb|airfoil_op.cpp| and linking the two together to produce the executable, named \verb|airfoil_cuda_jit|.
+The command executed by the Makefile is:
+\begin{verbatim}
+nvcc -gencode arch=compute_60,code=sm_60 -m64 -Xptxas=-v --use_fast_math -O3
+     -lineinfo -DOP2_JIT -I/home/cs-dunn1/cs310/OP2-Common/op2//c/include
+     -I/home/cs-dunn1/parlibs/phdf5/include -Icuda -I.	-c
+     -o cuda/airfoil_kernels_cu.o cuda/airfoil_kernels.cu
+\end{verbatim}
+\testresult{Some warnings are generated, but there are no compilation errors. Figure \ref{fig:files_c} shows the folder after running the above command}{pass}
+
+\minititle{JIT DISABLED}\\
+To build the executable with JIT compilation disabled a parameter needs to be added to the make command:
+\begin{verbatim}
+> make airfoil_cuda JIT=FALSE
+\end{verbatim}
+Which will prevent cause the compiler to ignore the call to \verb|jit_compile()| in the Host Function, and instead continue using the AOT kernel file. The only difference in expected outcome from the previous test is that the executable will be named \verb|airfoil_cuda|, without the "\_jit" suffix.
+\testresult{
+Again some warnings are generated, but there are no compilation errors. The Figure is omitted due to similarity to Figure \ref{fig:files_c} }{pass}
 
 
 \subsubsection{Just-in-Time Compilation}
+Testing Just-In-Time Compilation requires only that when executed the binary does not exit early with an error. As described previously in Section \ref{sss:mkf} there exists a check for success in the code, and the terminal output of the compilation is dumped to a file named \verb|jit_compile.log|.
+\par
+The test can be considered successful if the executable prints the compilation duration to the console output, and confirmed as a success by checking the compiler log for errors.
+\begin{verbatim}
+> ./airfoil_cuda_jit
+  ...
+  JIT compiling op_par_loops
+   Completed: 5.588549s
+\end{verbatim}
+In Figure \ref{fig:files_d}, which shows the airfoil folder after JIT compilation has completed successfully, we can see that there is now an object file for each of the parallel loops, as well as a new shared object in the \verb|cuda/| folder. Some other miscellaneous files have also been generated, including the compilation log file and the optimisation report from \verb|icpc|.
+\testresult{
+The JIT compilation log file does not contain any errors, and the expected files have been generated, as can be seen in /Figure \ref{fig:files_d} }{pass}
 
 \subsubsection{Output}
+The final test is that the result of the execution is within tolerance of the expected outcome. This test confirms that the contents of the file not just valid but also correct. The outputs are shown below:
+
+\begin{figure}[h]
+\renewcommand{\arraystretch}{1.2}
+\caption{Console Output from both binaries}
+\label{tab:output}
+\begin{tabular}{c c || c | c }
+JIT & & Enabled & Disabled \\
+\hline
+\multirow{10}{*}{Iterations} & 100  & $ 5.02186\times10^{-4} $ & $ 5.02186\times10^{-4} $  \\
+& 200  & $ 3.41746\times10^{-4} $ & $ 3.41746\times10^{-4} $  \\
+& 300  & $ 2.63430\times10^{-4} $ & $ 2.63430\times10^{-4} $  \\
+& 400  & $ 2.16288\times10^{-4} $ & $ 2.16288\times10^{-4} $  \\
+& 500  & $ 1.84659\times10^{-4} $ & $ 1.84659\times10^{-4} $  \\
+& 600  & $ 1.60866\times10^{-4} $ & $ 1.60866\times10^{-4} $  \\
+& 700  & $ 1.42253\times10^{-4} $ & $ 1.42253\times10^{-4} $  \\
+& 800  & $ 1.27627\times10^{-4} $ & $ 1.27627\times10^{-4} $  \\
+& 900  & $ 1.15810\times10^{-4} $ & $ 1.15810\times10^{-4} $  \\
+& 1000  & $ 1.06011\times10^{-4} $ & $ 1.06011\times10^{-4} $  \\
+\hline
+&&&\\
+Accuracy & & $2.484679129111100\times10^{-11} \%$ & $2.486899575160351\times10^{-11} \%$ \\
+&&&\\
+\hline
+\end{tabular}
+\end{figure}
+
+\noindent The table shows the result every 100 iterations, as printed to the terminal by the binary, as well as the percentage difference from the exact expected value.
+\testresult{Both outputs are well within the tolerance of $1\times10^{-5} \%$}{pass}
 
 \begin{figure}[t!p]
 \centering     %%% not \center
 \caption{Files in Application Folder}
-\subfloat[Input Files]{\label{fig:files_a}\includegraphics[width=60mm]{files1}}
- \qquad
-\subfloat[After Code Generation]{\label{fig:files_b}\includegraphics[width=60mm]{files2}}
+\subfloat[Input Files]{\label{fig:files_a}\includegraphics[width=64mm,valign=c]{files1}}
+ \qquad\qquad
+\subfloat[After Code Generation]{\label{fig:files_b}\includegraphics[width=64mm,valign=c]{files2}}
 \vspace*{3in}
 \end{figure}
 
 \begin{figure}[tp]\ContinuedFloat
 \centering     %%% not \center
 \caption{Files in Application Folder}
-\subfloat[After AOT Compile]{\label{fig:files_c}\includegraphics[width=60mm]{files3}}
- \qquad
-\subfloat[After Execution]{\label{fig:files_d}\includegraphics[width=60mm]{files4}}
+\subfloat[After AOT Compile]{\label{fig:files_c}\includegraphics[width=64mm]{files3}}
+ \qquad\qquad
+\subfloat[After JIT Compile]{\label{fig:files_d}\includegraphics[width=64mm]{files4}}
 \end{figure}
+
+\include{Chapter5/Benchmarking}
