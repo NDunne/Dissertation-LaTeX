@@ -1,6 +1,7 @@
 % !TEX root =  ../report.tex
 
 \section{Implementation}
+\label{s:impl}
 The OP2 library is hosted open source on GitHub\cite{OP2rep}. Instructions for obtaining the implementation completed for this report, and getting started with OP2 can be found in Appendix \ref{app:getStart}.
 \par
 The feature branch for this project, \verb|feature/jit| was branched from \\\verb|feature/lazy-execution| on 13th November 2019. The \verb|lazy-execution| branch's last commit was in April 2018, and lagged behind the \verb|master| branch somewhat. It was rebased onto \verb|master| before any other changes were made.
@@ -10,7 +11,7 @@ This branch was created for developing a system to execute parallel loops when v
 Currently this function generates the constants header file, then executes the queued loop straight away. This process for calling parallel loops is used similarly throughout work done to enable Just-In-Time Compilation for CUDA, so that future efforts towards lazy execution can continue in the future on top of the JIT implementation.
 
 \subsection{Code Generation}
-\label{sec:codegen}
+\label{ss:codegen}
 The Python code generation script which forms the main body of the implementation can be found in: \verb|translator/c/python/jit/op2_gen_cuda_jit.py|
 \\
 Its entry point function is:

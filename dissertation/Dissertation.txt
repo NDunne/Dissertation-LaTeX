@@ -43,7 +43,7 @@ ii
 
 List of Figures
 
-v
+vi
 
 1 Introduction
 
@@ -51,148 +51,188 @@ v
 
 1.1
 
-Background Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-1
-
-1.2
-
 Motivations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 2
 
+1.2
+
+Background Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2
+
+1.3
+
+Report Structure . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+3
+
 2 Research
-
-3
-
 2.1
-
-OP2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-3
 
 2.2
 
-CUDA . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.3
 
 4
 
-2.3
+OP2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+
+2.1.1
+
+Exisiting Work . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+
+2.1.2
+
+OP2 Applications . . . . . . . . . . . . . . . . . . . . . . . . .
+
+6
+
+CUDA . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+6
+
+2.2.1
+
+Hardware . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+7
+
+2.2.2
+
+Programming Interface . . . . . . . . . . . . . . . . . . . . . .
+
+8
 
 Related Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-4
+9
 
 2.3.1
 
 JIT . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-4
+9
 
 2.3.2
 
 Similar Libraries . . . . . . . . . . . . . . . . . . . . . . . . .
 
-4
+9
 
 3 Specification
 
-4
+10
 
-3.1
+3.1
 
-Runtime Assertions . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-5
+Runtime Assertions . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
 
 3.2
 
-System Model . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-5
+System Model . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
 
 4 Implementation
 4.1
 
-7
-
-Code Generation . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-7
-
-4.1.1
-
-8
-
-Kernel Files . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-4.1.2
 4.2
 
-Master Kernels File . . . . . . . . . . . . . . . . . . . . . . . . 15
+13
 
-Makefile . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+Code Generation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+4.1.1
+
+Kernel Files . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+
+4.1.2
+
+Master Kernels File . . . . . . . . . . . . . . . . . . . . . . . . 21
+
+Makefile . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
 4.2.1
-
-Optional Functionality . . . . . . . . . . . . . . . . . . . . . . 18
 
 5 Testing
 
-19
+Optional Functionality . . . . . . . . . . . . . . . . . . . . . . 24
+
+25
 
 5.1
 
-Test Plan . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+Test Plan . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
 
 5.2
 
-Test Results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+Test Results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
 
 5.3
 
 5.2.1
 
-Code Generation . . . . . . . . . . . . . . . . . . . . . . . . . 20
+Code Generation . . . . . . . . . . . . . . . . . . . . . . . . . 26
 
 5.2.2
 
-Ahead-of-Time Compilation . . . . . . . . . . . . . . . . . . . 20
+Ahead-of-Time Compilation . . . . . . . . . . . . . . . . . . . 26
 
 5.2.3
 
-Just-in-Time Compilation . . . . . . . . . . . . . . . . . . . . 21
+Just-in-Time Compilation . . . . . . . . . . . . . . . . . . . . 27
 
 5.2.4
 
-Output . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+Output . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28
 
-Benchmarking . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+Benchmarking . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31
+5.3.1
+
+Benchmarking Strategy . . . . . . . . . . . . . . . . . . . . . . 31
+
+5.3.2
+
+Results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+
+5.3.3
+
+Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+
+5.3.4
+
+Conclusion . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33
 
 6 Evaluation
 
-26
+34
+
+6.1
+
+Project Management . . . . . . . . . . . . . . . . . . . . . . . . . . . 34
 
 7 Future Work
 
-27
+34
 
 8 Conclusion
 
-27
+34
 
 Appendices
 
-29
+37
 
 A Getting Started with OP2
 
-29
+37
 
 Acknowledgements
 
-30
+38
 
-List of Figures
+List of Figures
 1
 
 Tri-Structured Mesh . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -207,148 +247,363 @@ Airfoil Tri-Unstructed Mesh . . . . . . . . . . . . . . . . . . . . . . .
 
 3
 
-OP2 System Diagram with JIT Addition . . . . . . . . . . . . . . . .
-
-6
-
-4
-
-JIT includes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-8
+Data layouts. Diagram reproduced from [15] . . . . . . . . . . . . . .
 
 5
 
-User Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4
 
-9
-
-6
-
-Kernel Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+Architecture Comparison. Diagram from [3, p3] . . . . . . . . . . . .
 
 7
 
-Host Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+5
+
+2D grid of Blocks and Threads. Diagram from [3, p9] . . . . . . . . .
 
 8
 
-Loop Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+6
+
+OP2 System Diagram with JIT Addition . . . . . . . . . . . . . . . . 11
+
+7
+
+JIT includes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+
+8
+
+User Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
 
 9
 
-Kernel Flow . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+Kernel Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
 
 10
 
-Console Output from both binaries . . . . . . . . . . . . . . . . . . . 22
+Host Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
 
 11
 
-Files in Application Folder . . . . . . . . . . . . . . . . . . . . . . . . 23
+Loop Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
 
-11
+12
 
-Files in Application Folder . . . . . . . . . . . . . . . . . . . . . . . . 24
+Kernel Flow . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+
+13
+
+Console Output from both binaries . . . . . . . . . . . . . . . . . . . 28
+
+14
+
+Files in Application Folder . . . . . . . . . . . . . . . . . . . . . . . . 29
+
+14
+
+Files in Application Folder . . . . . . . . . . . . . . . . . . . . . . . . 30
+
+15
+
+Runtime Divided by Parallel Loop . . . . . . . . . . . . . . . . . . . . 32
 
 1
 
 Introduction
 
 In the field of High Performance Computing (HPC), computers with processing
-power tens or hundreds of times greater than conventially available machines are
-used to solve (or appoximate solutions to) problems that would otherwise take an
-unwarrantable amount of time. Such computers have been required for some time
-to make use of a large degree of parallelism in order to complete with reasonable
-runtime: dividing work into independant subsections which can be executed simultaneously.
-Many paradigms for executing parallel workloads have emerged over time: including
-vector instructions (SIMD), many and multi-core CPUs, clusters of interconnected
-computers, and General Purpose Graphical Processing Units (GPGPUs). Hardware
-which was originally specilised for graphical shader calculations through it’s very
-high number of processing units, allows carrying out the same operation across a
-very large amount of data in parallel. This harware has been adapted in GPGPUs
-to perform non-specific operations that would normally have been done by the CPU.
-There is always space for further benefit to be gained, and even small gains in
-runtime can have large impact on workload that take hours or days to complete.
-This report details an investigation into applying a new optimisation to the CUDA
-code generation library subsection of OP2, and secondarily benchmarking what
-performance gain if any it is able to provide. The optimisation is named ”Just-In-Time
-Compilation” for its similarities to a comparable process often performed by compilers
-when runtime efficiency is desired.
+power hundreds of times greater than conventially available machines are used
+to solve or approximate complex problems. Such computers have been required
+for some time to utilise parallelism, in order to find solutions within a reasonable
+runtime.
+Many paradigms for executing parallel workloads have emerged over time. Recently,
+General Purpose Graphical Processing Units (GPGPUs) have become an increasingly
+popular hardware architecture, having originally been concieved as specilised hardware
+for graphical shader calculations. GPU’s high number of parallel processing units
+allow a high degree of parallelism, as well as being able to execute operations usually
+done by the CPU. Passing work to the GPU device can provide very significant
+speed-up over sequential execution.
+Commonly, a single developer or team is unlikely to have both the necessary
+expertise in both a niche area of physics with a non-trivial problem to be solved;
+and also sufficient depth of knowledge in computer science to understand the latest
+generation of parallel hardware. For this reason the OP2 framework was created:
+to provide a high level abstraction in which HPC applications can be written, and
+seperate the application code from the optimisation requirements. OP2 already is
+able to generate optimised code for a number of backends from an application file.
+This report details an investigation into applying a new optimisation to the
+CUDA code generation in OP2, and the process of benchmarking what performance
+gain, if any, it is able to provide. The optimisation is named“Just-In-Time Compilation”
+for its similarities to a comparable process often performed by compilers when
+runtime efficiency is desired.
 
-1.1
-
-Background Work
-
-The OP2 library is an Open Source Domain Specific Langauge (DSL) which provides
-a high level abstraction for describing physics problems which can be abstracted to
 1
 
-an Unstructured Mesh. A large proportion of HPC workloads involve approximating
-Partial Differential Equations (PDEs) to simulate complex interactions in physics
-problems, for example the Navier-Stokes equations for computational fluid dynamics,
-prediciting weather patterns, or computational electro-magnetics.
-
-It is usually
-
-necessary to discretise such problems across some form of mesh, either structured
-(regular) or unstructured.
-
-Figure 1: Tri-Structured Mesh
-
-Figure 2: Airfoil Tri-Unstructed Mesh
-
-Unstructed Meshes, such as Figure 2, use connectivity information to specify
-the mesh topology. The position of elements is highly arbritrary, unlike structured
-meshes where elements follow a regular pattern (Figure 1). A particular simulation
-might, for example, be approximating the velocity of a fluid in each cell based on
-the cells around it.
-
-1.2
+1.1
 
 Motivations
 
 The idea for this project was provided by my supervisor, Dr Gihan Mudalige - an
 Associate Proffesor in the University of Warwick Computer Science Department.
-It was pulled from the pool of uncompleted features for the OP2 project, and I
-selected it as it aligned with my interest in High Performance Computing, and
-similar experience with optimising exisiting codes.
+It was pulled from the pool of uncompleted features for the OP2 project, and was
+selected because it aligned with my interest in High Performance Computing, and
+previous experience with optimising exisiting codes.
 Since OP2 is Open Source and freely available, the implementation I produce
+will become part of the library, allowing future contributors to build on my work.
+
+1.2
+
+Background Work
+
+In order to become comfortable with the OP2 framework, and provide a useful
+contribution, it is important to understand the domain of problems for which it was
+created: Unstructured Mesh Solvers.
+A large proportion of HPC workloads involve approximating Partial Differential
+Equations (PDEs) to simulate complex interactions in physics problems, for example
+the Navier-Stokes equations for computational fluid dynamics, or prediciting weather
+patterns. It is usually necessary to discretise such problems, dividing 2D or 3D space
+into a number of cells. Depending on its structure this mesh can be described as
+either structured (regular) or unstructured.
+
+Figure 1: Tri-Structured Mesh
+
+Figure 2: Airfoil Tri-Unstructed Mesh
 2
 
-will become part of the library, allowing future contributors to build on my work.
-The project also allows me the opportunity to operate on a large codebase, where
-most university work is done largely within the confines of one’s own code.
+Unstructed Meshes, such as Figure 2, use connectivity information to specify
+the mesh topology. The position of elements is highly arbritrary, unlike structured
+meshes where elements follow a regular pattern (Figure 1). A particular simulation
+might, for example, be approximating the velocity of a fluid in each cell, and at
+every time step re-calculating this value based on the values of cells around it.
+Since a structured mesh can be represented using an unstructured mesh, OP2
+can support either - however unstructured meshes are more common.
+
+1.3
+
+Report Structure
+
+The rest of this report is structured as follows: In Section 2 (p4) the research done
+to inform the work in this project is discussed, followed by a Specification in Section
+3 (p10). Section 4 (p13) details the Implemention and expected results, Section 5
+(p25) explains the Testing and Benchmarking of the project, and Section 6 (p34)
+an Evaluation of the work completed, including Project Management (p34). Lastly,
+Section 7 (p34) contains a discussion on Future Work which could build on top of
+what was done for this report, and Section 8 (p34) an overall Conclusion
+
+3
+
+0
 
 2
 
 Research
 
 2.1
+2.1.1
 
 OP2
+Exisiting Work
 
-The OP2 library is already able to generate optimised code for a number of platforms,
-including the increasingly popular NVidia CUDA for parallel programming on NVidia
-GPUs. The current implementation is compiled entirely ahead of time however, and
-is not able to optimise based on the input mesh.
-The abstraction provided by OP2 allows scientists and engineers to focus on
-the description of the problem, and seperates the consideration for parallelism and
-efficiency into the back-end library and code generation. This is beneficial as it is
-unlikely that a single developer or team has the necessary expertise in both some
-niche area of physics with a non-trivial problem to be solved; and sufficient depth
-of knowledge in computer science to understand and utilise the latest generation of
-parallel hardware.
-A further benefit is that existing solutions which make use of the OP2 library can
-be ported onto a new generation of hardware, by modifying only the OP2 backend
-library to support the new hardware, instead of every application individually.
-This portability can save both time and money in development if multiple different
-hardware platforms are desired to be used.
+OP2 is an ”active library” framework [10], which takes a single application code
+written using the OP2 Application Programming Interface (API), embedded in
+either C or Fortran. It uses source-to-source translation to produce multiple solutions,
+each for different optimised parallel implementations - including CUDA for executing
+operations on NVidia graphics cards. The generated code is then linked against the
+OP2 library and compiled to produce an executable for the application, which can
+run on the desired hardware. It is the extra step of code generation that makes OP2
+an ”active” library, compared to conventional software libraries.
+Since this project is focussed on the GPU back-end, and specifically CUDA for
+NVidia GPUs, the journal article on the design of OP2 for GPU architectures [15]
+is necessary background material, as it covers a lot of important details from the
+GPU implementation.
+The paper is summerised in the following section:
+1. Designing OP2 for GPU architectures: This article, originally published
+in the Journal of Parallel and Distributed Computing in 2013, describes the ey
+design features of the current OP2 library for generating efficient code targeting
+GPUs based on NVIDIA’s Fermi architecture. It is worth noting that Fermi is no
+longer the latest architecture, and the code generation process has been modified
+4
+
+since publication, however the article still provides useful information.
+One of the key points made in the paper is on the managing of data dependencies
+(p1454), and the solutions proposed for avoiding errors when incrementing indirectly
+referenced array, where two edges end up updating the same node.
+
+Solutions
+
+include an owner of node data which performs the computation; colouring of edges
+such that no two edges of the same colour update the same node; and atomic
+operations. In the implementation for this project, atomic operations, which perform
+read-modify-write operation on one 32-bit or 64-bit word residing in global or shared
+memory [3, p96], as used to solve this issue.
+The paper also introduces the consideration for data layout in memory. Figure
+3 demonstrates the different layouts possible when there are multiple components
+for each element. The paper concludes that the struct-of-arrays layout reduces the
+total amount data transferred to and from GPU global memory, in some cases by
+over 50%.
+0
+
+1
+
+2
+
 3
 
-2.2
+0
+
+1
+
+2
+
+3
+
+0
+
+1
+
+2
+
+3
+
+0
+
+1
+
+2
+
+3
+
+2
+
+3
+
+3
+
+3
+
+3
+
+(a) Array of Structs (AOS) layout
+
+0
+
+0
+
+0
+
+0
+
+1
+
+1
+
+1
+
+1
+
+2
+
+2
+
+2
+
+(b) Struct of Arrays (SOA) layout
+
+Figure 3: Data layouts. Diagram reproduced from [15]
+
+The SoA layout is enabled by setting the value of an environment variable: OP AUTO SOA=1
+prior to code generation [9, p13].
+It is important to note that the existing implementation for CUDA code generation
+produces a solution that is compiled entirely ahead of time, i.e. prior to the inputs
+being known at run-time, and therefore is not able to make optimisations based on
+the mesh input. This project aims to fill this space and determine if there is benefit
+5
+
+to be gained from such optimisations.
+
+2.1.2
+
+OP2 Applications
+
+There are a number of industrial applications that have been implemented using
+OP2, which would immediately benefit from any optimisation of generated code,
+including Airfoil [8] - a non-linear 2D inviscid airfoil code; Hydra [13] - Rolls Royce’s
+turbomachinery simulator, and Volna [12] - a finite-volume nonlinear shallow-water
+equation solver used to simulate tsunamis.
+They make use of the abstraction provided by OP2, allowing scientists and
+engineers to focus on the description of the problem, and seperates the consideration
+for parallelism and data-movements into the OP2 library and code generation.
+A further benefit is that such applications could be ported onto a new generation
+of hardware which might be developed in the future, with only the OP2 backend
+library needing to be modified to support the new hardware instead of every application
+individually. This portability can save both time and money in development if
+multiple different hardware platforms are desired to be used.
+Later in this report we will see Airfoil used as a benchmark, to determine whether
+the new optimisation presented in the report is likely to provide benefit to other OP2
+applications.
+
+2.2
 
 CUDA
+
+Since this project will require the automatic generation of CUDA from sequential
+code, it is important to introduce the NVidia hardware, and the C API which will be
+utilised. The information is pulled from the NVidia CUDA C Programming Guide
+[3], which will continue to be used for reference throughout the report.
+6
+
+2.2.1
+
+Hardware
+
+GPU hardware is specialised to perform compute-heavy workloads, where the ratio
+of arithmetic operations to memory operations is high, by devoting more resources
+to actual data processing. Figure 4 compares this to a more traditional CPU
+architecture, which optimises for flow control and data caching:
+
+Figure 4: Architecture Comparison. Diagram from [3, p3]
+
+This structure allows GPUs to excel at performing parallel tasks requiring the
+same action to be performed on large sets of data, and therefore well suited to the
+needs of OP2, where a particular function might need to be applied to all edges,
+or cells, or nodes in the mesh. Since OP2 enforces that the order in which the
+function is applied to the members of the set must not affect the final result [9, p4],
+the consideration for data dependencies is largely removed, and operations can be
+scheduled based on best performance.
+Workloads executed on a GPU are divided among a Grid of Blocks, where each
+Block contains a number of Threads. To allow for simple mapping from the problem
+to the thread ID, the Block Identifiers, and Thread Identifiers within each block,
+can be 1D, 2D or 3D [3, p9]. Figure 5 shows an example where 2D identifiers are
+used.
+
+7
+
+Figure 5: 2D grid of Blocks and Threads. Diagram from [3, p9]
+The use of this thread layout will become more clear in the next section, where the
+invocation of a function to run on a GPU device is described.
+
+2.2.2
+
+Programming Interface
+
+Firstly, the CUDA C API provides two function type quantifiers that will need to
+be used in the generated code:
+• __device__
+• __global__
+Both indicate that the function should be compiled to PTX, the CUDA instruction
+set architecture [3, p15], however a function declared __global__ can be invoked
+from host (CPU) code, or device (GPU) code; where a __device__ function can
+only be called from code already executing on the device [3, p81].
+Global functions therefore act as a sort of entry point into device code. They are
+called using special notation to specify the requested number of blocks and threads
+8
+
+per block:
+function<<< num_blocks, threads_per_block >>>( [arguments...] )
+
+Where num_blocks and threads_per_block can be of either int (1D) or dim3
+(1D,2D or 3D) data type [3, p9]. The function body will then be executed num_blocks×
+threads_per_block times. The Kepler Architecture has an upper limit of 2048 total
+threads per multiprocessor [6].
 
 2.3
 
@@ -362,7 +617,9 @@ JIT
 
 Similar Libraries
 
-3
+9
+
+3
 
 Specification
 
@@ -377,23 +634,22 @@ and indicating where the loops parallelised by OP2 should be executed; and a
 kernel descriptor for each loop, which will describe the operation to be performed
 on each element of the set passed to the loop as a parameter. OP2 makes an
 important restriction that the order in which elements are processed must not affect
-the final result, to within the limits of finite precision floating-point arithmetic[7,
+the final result, to within the limits of finite precision floating-point arithmetic[10,
 p3]. This constraint allows the code generator freedom to not consider the ordering
 of iterations, and select an ordering based on performance.
 From this a set of valid C files must be generated, to be compiled by a normal
 C compiler. In the case of this project the compiler will be the NVidia C Compiler
 (nvcc), as the code generated will be include CUDA.
-4
-
-It is important that the resulting executable compiled from the generated code
+It is important that the resulting executable compiled from the generated code
 produces outputs within some tolerance of the outputs generated by execting parallel
 loop iterations sequentially. Correctness is always a priority over performance for
 any compiler.
 Furthermore, it will be ensured that the OP2 API is not be altered by any
 modifications to the library, to ensure that all exisiting programs using the API are
 able to seemless use the updated version.
+10
 
-3.1
+3.1
 
 Runtime Assertions
 
@@ -410,15 +666,9 @@ Work.
 
 System Model
 
-Figure 3 describes the new workflow of the OP2 library, with the addition of
-Just-In-Time compilation. As before, code generation takes the application and
-loop files as input, and generates the Kernels and Modified Application Files. It also
-generates Optimised Kernels, where the code will only compile once the constants
-are known and defined by the pre-processor. These Kernel files are not used by the
-ahead of time compiler.
-5
+Runtime
 
-Source
+Source
 Files
 
 Kernels
@@ -438,8 +688,6 @@ Compiler
 Optimised
 Kernels
 
-Runtime
-
 Program
 Binary
 
@@ -453,15 +701,21 @@ Object
 
 JIT
 Compiler
-
 OP2 ”JIT”
+Figure 6: OP2 System Diagram with JIT Addition
+11
 
-Figure 3: OP2 System Diagram with JIT Addition
+Figure 6 describes the new workflow of the OP2 library, with the addition of
+Just-In-Time compilation. As before, code generation takes the application and
+loop files as input, and generates the Kernels and Modified Application Files. It also
+generates Optimised Kernels, where the code will only compile once the constants
+are known and defined by the pre-processor. These Kernel files are not used by the
+ahead of time compiler.
 The OP2 API function:
 
 void op_decl_const(int dim, char *type, T *dat, char *name)
 
-[6, p9]
+[9, p9]
 Will be modified so that when called by the Program Binary it will generate a
 header file, where each of the constant values is added as a C #define directive,
 where previously it needed to copy these values to the GPU device’s memory.
@@ -471,13 +725,13 @@ them into a Shared Object (Dynamically Loaded Library). This object is then
 loaded by the running executable, and the functions it provides are used instead of
 the unoptimised versions.
 
-6
+12
 
 4
 
 Implementation
 
-The OP2 library is hosted open source on GitHub[4]. Instructions for obtaining
+The OP2 library is hosted open source on GitHub[7]. Instructions for obtaining
 the implementation completed for this report, and getting started with OP2 can be
 found in Appendix A.
 The feature branch for this project, feature/jit was branched from
@@ -506,7 +760,7 @@ translator/c/python/jit/op2 gen cuda jit.py [102]
 Which is called from op2.py in the parent directory - the same as the other code generation scripts,
 and its parameters are:
 
-7
+13
 
 master:
 
@@ -527,7 +781,7 @@ describing the kernel. The values may alter the way the code for that loop is
 generated.
 
 The code generator first performs a quick check across all kernels to see if any use the Struct
-of Arrays feature [6, p13], or if all are using the default data layout. Then, it iterates over each
+of Arrays feature [9, p13], or if all are using the default data layout. Then, it iterates over each
 kernel and generates both the Ahead-Of-Time (AOT) kernel file, and the Just-In-Time (JIT) kernel
 file simultaneously. A folder cuda/ is created if it doesn’t exist, and the files are generated with
 the following naming scheme:
@@ -544,8 +798,8 @@ It contains shared functions, and include statements for each of the parallel lo
 Kernel Files
 
 As mentioned above, the code generator creates two files: AOT and JIT for each parallel loop. The
-following section details the functions generated, and examples in Figures 4-8 show the progression
-of each file for an example kernel. There is a summary on page 13 if this is not of interest.
+following section details the functions generated, and examples in Figures 7-11 show the progression
+of each file for an example kernel. There is a summary on page 19 if this is not of interest.
 1.
 
 JIT includes:
@@ -559,9 +813,9 @@ the master kernels file:
 # include ‘ op_lib_cpp . h ’
 # include ‘ op _c ud a_ rt _s up po rt . h ’
 
-8
+14
 
-Figure 4: JIT includes
+Figure 7: JIT includes
 
 # include ‘ op_cu da_red uction . h ’
 // global_constants
@@ -577,7 +831,7 @@ is given the signiture:
 __device__ void [name]_gpu( [args] )
 The __device__ descriptor is used so that it will be
 
-Figure 5: User Function
+Figure 8: User Function
 
 compiled for the GPU, and can only be called from other device
 code. The kernel function found is checked to ensure it has the
@@ -599,7 +853,7 @@ aot _user_ functi on = re . sub ( ’ \\ b ’ + varname + ’ \\ b ’ ,
 varname + ’ _cuda ’ ,
 aot_ user_ functi on )
 
-9
+15
 
 translator/c/python/jit/op2 gen cuda jit.py [905-907]
 JIT: The JIT kernel is a little different: contants with a dimension of 1 (i.e. they contain
@@ -640,9 +894,9 @@ codeline = codeline [: -2] + ‘}; ’
 jit _user_ functi on = codeline + ’\ n \ n ’+ jit _user_ functi on
 translator/c/python/jit/op2 gen cuda jit.py [931-944]
 
-10
+16
 
-Figure 6: Kernel Function
+Figure 9: Kernel Function
 3. Kernel Function: From here onward, all code generated
 is based only on the kernel descriptor, and not the code that the
 user wrote for the body of the loop. The kernel function is the
@@ -654,14 +908,14 @@ The function arguments depend on whether any of the
 arguments are optional, and whether the loop uses indirection
 - accessing a set using an index which is the value in another
 set. OP2 enforces that the operands in the set operations are
-referenced through at most a single level of indirection [6, p4].
+referenced through at most a single level of indirection [9, p4].
 The function body also depends on whether there is
 indirection, as the indicies need to be retrieved from the inner
 map. A call is made to the user function generated above, then
 any reductions on arguments needs to be done. The supported
-reductions are: sum, maximum, and minimum[6, p11].
+reductions are: sum, maximum, and minimum[9, p11].
 
-Figure 7: Host Function
+Figure 10: Host Function
 
 4. Host Function: The purpose of the host function is to
 bridge the gap between the host and the device. It is CPU code,
@@ -669,7 +923,7 @@ so runs on the host, but contains the CUDA call to the kernel
 function which will run on the GPU. While the function body is
 the same for both AOT and JIT: setting up arguments, timers,
 and block and thread sizes for the CUDA call; the function head
-differs, as shown in Figure 7.
+differs, as shown in Figure 10.
 
 AOT: In the Ahead-Of-Time kernel file, the C code generated
 for the head of the host function is as follows:
@@ -680,7 +934,7 @@ void op_par_loop_ [ name ] _execute ( o p _ k e r n e l _ d e s c r i p t o r * 
 if (! jit_compiled ) {
 jit_compile ();
 
-11
+17
 
 }
 (*[ name ] _function )( desc );
@@ -718,7 +972,7 @@ loaded library, it is placed inside an extern "C" scope, to ensure C linkage, an
 compiler from ”mangling” the name. Following that, the function, which is named
 op_par_loop_[name]_rec_execute (”rec” short for recompiled), will come to reside in the address
 
-12
+18
 
 of the [name]_function function pointer.
 It will be executed after the runtime compiler has been invoked, as the replacement JIT-compiled
@@ -728,12 +982,12 @@ than those in the AOT file - allowing the optimisations made to be used.
 which is the entry point for the parallel loop:
 op_par_loop_[name](char* name, op_set set, [args]... )
 
-Figure 8: Loop Function
+Figure 11: Loop Function
 The application file will be modified by op2.py to contain
 an declaration for this function marked extern, to be linked
 againt this definition. Only the AOT kernel requires this, as
 previously mentioned the JIT host function acts as its entry
-point (Figure 8).
+point (Figure 11).
 The purpose of this function is to generate the kernel descriptor,
 then make a call to:
 void op_enqueue_kernel(op_kernel_descriptor *desc)
@@ -747,15 +1001,12 @@ of this project.
 Summary:
 To recap, the AOT and JIT kernel files are generated
 for each parallel loop, to be executed when that loop
-is invoked in the application file.
-
-Figure 9 has been
-
+is invoked in the application file. Figure 12 has been
 included to make clear the data flow through the two files:
 starting in the Loop Function, which calls the AOT Host
 Function, where either the re-compiled version is invoked,
 
-13
+19
 
 or the original version is used if JIT is not enabled at
 compile time.
@@ -763,7 +1014,7 @@ The jit_compile() function has not yet been
 defined, but this will be covered in the next section on
 the master kernels file.
 
-14
+20
 
 4.1.2
 
@@ -798,12 +1049,12 @@ second is jit_compile which will invoke the runtime compiler, load the generated
 a function pointer for each re-compiled loop.
 1. op decl const char: This function is an OP2 library function which allows users to declare
 a value that will not change over the course of execution. It has the following signature, defined
-by the OP2 API[6, p9]:
+by the OP2 API[9, p9]:
 void op_decl_const_char(int dim, char const *type, int size, char *dat, char const *name)
 Two versions of the function are generated, one for AOT and one for JIT. The two functions are
 wrapped with pre-processor conditionals, so that only one of them will be visible to the compiler.
 
-15
+21
 
 As before, OP2_JIT being defined is the test, so the JIT functionality can be enabled or disabled.
 The AOT version of the function copies the value passed to it to the corresponding device
@@ -842,7 +1093,7 @@ measuring later.
 The compiler arguments, library paths, and other required parameters are in this implementation
 handled by a make file which would need to be generated by the user. The contents of the makefile
 
-16
+22
 
 will be covered in the next section.
 As can be seen below, the executable makes a system call to initiate a make command, and
@@ -873,7 +1124,7 @@ function is printed to the terminal.
 
 Makefile
 
-This implementation relies on GNU Make[9] to determine which compiler should be used, which
+This implementation relies on GNU Make[14] to determine which compiler should be used, which
 parameters should be passed, and other options. There are a number of libraries required to build
 an OP2 binary, as covered in Appendix A, so only the recompilation target will be discussed here.
 The binary expects there to be a Makefile in the directory it executes in, with a target:
@@ -881,7 +1132,7 @@ The binary expects there to be a Makefile in the directory it executes in, with 
 at runtime. As mentioned in the previous section, the result of making this target needs to be
 a a shared object file named cuda/airfoil_kernel_rec.so, which contains the recompiled loop
 
-17
+23
 
 functions.
 The library object is produced by compiling each of the kernels individually, using the NVidia
@@ -913,7 +1164,7 @@ The target cuda/airfoil_kernels_cu.o is also declared PHONY, so that it is alway
 even if the file already exists, otherwise this make flag would not function correctly, and a JIT
 enabled version of this file may be used when the user intended to recompile it with JIT disabled.
 
-18
+24
 
 5
 
@@ -924,7 +1175,7 @@ results. The application has been used previously for validating generated OP2 c
 use of all the key features, including having both direct and indirect loops. It is called airfoil, and
 is a computational fluid dynamics solver which models the air flow around the cross section of a
 aeroplane wing, using unstructured grid to discretise the space. A document detailing the airfoil
-code is available on the OP2 website [5].
+code is available on the OP2 website [8].
 
 5.1
 
@@ -945,12 +1196,12 @@ With this in mind, the airfoil application code includes a test of the result af
 against the expected outcome, and prints the percentage difference. A difference of less than
 0.00001 is considered within tolerance due to the potential for minor floating point errors, and
 therefore a passing test.
-The initial state for the test is a folder with the files listed in Figure 11a (p23). The main
+The initial state for the test is a folder with the files listed in Figure 14a (p29). The main
 application file is airfoil.cpp which contains OP2 API calls, and the structure of the program.
 The 5 header files contain the user functions for the respective parallel loop with the same name,
-and new_grid.h5 is the input data in the Heterogenous Data Format (HDF5 [8]) file format.
+and new_grid.h5 is the input data in the Heterogenous Data Format (HDF5 [11]) file format.
 
-19
+25
 
 5.2
 5.2.1
@@ -970,7 +1221,7 @@ This test is considered a pass if these files exist, as their contents is valida
 next tests passing. A folder called seq/ is also created by the translator script
 translator/c/python/jit/op2_gen_seq_jit.py, which was not completed as part of this project,
 but part of the feature/lazy-execution, the parent branch of feature/jit.
-Figure 11b shows the folder after running the above command. The test is considered PASSED.
+Figure 14b shows the folder after running the above command. The test is considered PASSED.
 
 5.2.2
 
@@ -987,14 +1238,14 @@ This target includes compiling all of the AOT kernel files into a single binary,
 the modified master application file airfoil_op.cpp and linking the two together to produce the
 executable, named airfoil_cuda_jit. The command executed by the Makefile is:
 
-20
+26
 
 nvcc -gencode arch=compute_60,code=sm_60 -m64 -Xptxas=-v --use_fast_math -O3
 -lineinfo -DOP2_JIT -I/home/cs-dunn1/cs310/OP2-Common/op2//c/include
 -I/home/cs-dunn1/parlibs/phdf5/include -Icuda -I. -c
 -o cuda/airfoil_kernels_cu.o cuda/airfoil_kernels.cu
 
-Some warnings are generated, but there are no compilation errors. Figure 11c shows the folder
+Some warnings are generated, but there are no compilation errors. Figure 14c shows the folder
 after running the above command. The test is considered PASSED.
 
 2. JIT DISABLED:
@@ -1007,7 +1258,7 @@ Which will prevent cause the compiler to ignore the call to jit_compile() in the
 and instead continue using the AOT kernel file. The only difference in expected outcome from the
 previous test is that the executable will be named airfoil_cuda, without the ” jit” suffix.
 Again some warnings are generated, but there are no compilation errors. The Figure is omitted
-due to similarity to Figure 11c . The test is considered PASSED.
+due to similarity to Figure 14c . The test is considered PASSED.
 
 5.2.3
 
@@ -1024,14 +1275,14 @@ console output, and confirmed as a success by checking the compiler log for erro
 JIT compiling op_par_loops
 Completed: 5.588549s
 
-21
+27
 
-In Figure 11d, which shows the airfoil folder after JIT compilation has completed successfully, we
+In Figure 14d, which shows the airfoil folder after JIT compilation has completed successfully, we
 can see that there is now an object file for each of the parallel loops, as well as a new shared
 object in the cuda/ folder. Some other miscellaneous files have also been generated, including the
 compilation log file and the optimisation report from icpc.
 The JIT compilation log file does not contain any errors, and the expected files have been generated,
-as can be seen in /Figure 11d . The test is considered PASSED.
+as can be seen in /Figure 14d . The test is considered PASSED.
 
 5.2.4
 
@@ -1041,7 +1292,7 @@ The final test is that the result of the execution is within tolerance of the ex
 test confirms that the contents of the file not just valid but also correct. The outputs are shown
 below:
 
-Figure 10: Console Output from both binaries
+Figure 13: Console Output from both binaries
 JIT
 100
 200
@@ -1085,38 +1336,165 @@ Disabled
 2.486899575160351 × 10−11 %
 
 The table shows the result every 100 iterations, as printed to the terminal by the binary, as well
-as the percentage difference from the exact expected value.
+as the percentage difference from the exact expected value. Adding a print statement to the
+generated code for the JIT kernel confirms it is executing the newly compiled functions rather
+than the originals.
 Both outputs are well within the tolerance of 1 × 10−5 %. The test is considered PASSED.
 
-22
+28
 
-Figure 11: Files in Application Folder
+Figure 14: Files in Application Folder
 (a) Input Files
 
 (b) After Code Generation
 
-23
+29
 
-Figure 11: Files in Application Folder
+Figure 14: Files in Application Folder
 (c) After AOT Compile
 
 (d) After JIT Compile
 
-24
+30
 
 5.3
 
 Benchmarking
 
+Once the functionality has been confirmed to work as intended, the technique can be benchmarked
+to determine if there is benefit in using it for run-time efficiency. Testing was done on a personal
+computer with an NVIDIA GeForce MX250 Graphics Card [4] - and while this is able to execute
+the CUDA code and ensure it produces the right output, it is not sufficient to gather representative
+benchmarking data. Using a personal computer system may result in noisy data, from the system
+scheduling other tasks.
+In order to gather better data, access to a supercomputer located in Cambridge, part of the
+Cambridge Service for Data-Driven Discovery (CSD3), was kindly provided - although workloads
+for this project were placed in a low priority queue.
+The supercomputer named Wilkes2 was used, which provides 4 NVidia P100 16GB Graphical
+Processing Units [5]. The translator currently only generates code for a single graphics card, but
+a possible extension would be to include MPI and divide the workload across multiple GPUs. As
+with many supercomputer clusters, Wilkes2 requires jobs to be submitted via SLURM [16].
+
+5.3.1
+
+Benchmarking Strategy
+
+The airfoil program is also used for benchmarking, as it is reasonably industrially representative.
+The input mesh remains the same as in the Testing section, with 721801 nodes, but the number
+of time steps is upped from 1000 to 10,000 to make any difference more noticable. OP2’s internal
+timing funtions are used to sum the total time spent in each of the parallel loops, which can be
+compared between the versions with JIT compilation enabled and disabled.
+As seen previously in Section 5.2.3 (Just-in-Time Compilation), the time taken for the invocation
+of the compiler at runtime to complete is also recorded. It is a one-time cost at the start of
+execution, but still needs to be considered.
+Given more time other OP2 applications would also have been used to compare data, however,
+finding a suitable HPC system and gaining access took a larger portion of the project’s duration
+than expected.
+
+31
+
+5.3.2
+
+Results
+
+The graph in Figure 15 shows the total runtime of both versions, divided sections corresponding
+to the total wall clock time spent in each of the parallel loops.
+
+Figure 15: Runtime Divided by Parallel Loop
 25
 
+1.138373
+1.48774
+
+1.49685
+
+2.42525
+
+2.40867
+
+13.24364
+
+13.25343
+
+JIT Compile
+save_soln
+adt_calc
+res_calc
+
+20
+
+bres_calc
+update
+
+Duration /s
+
+15
+
+10
+
+5
+
+0.25642
+
+0.25883
+
+6.32893
+
+6.3839
+
+JIT Disabled
+
+JIT Enabled
+
+0
+
+Values are taken across an average of 10 executions of the binary, to further eliminate any possible
+noise in the JIT compilation duration.
+
+5.3.3
+
+Analysis
+
+What Figure 15 clearly shows, is that the runtime has not been reduced by using the technique,
+and indeed is almost the same but with the addition of the time taken to invoke the compiler.
+It is important when drawing conclusions from this to remember that there are other assertions
+that can be made at runtime. Since the only assertion being made is that values declared constant
+will not change, the time available for optimisation is only the time taken to read constant values
+from memory, which will not be a significant proportion of the runtime for most projects, since
+CUDA-capable graphics cards have a designated section of device memory for caching constants
+[3, p73].
+It is true that the constants no longer need to be copied into the device memory, however this
+was previously only done once at the start of the program.
+
+32
+
+What the results demonstrate is that more sophisticated optimisations which make use of
+the inputs being known need to be implemented. Since the JIT Compilation process has now
+been implemented, this system can continue to be used and improved upon to provide a runtime
+reduction to the execution of the binary. Even a small improvement to a very large solver, which
+might run millions of time-step iterations, could quickly re-coup and indeed begin to outweigh the
+relatively tiny one-time cost of recompilation.
+
+5.3.4
+
+Conclusion
+
+Considering that this project was intended as an investigation, it can certainly be considered
+successful, despite not achieving the speed-up that was hoped for at the outset. Laying the
+groundwork for future contributors to build on top of is a worthwhile contribution to the OP2
+project, and discovering that the technique of defining constants for the preprocessor is not sufficient
+to reduce the runtime noticably will inform future investiagations into what techniques should
+implemented.
+
+33
+
 6
+6.1
 
 Evaluation
+Project Management
 
-26
-
-7
+7
 
 Future Work
 
@@ -1124,7 +1502,7 @@ Future Work
 
 Conclusion
 
-27
+34
 
 References
 [1] NVidia Corporation. CUDA toolkit.
@@ -1134,33 +1512,57 @@ url: https : / / docs . nvidia . com / cuda / cuda - compiler - driver - nvcc /
 index.html (visited on 04/01/2020).
 [3] NVidia Corporation. NVidia CUDA C Programming Guide. English. Version 4.2.
 NVidia. 160 pp.
-[4] OP-DSL. OP2-Common. https://github.com/OP-DSL/OP2-Common.
-[5] M.B. Giles G.R. Mudalige I. Reguly. OP2 Airfoil Example. 2012.
+[4] NVidia Corporation. NVidia GeForce MX250 Specification.
+url: https : / / www . geforce . com / hardware / notebook - gpus / geforce mx250 (visited on 04/07/2020).
+[5] NVidia Corporation. NVidia Tesla P100 Specification.
+url: https://www.nvidia.com/en-gb/data-center/tesla-p100/ (visited
+on 04/07/2020).
+[6] NVidia Corporation. Whitepaper: NVIDIA’s Next Generation CUDA Compute
+Architecture: Lepler TM GK110. Version v1.0. 2012.
+[7] OP-DSL. OP2-Common. https://github.com/OP-DSL/OP2-Common.
+[8] M.B. Giles G.R. Mudalige I. Reguly. OP2 Airfoil Example. 2012.
 url: https://op-dsl.github.io/docs/OP2/airfoil-doc.pdf (visited on
 11/05/2019).
-[6] M.B. Giles G.R. Mudalige I. Reguly. OP2 C++ User Manual.
+[9] M.B. Giles G.R. Mudalige I. Reguly. OP2 C++ User Manual.
 url: https://op-dsl.github.io/docs/OP2/OP2_Users_Guide.pdf (visited
 on 11/05/2019).
-[7] M.B. Giles G.R. Mudalige I. Reguly. OP2: An Active Library Framework for
+
+35
+
+[10] M.B. Giles G.R. Mudalige I. Reguly. OP2: An Active Library Framework for
 Solving Unstructured Mesh-based Applications on Multi-Core and Many-Core
 Architectures. 2012.
-[8] The HDF Group. HDF5.
+[11] The HDF Group. HDF5.
 url: https://www.hdfgroup.org/ (visited on 04/04/2020).
-[9] Free Software Foundation Inc. GNU Make.
-url: https://www.gnu.org/software/make/ (visited on 04/01/2020).
 
-28
+[12] et al. I. Reguly D. Giles. The Volna-OP2 tsunami code. https://www.geosci-model-dev.net/11/46
+2018.
+[13] C. Bertolli I.Z. Reguly G.R. Mudalige et al. “Acceleration of a Full-scale
+Industrial CFD Application with OP2”. In: Languages and Compilers for
+Parallel Computing (2013), pp. 112–126.
+url: https://people.maths.ox.ac.uk/gilesm/files/OP2- Hydra.pdf
+(visited on 04/09/2020).
+[14] Free Software Foundation Inc. GNU Make.
+url: https://www.gnu.org/software/make/ (visited on 04/01/2020).
+[15] B. Spencer M.B. Giles G.R. Mudalige et al. “Designing OP2 for GPU architectures”.
+In: Journal of Parallel and Distributed Computing 73.11 (2013), pp. 1451–1460.
+url: https://www.sciencedirect.com/science/article/pii/S0743731512001694
+(visited on 04/09/2020).
+[16] SLURM Documentation.
+url: https://slurm.schedmd.com/documentation.html (visited on 04/07/2020).
+
+36
 
 Appendices
 A
 
 Getting Started with OP2
 
-29
+37
 
 Acknowledgements
 TODO
 
-30
+38
 
 

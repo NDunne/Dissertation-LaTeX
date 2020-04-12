@@ -1,6 +1,7 @@
 % !TEX root =  ../report.tex
 
 \section{Specification}
+\label{s:spec}
 The implementation will require work in two main areas: The Python code generation script, and in the OP2 library itself which is implemented in both C and Fortran. Only the C library will be modified, due to developer familiarity. OP2 does also include code generation using MatLab, but Python is more preferable recently, due to its flexibility, and it's conveniant string manipulation capabilities.
 \par
 The Python script will perform source-to-source translation. As input it will take the application files, which specify the structure of the program: declaring variables, and indicating where the loops parallelised by OP2 should be executed; and a kernel descriptor for each loop, which will describe the operation to be performed on each element of the set passed to the loop as a parameter. OP2 makes an important restriction that the order in which elements are processed must not affect the final result, to within the limits of finite precision floating-point arithmetic\cite[p3]{op2main}. This constraint allows the code generator freedom to not consider the ordering of iterations, and select an ordering based on performance.
@@ -12,7 +13,7 @@ It is important that the resulting executable compiled from the generated code p
 Furthermore, it will be ensured that the OP2 API is not be altered by any modifications to the library, to ensure that all exisiting programs using the API are able to seemless use the updated version.
 
 \subsection{Runtime Assertions}
-As discussed in Section \ref{sec:rw_JIT} on Just-In-Time Compilation, the performance gain from this optimisation technique comes from making assertions at runtime which can only be made once the input is known. The application's input will be a mesh over which to operate, which includes a large amount of data, and opens up a number of runtime optimisations. The primary target for this project is "Constant Definition": turning values specified in the input as constants into \verb|#define| directives for the C-Preprocessor. Other possible optimisations will be discussed in Section \ref{fw}, Future Work.
+As discussed in Section \ref{sec:rw_JIT} on Just-In-Time Compilation, the performance gain from this optimisation technique comes from making assertions at runtime which can only be made once the input is known. The application's input will be a mesh over which to operate, which includes a large amount of data, and opens up a number of runtime optimisations. The primary target for this project is "Constant Definition": turning values specified in the input as constants into \verb|#define| directives for the C-Preprocessor. Other possible optimisations will be discussed in Section \ref{s:fw}, Future Work.
 
 \subsection{System Model}
 \begin{figure}[h!]

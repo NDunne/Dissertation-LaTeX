@@ -1,6 +1,7 @@
 % !TEX root =  ../report.tex
 
 \section{Testing}
+\label{s:test}
 Throughout development, an example application was used to test code generation, and verify the results. The application has been used previously for validating generated OP2 code, as it makes use of all the key features, including having both direct and indirect loops. It is called \textit{airfoil}, and is a computational fluid dynamics solver which models the air flow around the cross section of a aeroplane wing, using unstructured grid to discretise the space. A document detailing the airfoil code is available on the OP2 website \cite{airfoil}.
 
 \subsection{Test Plan}
@@ -19,7 +20,7 @@ To test the code generation, the python script \verb|op2.py| is called in the di
 \begin{verbatim}
 > python2 \$OP2_INSTALL_PATH/../translator/c/python/op2.py airfoil.cpp JIT
 \end{verbatim}
-After running this command, the expected outcome is that a new file: \verb|airfoil_op.cpp| is created in the directory, and a directory named \verb|cuda/| will be created with eleven files in it: Two for each of the five parallel loops, as described in Section \ref{sec:codegen}; and a single master kernels file named \verb|airfoil_kernels.cu|.
+After running this command, the expected outcome is that a new file: \verb|airfoil_op.cpp| is created in the directory, and a directory named \verb|cuda/| will be created with eleven files in it: Two for each of the five parallel loops, as described in Section \ref{ss:codegen}; and a single master kernels file named \verb|airfoil_kernels.cu|.
 \par
 This test is considered a pass if these files exist, as their contents is validated as correct by the next tests passing. A folder called \verb|seq/| is also created by the translator script\\
  \verb|translator/c/python/jit/op2_gen_seq_jit.py|, which was not completed as part of this project, but part of the \verb|feature/lazy-execution|, the parent branch of \verb|feature/jit|.
@@ -55,6 +56,7 @@ Again some warnings are generated, but there are no compilation errors. The Figu
 
 
 \subsubsection{Just-in-Time Compilation}
+\label{sss:jit_comp}
 Testing Just-In-Time Compilation requires only that when executed the binary does not exit early with an error. As described previously in Section \ref{sss:mkf} there exists a check for success in the code, and the terminal output of the compilation is dumped to a file named \verb|jit_compile.log|.
 \par
 The test can be considered successful if the executable prints the compilation duration to the console output, and confirmed as a success by checking the compiler log for errors.
@@ -96,7 +98,7 @@ Accuracy & & $2.484679129111100\times10^{-11} \%$ & $2.486899575160351\times10^{
 \end{tabular}
 \end{figure}
 
-\noindent The table shows the result every 100 iterations, as printed to the terminal by the binary, as well as the percentage difference from the exact expected value.
+\noindent The table shows the result every 100 iterations, as printed to the terminal by the binary, as well as the percentage difference from the exact expected value. Adding a print statement to the generated code for the JIT kernel confirms it is executing the newly compiled functions rather than the originals.
 \testresult{Both outputs are well within the tolerance of $1\times10^{-5} \%$}{pass}
 
 \begin{figure}[t!p]
