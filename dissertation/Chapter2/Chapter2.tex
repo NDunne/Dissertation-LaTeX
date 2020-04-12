@@ -1,7 +1,50 @@
-0% !TEX root =  ../report.tex
+% !TEX root =  ../report.tex
 
 \section{Research}
 \label{s:research}
+
+\subsection{CUDA}
+Since this project will require the automatic generation of CUDA from sequential code, it is important to introduce the NVidia hardware, and the C API which will be utilised. The information is pulled from the \textit{NVidia CUDA C Programming Guide} \cite{guide}, which will continue to be used for reference throughout the report.
+
+\subsubsection{Hardware}
+GPU hardware is specialised to perform compute-heavy workloads, where the ratio of arithmetic operations to memory operations is high, by devoting more resources to actual data processing. Figure \ref{fig:arch} compares this to a more traditional CPU architecture, which optimises for flow control and data caching:
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{Architecture}
+  \caption{\label{fig:arch} Architecture Comparison. Diagram from \cite[p3]{guide}}
+\end{figure}
+
+This structure allows GPUs to excel at performing parallel tasks requiring the same action to be performed on large sets of data, and therefore well suited to the needs of OP2, where a particular function might need to be applied to all edges, or cells, or nodes in the mesh. Since OP2 enforces that the order in which the function is applied to the members of the set must not affect the final result \cite[p4]{manual}, the consideration for data dependencies is largely removed, and operations can be scheduled based on best performance.
+\par
+Workloads executed on a GPU are divided among a Grid of Blocks, where each Block contains a number of Threads. To allow for simple mapping from the problem to the thread ID, the Block Identifiers, and Thread Identifiers within each block, can be 1D, 2D or 3D \cite[p9]{guide}. Figure \ref{fig:threadgrid} shows an example where 2D identifiers are used.\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.5\textwidth]{threadgrid}
+  \caption{\label{fig:threadgrid} 2D grid of Blocks and Threads. Diagram from \cite[p9]{guide}}
+\end{figure}
+
+\noindent The use of this thread layout will become more clear in the next section, where the invocation of a function to run on a GPU device is described.
+
+\subsubsection{Programming Interface}
+The CUDA C API provides two function type quantifiers that will need to be used in the generated code:
+\begin{itemize}
+\vspace{-.5cm}
+\setlength{\itemsep}{0pt}%
+\setlength{\parskip}{0pt}%
+\item{\verb|__device__|}
+\item{\verb|__global__|}
+\vspace{-.5cm}
+\end{itemize}
+Both indicate that the function should be compiled to \textit{PTX}, the CUDA instruction set architecture \cite[p15]{guide}, however the difference is that a function declared \verb|__global__| can be invoked from host (CPU) code,  or device (GPU) code; whereas a \verb|__device__| function can only be called from code already executing on the device \cite[p81]{guide}.
+\par
+Global functions therefore act as a sort of entry point into device code. They are called using special notation to specify the requested number of blocks and threads per block:
+\codeline{function<<< num_blocks, threads_per_block >>>( [arguments...] )}{}
+\noindent Where the data type of \verb|num_blocks| and \verb|threads_per_block| can be either of \verb|int| (1D), or \verb|dim3| (1D,2D or 3D) \cite[p9]{guide}. The function body will then be executed $\verb|num_blocks| \times  \verb|threads_per_block|$ times. The Kepler Architecture has an upper limit of 2048 total threads per multiprocessor \cite{kepler}.
+\par
+Inside the function body, built-in variables can be used to access the thread and block ID of each thread as it executes, and from this determine the work which a certain thread should carry out. Appendix \ref{app:cudaEx} is a CUDA program written during research to build familiarity with the constructs, based on an NVidia tutorial.
+\par
+In the next section, the OP2 library's exisiting code generation script will be discussed, which can produce code executable on a GPU. This code generator can therefore be use to inform some parts of the new code generation script being produced for this report, to save time that would otherwise need to be spent re-developing solutions that have already been completed.
 
 \subsection{OP2}
 
@@ -44,7 +87,7 @@ The paper also introduces the consideration for data layout in memory. Figure \r
 
 \noindent The SoA layout is enabled by setting the value of an environment variable: \verb|OP AUTO SOA=1| prior to code generation \cite[p13]{manual}.
 \par
-It is important to note that the existing implementation for CUDA code generation produces a solution that is compiled entirely ahead of time, i.e. prior to the inputs being known at run-time, and therefore is not able to make optimisations based on the mesh input. This project aims to fill this space and determine if there is benefit to be gained from such optimisations.
+The existing solution is able to generate optimised CUDA code for a parallel loop; given the set of nodes, edges, cells, or any other collection which it operates over; where the resulting code can assign a set element to a GPU thread where it will be processed by the loop body. It is important to note that the existing implementation for CUDA code generation produces a solution that is compiled entirely ahead of time, i.e. prior to the inputs being known, and therefore is not able to make optimisations based on the mesh input. This project aims to fill this space, and determine if there is benefit to be gained from such optimisations.
 
 \subsubsection{OP2 Applications}
 There are a number of industrial applications that have been implemented using OP2, which would immediately benefit from any optimisation of generated code, including Airfoil \cite{airfoil} - a non-linear 2D inviscid airfoil code; Hydra \cite{hydra} - Rolls Royce’s turbomachinery simulator, and Volna \cite{volna} - a finite-volume nonlinear shallow-water equation solver used to simulate tsunamis.
@@ -55,49 +98,9 @@ A further benefit is that such applications could be ported onto a new generatio
 \par
 Later in this report we will see Airfoil used as a benchmark, to determine whether the new optimisation presented in the report is likely to provide benefit to other OP2 applications.
 
-\subsection{CUDA}
-Since this project will require the automatic generation of CUDA from sequential code, it is important to introduce the NVidia hardware, and the C API which will be utilised. The information is pulled from the \textit{NVidia CUDA C Programming Guide} \cite{guide}, which will continue to be used for reference throughout the report.
-
-\subsubsection{Hardware}
-GPU hardware is specialised to perform compute-heavy workloads, where the ratio of arithmetic operations to memory operations is high, by devoting more resources to actual data processing. Figure \ref{fig:arch} compares this to a more traditional CPU architecture, which optimises for flow control and data caching:
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=\textwidth]{Architecture}
-  \caption{\label{fig:arch} Architecture Comparison. Diagram from \cite[p3]{guide}}
-\end{figure}
-
-This structure allows GPUs to excel at performing parallel tasks requiring the same action to be performed on large sets of data, and therefore well suited to the needs of OP2, where a particular function might need to be applied to all edges, or cells, or nodes in the mesh. Since OP2 enforces that the order in which the function is applied to the members of the set must not affect the final result \cite[p4]{manual}, the consideration for data dependencies is largely removed, and operations can be scheduled based on best performance.
-\par
-Workloads executed on a GPU are divided among a Grid of Blocks, where each Block contains a number of Threads. To allow for simple mapping from the problem to the thread ID, the Block Identifiers, and Thread Identifiers within each block, can be 1D, 2D or 3D \cite[p9]{guide}. Figure \ref{fig:threadgrid} shows an example where 2D identifiers are used.\\
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.5\textwidth]{threadgrid}
-  \caption{\label{fig:threadgrid} 2D grid of Blocks and Threads. Diagram from \cite[p9]{guide}}
-\end{figure}
-
-\noindent The use of this thread layout will become more clear in the next section, where the invocation of a function to run on a GPU device is described.
-
-\subsubsection{Programming Interface}
-Firstly, the CUDA C API provides two function type quantifiers that will need to be used in the generated code:
-\begin{itemize}
-\vspace{-.5cm}
-\setlength{\itemsep}{0pt}%
-\setlength{\parskip}{0pt}%
-\item{\verb|__device__|}
-\item{\verb|__global__|}
-\vspace{-.5cm}
-\end{itemize}
-Both indicate that the function should be compiled to \textit{PTX}, the CUDA instruction set architecture \cite[p15]{guide}, however a function declared \verb|__global__| can be invoked from host (CPU) code,  or device (GPU) code; where a \verb|__device__| function can only be called from code already executing on the device \cite[p81]{guide}.
-\par
-Global functions therefore act as a sort of entry point into device code. They are called using special notation to specify the requested number of blocks and threads per block:
-\codeline{function<<< num_blocks, threads_per_block >>>( [arguments...] )}{}
-Where \verb|num_blocks| and \verb|threads_per_block| can be of either \verb|int| (1D) or \verb|dim3| (1D,2D or 3D) data type \cite[p9]{guide}. The function body will then be executed $\verb|num_blocks| \times  \verb|threads_per_block|$ times. The Kepler Architecture has an upper limit of 2048 total threads per multiprocessor \cite{kepler}. 
-
-
 \subsection{Related Work}
+
+\subsubsection{Similar Libraries}
 
 \subsubsection{JIT}
 \label{sec:rw_JIT}
-
-\subsubsection{Similar Libraries}

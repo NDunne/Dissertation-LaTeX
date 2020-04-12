@@ -108,6 +108,7 @@
    \vspace{-1em}
    \hspace*{\fill}\footnotesize{#2}\\
  }
+ \noindent
 }
 
 \newcommand{\pyline}[2]{
@@ -159,7 +160,13 @@ frame=tlbr,
 backgroundcolor=\color{lightgray!15},
 showspaces=false, showstringspaces=false,
 commentstyle=\ttfamily\footnotesize\color{gray},
-escapechar=|}
+escapechar=|,
+emph={
+       cudaMalloc, cudaFree,
+       __global__, __shared__, __device__, __host__,
+       __syncthreads,
+   }
+}
 
 %%TC:ignore
 \include{Preamble/FrontPage}

@@ -76,37 +76,37 @@ Report Structure . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 4
 
-OP2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+CUDA . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 4
 
 2.1.1
 
-Exisiting Work . . . . . . . . . . . . . . . . . . . . . . . . . .
+Hardware . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 4
 
 2.1.2
 
-OP2 Applications . . . . . . . . . . . . . . . . . . . . . . . . .
+Programming Interface . . . . . . . . . . . . . . . . . . . . . .
 
 6
 
-CUDA . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+OP2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-6
+7
 
 2.2.1
 
-Hardware . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Exisiting Work . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 7
 
 2.2.2
 
-Programming Interface . . . . . . . . . . . . . . . . . . . . . .
+OP2 Applications . . . . . . . . . . . . . . . . . . . . . . . . .
 
-8
+9
 
 Related Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -114,13 +114,13 @@ Related Work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 2.3.1
 
-JIT . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Similar Libraries . . . . . . . . . . . . . . . . . . . . . . . . .
 
 9
 
 2.3.2
 
-Similar Libraries . . . . . . . . . . . . . . . . . . . . . . . . .
+JIT . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 9
 
@@ -224,13 +224,17 @@ Appendices
 
 37
 
-A Getting Started with OP2
+A Example CUDA program for vector addition
 
 37
 
+B Getting Started with OP2
+
+39
+
 Acknowledgements
 
-38
+40
 
 List of Figures
 1
@@ -247,19 +251,19 @@ Airfoil Tri-Unstructed Mesh . . . . . . . . . . . . . . . . . . . . . . .
 
 3
 
-Data layouts. Diagram reproduced from [15] . . . . . . . . . . . . . .
-
-5
+Architecture Comparison. Diagram from [3, p3] . . . . . . . . . . . .
 
 4
 
-Architecture Comparison. Diagram from [3, p3] . . . . . . . . . . . .
+4
 
-7
+2D grid of Blocks and Threads. Diagram from [3, p9] . . . . . . . . .
 
 5
 
-2D grid of Blocks and Threads. Diagram from [3, p9] . . . . . . . . .
+5
+
+Data layouts. Diagram reproduced from [15] . . . . . . . . . . . . . .
 
 8
 
@@ -283,11 +287,11 @@ Kernel Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
 
 Host Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
 
-11
+11
 
 Loop Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
 
-12
+12
 
 Kernel Flow . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
 
@@ -391,14 +395,86 @@ what was done for this report, and Section 8 (p34) an overall Conclusion
 
 3
 
-0
-
-2
+2
 
 Research
 
 2.1
+
+CUDA
+
+Since this project will require the automatic generation of CUDA from sequential
+code, it is important to introduce the NVidia hardware, and the C API which will be
+utilised. The information is pulled from the NVidia CUDA C Programming Guide
+[3], which will continue to be used for reference throughout the report.
+
 2.1.1
+
+Hardware
+
+GPU hardware is specialised to perform compute-heavy workloads, where the ratio
+of arithmetic operations to memory operations is high, by devoting more resources
+to actual data processing. Figure 3 compares this to a more traditional CPU
+architecture, which optimises for flow control and data caching:
+
+Figure 3: Architecture Comparison. Diagram from [3, p3]
+
+This structure allows GPUs to excel at performing parallel tasks requiring the
+same action to be performed on large sets of data, and therefore well suited to the
+needs of OP2, where a particular function might need to be applied to all edges,
+or cells, or nodes in the mesh. Since OP2 enforces that the order in which the
+function is applied to the members of the set must not affect the final result [9, p4],
+4
+
+the consideration for data dependencies is largely removed, and operations can be
+scheduled based on best performance.
+Workloads executed on a GPU are divided among a Grid of Blocks, where each
+Block contains a number of Threads. To allow for simple mapping from the problem
+to the thread ID, the Block Identifiers, and Thread Identifiers within each block,
+can be 1D, 2D or 3D [3, p9]. Figure 4 shows an example where 2D identifiers are
+used.
+
+Figure 4: 2D grid of Blocks and Threads. Diagram from [3, p9]
+
+The use of this thread layout will become more clear in the next section, where the
+invocation of a function to run on a GPU device is described.
+5
+
+2.1.2
+
+Programming Interface
+
+The CUDA C API provides two function type quantifiers that will need to be used
+in the generated code:
+• __device__
+• __global__
+Both indicate that the function should be compiled to PTX, the CUDA instruction
+set architecture [3, p15], however the difference is that a function declared __global__
+can be invoked from host (CPU) code, or device (GPU) code; whereas a __device__
+function can only be called from code already executing on the device [3, p81].
+Global functions therefore act as a sort of entry point into device code. They are
+called using special notation to specify the requested number of blocks and threads
+per block:
+function<<< num_blocks, threads_per_block >>>( [arguments...] )
+
+Where the data type of num_blocks and threads_per_block can be either of int
+(1D), or dim3 (1D,2D or 3D) [3, p9]. The function body will then be executed
+num_blocks × threads_per_block times. The Kepler Architecture has an upper
+limit of 2048 total threads per multiprocessor [6].
+Inside the function body, built-in variables can be used to access the thread and
+block ID of each thread as it executes, and from this determine the work which a
+certain thread should carry out. Appendix A is a CUDA program written during
+research to build familiarity with the constructs, based on an NVidia tutorial.
+In the next section, the OP2 library’s exisiting code generation script will be
+discussed, which can produce code executable on a GPU. This code generator can
+therefore be use to inform some parts of the new code generation script being
+produced for this report, to save time that would otherwise need to be spent
+6
+
+re-developing solutions that have already been completed.
+
+2.2
+2.2.1
 
 OP2
 Exisiting Work
@@ -421,12 +497,12 @@ in the Journal of Parallel and Distributed Computing in 2013, describes the ey
 design features of the current OP2 library for generating efficient code targeting
 GPUs based on NVIDIA’s Fermi architecture. It is worth noting that Fermi is no
 longer the latest architecture, and the code generation process has been modified
-4
-
-since publication, however the article still provides useful information.
+since publication, however the article still provides useful information.
 One of the key points made in the paper is on the managing of data dependencies
 (p1454), and the solutions proposed for avoiding errors when incrementing indirectly
-referenced array, where two edges end up updating the same node.
+7
+
+referenced array, where two edges end up updating the same node.
 
 Solutions
 
@@ -436,7 +512,7 @@ operations. In the implementation for this project, atomic operations, which per
 read-modify-write operation on one 32-bit or 64-bit word residing in global or shared
 memory [3, p96], as used to solve this issue.
 The paper also introduces the consideration for data layout in memory. Figure
-3 demonstrates the different layouts possible when there are multiple components
+5 demonstrates the different layouts possible when there are multiple components
 for each element. The paper concludes that the struct-of-arrays layout reduces the
 total amount data transferred to and from GPU global memory, in some cases by
 over 50%.
@@ -508,19 +584,22 @@ over 50%.
 
 (b) Struct of Arrays (SOA) layout
 
-Figure 3: Data layouts. Diagram reproduced from [15]
+Figure 5: Data layouts. Diagram reproduced from [15]
 
 The SoA layout is enabled by setting the value of an environment variable: OP AUTO SOA=1
 prior to code generation [9, p13].
-It is important to note that the existing implementation for CUDA code generation
-produces a solution that is compiled entirely ahead of time, i.e. prior to the inputs
-being known at run-time, and therefore is not able to make optimisations based on
-the mesh input. This project aims to fill this space and determine if there is benefit
-5
+The existing solution is able to generate optimised CUDA code for a parallel
+loop; given the set of nodes, edges, cells, or any other collection which it operates
+over; where the resulting code can assign a set element to a GPU thread where
+it will be processed by the loop body. It is important to note that the existing
+implementation for CUDA code generation produces a solution that is compiled
+entirely ahead of time, i.e. prior to the inputs being known, and therefore is not
+able to make optimisations based on the mesh input. This project aims to fill this
+8
 
-to be gained from such optimisations.
+space, and determine if there is benefit to be gained from such optimisations.
 
-2.1.2
+2.2.2
 
 OP2 Applications
 
@@ -541,81 +620,17 @@ Later in this report we will see Airfoil used as a benchmark, to determine wheth
 the new optimisation presented in the report is likely to provide benefit to other OP2
 applications.
 
-2.2
-
-CUDA
-
-Since this project will require the automatic generation of CUDA from sequential
-code, it is important to introduce the NVidia hardware, and the C API which will be
-utilised. The information is pulled from the NVidia CUDA C Programming Guide
-[3], which will continue to be used for reference throughout the report.
-6
-
-2.2.1
-
-Hardware
-
-GPU hardware is specialised to perform compute-heavy workloads, where the ratio
-of arithmetic operations to memory operations is high, by devoting more resources
-to actual data processing. Figure 4 compares this to a more traditional CPU
-architecture, which optimises for flow control and data caching:
-
-Figure 4: Architecture Comparison. Diagram from [3, p3]
-
-This structure allows GPUs to excel at performing parallel tasks requiring the
-same action to be performed on large sets of data, and therefore well suited to the
-needs of OP2, where a particular function might need to be applied to all edges,
-or cells, or nodes in the mesh. Since OP2 enforces that the order in which the
-function is applied to the members of the set must not affect the final result [9, p4],
-the consideration for data dependencies is largely removed, and operations can be
-scheduled based on best performance.
-Workloads executed on a GPU are divided among a Grid of Blocks, where each
-Block contains a number of Threads. To allow for simple mapping from the problem
-to the thread ID, the Block Identifiers, and Thread Identifiers within each block,
-can be 1D, 2D or 3D [3, p9]. Figure 5 shows an example where 2D identifiers are
-used.
-
-7
-
-Figure 5: 2D grid of Blocks and Threads. Diagram from [3, p9]
-The use of this thread layout will become more clear in the next section, where the
-invocation of a function to run on a GPU device is described.
-
-2.2.2
-
-Programming Interface
-
-Firstly, the CUDA C API provides two function type quantifiers that will need to
-be used in the generated code:
-• __device__
-• __global__
-Both indicate that the function should be compiled to PTX, the CUDA instruction
-set architecture [3, p15], however a function declared __global__ can be invoked
-from host (CPU) code, or device (GPU) code; where a __device__ function can
-only be called from code already executing on the device [3, p81].
-Global functions therefore act as a sort of entry point into device code. They are
-called using special notation to specify the requested number of blocks and threads
-8
-
-per block:
-function<<< num_blocks, threads_per_block >>>( [arguments...] )
-
-Where num_blocks and threads_per_block can be of either int (1D) or dim3
-(1D,2D or 3D) data type [3, p9]. The function body will then be executed num_blocks×
-threads_per_block times. The Kepler Architecture has an upper limit of 2048 total
-threads per multiprocessor [6].
-
 2.3
 
 Related Work
 
 2.3.1
 
-JIT
+Similar Libraries
 
 2.3.2
 
-Similar Libraries
+JIT
 
 9
 
@@ -653,7 +668,7 @@ able to seemless use the updated version.
 
 Runtime Assertions
 
-As discussed in Section 2.3.1 on Just-In-Time Compilation, the performance gain
+As discussed in Section 2.3.2 on Just-In-Time Compilation, the performance gain
 from this optimisation technique comes from making assertions at runtime which can
 only be made once the input is known. The application’s input will be a mesh over
 which to operate, which includes a large amount of data, and opens up a number of
@@ -733,7 +748,7 @@ Implementation
 
 The OP2 library is hosted open source on GitHub[7]. Instructions for obtaining
 the implementation completed for this report, and getting started with OP2 can be
-found in Appendix A.
+found in Appendix B.
 The feature branch for this project, feature/jit was branched from
 feature/lazy-execution on 13th November 2019. The lazy-execution branch’s
 last commit was in April 2018, and lagged behind the master branch somewhat. It
@@ -829,12 +844,12 @@ specified by the user to be carried out on each iteration of the
 loop, so this function will run on the device (GPU) at least once for each set item. This function
 is given the signiture:
 __device__ void [name]_gpu( [args] )
-The __device__ descriptor is used so that it will be
+The __device__ descriptor is used so that it will be compiled
 
 Figure 8: User Function
 
-compiled for the GPU, and can only be called from other device
-code. The kernel function found is checked to ensure it has the
+for the GPU, and can only be called from other device code.
+The kernel function found is checked to ensure it has the
 correct number of parameters, and, if requested, parameters are
 modified to utlise the struct of arrays layout.
 The User Function is where any runtime assertions need to
@@ -1004,11 +1019,11 @@ for each parallel loop, to be executed when that loop
 is invoked in the application file. Figure 12 has been
 included to make clear the data flow through the two files:
 starting in the Loop Function, which calls the AOT Host
-Function, where either the re-compiled version is invoked,
 
 19
 
-or the original version is used if JIT is not enabled at
+Function, where either the re-compiled version is invoked,
+or the original version is used if JIT is not enabled at
 compile time.
 The jit_compile() function has not yet been
 defined, but this will be covered in the next section on
@@ -1126,7 +1141,7 @@ Makefile
 
 This implementation relies on GNU Make[14] to determine which compiler should be used, which
 parameters should be passed, and other options. There are a number of libraries required to build
-an OP2 binary, as covered in Appendix A, so only the recompilation target will be discussed here.
+an OP2 binary, as covered in Appendix B, so only the recompilation target will be discussed here.
 The binary expects there to be a Makefile in the directory it executes in, with a target:
 [application]_cuda_rec in order to work correctly. This is the target which will be compiled
 at runtime. As mentioned in the previous section, the result of making this target needs to be
@@ -1518,7 +1533,7 @@ url: https : / / www . geforce . com / hardware / notebook - gpus / geforce mx25
 url: https://www.nvidia.com/en-gb/data-center/tesla-p100/ (visited
 on 04/07/2020).
 [6] NVidia Corporation. Whitepaper: NVIDIA’s Next Generation CUDA Compute
-Architecture: Lepler TM GK110. Version v1.0. 2012.
+Architecture: Lepler TM GK110. Version 1.0. 2012.
 [7] OP-DSL. OP2-Common. https://github.com/OP-DSL/OP2-Common.
 [8] M.B. Giles G.R. Mudalige I. Reguly. OP2 Airfoil Example. 2012.
 url: https://op-dsl.github.io/docs/OP2/airfoil-doc.pdf (visited on
@@ -1556,13 +1571,92 @@ url: https://slurm.schedmd.com/documentation.html (visited on 04/07/2020).
 Appendices
 A
 
-Getting Started with OP2
+Example CUDA program for vector addition
+
+# include < stdio .h >
+// Vector Size
+# define N 32
+// Device Function
+__global__ void add ( int * a , int * b , int * c )
+{
+// perfrom single addition
+c [ threadIdx . x ] = a [ threadIdx . x ] + b [ threadIdx . x ];
+// store result in c
+}
+// Generate N random integers , store in a
+void random_ints ( int * a )
+{
+int i ;
+for ( i =0; i < N ; i ++)
+{
+a [ i ] = rand () % 10;
+printf ( " %02 d " , a [ i ]);
+}
+printf ( " \ n " );
+}
+
+int main ( void )
+{
+// Host Arrays
+int *a , *b , * c ;
+// Device Arrays
+int * d_a , * d_b , * d_c ;
+// Total mem size
+int size = N * sizeof ( int );
+// Allocate device mem
+cudaMalloc (( void **) & d_a , size );
+cudaMalloc (( void **) & d_b , size );
+cudaMalloc (( void **) & d_c , size );
+a = ( int *) malloc ( size ); random_ints ( a );
+b = ( int *) malloc ( size ); random_ints ( b );
 
 37
+
+// Allocate and populate a , b
+c = ( int *) malloc ( size );
+// Allocate c
+cudaMemcpy ( d_a , a , size , c u d a M e m c p y H o s t T o D e v i c e );
+cudaMemcpy ( d_b , b , size , c u d a M e m c p y H o s t T o D e v i c e );
+// Copy a and b to device memory , store in d_a and d_b
+// Execute in 1 block , N threads
+add < < <1 ,N > > >( d_a , d_b , d_c );
+// Copy result back from device
+cudaMemcpy (c , d_c , size , c u d a M e m c p y D e v i c e T o H o s t );
+for ( int i =0; i < N ; i ++)
+{
+printf ( " %02 d " , c [ i ]);
+}
+printf ( " \ n " );
+// -- Free Memory - -//
+free ( a );
+free ( b );
+free ( c );
+cudaFree ( d_a );
+cudaFree ( d_b );
+cudaFree ( d_c );
+// - - - - - - - - - - - - - - -//
+return 0;
+}
+
+1. Compilation:
+> nvcc thread_add.cu -o thread_add
+2. Result:
+> ./thread_add
+03 06 07 05 03 05 06 02 09 01 02 07 00 09 03 06 00 06 02 06 01 08 07 09 02 00 02 03 07 05 09 02
+02 08 09 07 03 06 01 02 09 03 01 09 04 07 08 04 05 00 03 06 01 00 06 03 02 00 06 01 05 05 04 07
+05 14 16 12 06 11 07 04 18 04 03 16 04 16 11 10 05 06 05 12 02 08 13 12 04 00 08 04 12 10 13 09
+
+38
+
+B
+
+Getting Started with OP2
+
+39
 
 Acknowledgements
 TODO
 
-38
+40
 
 
