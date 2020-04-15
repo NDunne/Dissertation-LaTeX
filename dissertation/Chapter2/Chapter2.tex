@@ -4,10 +4,10 @@
 \label{s:research}
 
 \subsection{CUDA}
-Since this project will require the automatic generation of CUDA from sequential code, it is important to introduce the NVidia hardware, and the C API which will be utilised. The information is pulled from the \textit{NVidia CUDA C Programming Guide} \cite{guide}, which will continue to be used for reference throughout the report.
+Since this project will require the automatic generation of CUDA from sequential code, it is important to introduce the NVidia hardware, and the C API which will be utilised. The information is pulled from the \textit{NVidia CUDA C Programming Guide} \cite{guide}, which will continue to be used for reference throughout this report.
 
 \subsubsection{Hardware}
-GPU hardware is specialised to perform compute-heavy workloads, where the ratio of arithmetic operations to memory operations is high, by devoting more resources to actual data processing. Figure \ref{fig:arch} compares this to a more traditional CPU architecture, which optimises for flow control and data caching:
+GPU hardware is specialised to perform compute-heavy workloads, where the ratio of arithmetic operations to memory operations is high. It achieves this specialisation by devoting more resources to actual data processing, compared to a traditional CPU architecture, which optimises more for flow control and data caching. Figure \ref{fig:arch} constrasts the two approaches:
 
 \begin{figure}[h]
   \centering
@@ -15,7 +15,7 @@ GPU hardware is specialised to perform compute-heavy workloads, where the ratio 
   \caption{\label{fig:arch} Architecture Comparison. Diagram from \cite[p3]{guide}}
 \end{figure}
 
-This structure allows GPUs to excel at performing parallel tasks requiring the same action to be performed on large sets of data, and therefore well suited to the needs of OP2, where a particular function might need to be applied to all edges, or cells, or nodes in the mesh. Since OP2 enforces that the order in which the function is applied to the members of the set must not affect the final result \cite[p4]{manual}, the consideration for data dependencies is largely removed, and operations can be scheduled based on best performance.
+\noindent This structure allows GPUs to excel at performing parallel tasks requiring the same operations to be performed on large sets of data, and therefore well suited to the needs of OP2, where a particular function might need to be applied to all edges, or cells, or nodes in a given mesh.
 \par
 Workloads executed on a GPU are divided among a Grid of Blocks, where each Block contains a number of Threads. To allow for simple mapping from the problem to the thread ID, the Block Identifiers, and Thread Identifiers within each block, can be 1D, 2D or 3D \cite[p9]{guide}. Figure \ref{fig:threadgrid} shows an example where 2D identifiers are used.\\
 \begin{figure}[h!]
@@ -38,13 +38,13 @@ The CUDA C API provides two function type quantifiers that will need to be used 
 \end{itemize}
 Both indicate that the function should be compiled to \textit{PTX}, the CUDA instruction set architecture \cite[p15]{guide}, however the difference is that a function declared \verb|__global__| can be invoked from host (CPU) code,  or device (GPU) code; whereas a \verb|__device__| function can only be called from code already executing on the device \cite[p81]{guide}.
 \par
-Global functions therefore act as a sort of entry point into device code. They are called using special notation to specify the requested number of blocks and threads per block:
+Global functions therefore act as a sort of entry point into device code. They are called using new notation which allows the user to specify the requested number of blocks and threads per block:
 \codeline{function<<< num_blocks, threads_per_block >>>( [arguments...] )}{}
-\noindent Where the data type of \verb|num_blocks| and \verb|threads_per_block| can be either of \verb|int| (1D), or \verb|dim3| (1D,2D or 3D) \cite[p9]{guide}. The function body will then be executed $\verb|num_blocks| \times  \verb|threads_per_block|$ times. The Kepler Architecture has an upper limit of 2048 total threads per multiprocessor \cite{kepler}.
+\noindent Where the data type of \verb|num_blocks| and \verb|threads_per_block| can be either of \verb|int| (1D), or \verb|dim3| (1D,2D or 3D) \cite[p9]{guide}. The function body will then be executed $\verb|num_blocks| \times  \verb|threads_per_block|$ times. The Kepler Architecture has an upper limit of 2048 total threads per multiprocessor \cite{kepler}, for example 8 blocks of 16 $\times$ 16 threads (2 dimensions of thread IDs), which is a common choice.
 \par
-Inside the function body, built-in variables can be used to access the thread and block ID of each thread as it executes, and from this determine the work which a certain thread should carry out. Appendix \ref{app:cudaEx} is a CUDA program written during research to build familiarity with the constructs, based on an NVidia tutorial.
+Inside the function body, built-in variables can be used to access the thread and block ID of each thread as it executes, and from this determine the work which a certain thread should carry out. Appendix \ref{app:cudaEx} is a CUDA program written during research to build familiarity which utilises these constructs and ideas, based on an NVidia tutorial.
 \par
-In the next section, the OP2 library's exisiting code generation script will be discussed, which can produce code executable on a GPU. This code generator can therefore be use to inform some parts of the new code generation script being produced for this report, to save time that would otherwise need to be spent re-developing solutions that have already been completed.
+In the next section, the OP2 library's exisiting code generation script will be discussed, which can produce optimised code executable on a GPU. This code generator will inform some parts of the new code generation script being produced for this report, with the Just-In-Time Compilation functionality as an addition and hopefully an improvement.
 
 \subsection{OP2}
 
@@ -88,6 +88,8 @@ The paper also introduces the consideration for data layout in memory. Figure \r
 \noindent The SoA layout is enabled by setting the value of an environment variable: \verb|OP AUTO SOA=1| prior to code generation \cite[p13]{manual}.
 \par
 The existing solution is able to generate optimised CUDA code for a parallel loop; given the set of nodes, edges, cells, or any other collection which it operates over; where the resulting code can assign a set element to a GPU thread where it will be processed by the loop body. It is important to note that the existing implementation for CUDA code generation produces a solution that is compiled entirely ahead of time, i.e. prior to the inputs being known, and therefore is not able to make optimisations based on the mesh input. This project aims to fill this space, and determine if there is benefit to be gained from such optimisations.
+\par
+Since OP2 enforces that the order in which the function is applied to the members of the set must not affect the final result \cite[p4]{manual}, the consideration for data dependencies when generating code is largely removed, and therfore loop iterations can be scheduled in any order, based on best performance.
 
 \subsubsection{OP2 Applications}
 There are a number of industrial applications that have been implemented using OP2, which would immediately benefit from any optimisation of generated code, including Airfoil \cite{airfoil} - a non-linear 2D inviscid airfoil code; Hydra \cite{hydra} - Rolls Royce’s turbomachinery simulator, and Volna \cite{volna} - a finite-volume nonlinear shallow-water equation solver used to simulate tsunamis.
@@ -98,9 +100,26 @@ A further benefit is that such applications could be ported onto a new generatio
 \par
 Later in this report we will see Airfoil used as a benchmark, to determine whether the new optimisation presented in the report is likely to provide benefit to other OP2 applications.
 
-\subsection{Related Work}
-
 \subsubsection{Similar Libraries}
 
-\subsubsection{JIT}
+\subsection{Related Work}
+
+\subsubsection{Just-In-Time Compilation}
 \label{sec:rw_JIT}
+
+\hspace{\parindent}\minititle{Java}
+The term "Just-In-Time Compilation" is most commonly associated with the Java Runtime Environment (JRE), as it is integral to the Java Virtual Machine (JVM). In this case, Java compiles code into platform independant "bytecode", then at runtime this bytecode is compiled again by the JVM into native code, which can be optimised for the machine it will run on. It can also take the program's inputs into account, since they will be known and fixed at runtime.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{javaJIT}
+  \caption{\label{fig:javaJIT} JIT Compilation in the JVM. Diagram from \cite{javaJITsrc}}
+\end{figure}
+
+\noindent Chapter 4 of \cite{javaPerf} contains further detail on Java Performance and the JIT compiler.
+
+This approach is not exactly equivalent to the approach taken in this report, as will be discussed further in Section \ref{s:spec} (Specification), however the key idea of recompiling code at runtime to obtain performance remains. In the implementation presented here, there is no intermediate code, but rather an alternative source file which is able to utilise assertions made using the input data is compiled and used, in place of equivalent but unoptimsed functions compiled ahead of time.
+
+\minititle{easy::JIT}
+\textit{easy::JIT} \cite{eJIT} is a library created by \textit{Juan Manuel Martinez Caamaño} and \textit{Serge Guelton} of \textit{Quarkslab} \cite{Quarkslab}, and fits closer to the goal of this report. It targets C++ code, and utilises \verb|clang| \cite{clang} as the compiler, and therefore can make use of the LLVM's intermediate representation. \textit{easy::JIT} differs does also from this project however, as it utilises code generation at runtime, and a cache of code to ensure this does not need to be done on every execution. The OP2 implementation discussed in this report will generated the majority of the code ahead of time, as this is a slow process.
+\par
+Applications developed for OP2 are not currently limited to only LLVM-based C compilers, although a translator using LLVM Intermediate Representation to replace the current Python translator is in development \cite{op2clang}. The implementation completed for this report will also seek to be compiler agnostic, and therefore will not utilise LLVM.
