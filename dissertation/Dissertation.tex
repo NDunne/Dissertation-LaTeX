@@ -16,7 +16,7 @@
 \usepackage{wrapfig}
 \usepackage{changepage}
 \usepackage{url}            % clickable links
-\usepackage{newclude}
+\usepackage{newclude}       % provides include for no clearpage
 \usepackage{helvet}         % font
 \usepackage{lipsum}         % placeholder text
 \usepackage{pgfplots}       % gantt
@@ -171,26 +171,24 @@ emph={
 %%TC:ignore
 \include{Preamble/FrontPage}
 \include{Preamble/Abstract}
+\include{Appendices/Acknowledgements}
 \include{Preamble/Contents}
 \include{Preamble/ChapterMods}
 %%TC:endignore
 
-\include*{Chapter1/Chapter1}
+\include{Chapter1/Chapter1}
 \include{Chapter2/Chapter2}
-\include*{Chapter3/Chapter3}
+\include{Chapter3/Chapter3}
 \include{Chapter4/Chapter4}
-\include*{Chapter5/Chapter5}
-\include*{Chapter6/Chapter6}
-\include*{Chapter7/Chapter7}
-\include*{Chapter8/Chapter8}
-\include*{Chapter9/Chapter9}
+\include{Chapter5/Chapter5}
+\include{Chapter6/Chapter6}
+\include{Chapter7/Chapter7}
 
 \newpage
 
 %%TC:ignore
 \printbibliography
 \include{Appendices/Appendices}
-\include{Appendices/Acknowledgements}
 %%TC:endignore
 
 \end{document}

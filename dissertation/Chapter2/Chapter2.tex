@@ -54,7 +54,7 @@ OP2 is an "active library" framework \cite{op2main}, which takes a single applic
 \par
 Since this project is focussed on the GPU back-end, and specifically CUDA for NVidia GPUs, the journal article on the design of OP2 for GPU architectures \cite{gpudesign} is necessary background material, as it covers a lot of important details from the GPU implementation.\\ The paper is summerised in the following section:
 
-\minititle{Designing OP2 for GPU architectures}
+\tinytitle{Designing OP2 for GPU architectures}
 This article, originally published in the Journal of Parallel and Distributed Computing in 2013, describes the ey design features of the current OP2 library for generating efficient code targeting GPUs based on NVIDIA’s Fermi architecture. It is worth noting that Fermi is no longer the latest architecture, and the code generation process has been modified since publication, however the article still provides useful information.
 \par
 One of the key points made in the paper is on the managing of data dependencies (p1454), and the solutions proposed for avoiding errors when incrementing indirectly referenced array, where two edges end up updating the same node. Solutions include an owner of node data which performs the computation; colouring of edges such that no two edges of the same colour update the same node; and atomic operations. In the implementation for this project, atomic operations, which perform read-modify-write operation on one 32-bit or 64-bit word residing in global or shared memory \cite[p96]{guide}, as used to solve this issue.
@@ -100,26 +100,26 @@ A further benefit is that such applications could be ported onto a new generatio
 \par
 Later in this report we will see Airfoil used as a benchmark, to determine whether the new optimisation presented in the report is likely to provide benefit to other OP2 applications.
 
-\subsubsection{Similar Libraries}
+\subsubsection{Related Work}
+TODO
 
-\subsection{Related Work}
+\subsection{Just-In-Time Compilation}
+\label{ss:rw_JIT}
 
-\subsubsection{Just-In-Time Compilation}
-\label{sec:rw_JIT}
-
-\hspace{\parindent}\minititle{Java}
-The term "Just-In-Time Compilation" is most commonly associated with the Java Runtime Environment (JRE), as it is integral to the Java Virtual Machine (JVM). In this case, Java compiles code into platform independant "bytecode", then at runtime this bytecode is compiled again by the JVM into native code, which can be optimised for the machine it will run on. It can also take the program's inputs into account, since they will be known and fixed at runtime.
+\hspace{\parindent}\tinytitle{Java}
+The term "Just-In-Time Compilation" is most commonly associated with the Java Run-time Environment (JRE), as it is integral to the Java Virtual Machine (JVM). In this case, Java compiles code into platform independant "bytecode", then at run-time this bytecode is compiled again by the JVM into native code, which can be optimised for the machine it will run on. It can also take the program's inputs into account, since they will be known and fixed at run-time.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.8\textwidth]{javaJIT}
   \caption{\label{fig:javaJIT} JIT Compilation in the JVM. Diagram from \cite{javaJITsrc}}
 \end{figure}
 
-\noindent Chapter 4 of \cite{javaPerf} contains further detail on Java Performance and the JIT compiler.
+\noindent Chapter 4 of \textit{Java Performance: The Definitive Guide} \cite{javaPerf} contains further detail on the JIT compiler.and its impact on the performance of Java. 
 
-This approach is not exactly equivalent to the approach taken in this report, as will be discussed further in Section \ref{s:spec} (Specification), however the key idea of recompiling code at runtime to obtain performance remains. In the implementation presented here, there is no intermediate code, but rather an alternative source file which is able to utilise assertions made using the input data is compiled and used, in place of equivalent but unoptimsed functions compiled ahead of time.
+This approach is not exactly equivalent to the approach taken in this report, as will be discussed further in Section \ref{s:spec} (Specification), however the key idea of recompiling code at run-time to obtain performance remains. In the implementation presented here, there is no intermediate code, but rather an alternative source file which is able to utilise assertions made using the input data is compiled and used, in place of equivalent but unoptimsed functions compiled ahead of time.
 
-\minititle{easy::JIT}
-\textit{easy::JIT} \cite{eJIT} is a library created by \textit{Juan Manuel Martinez Caamaño} and \textit{Serge Guelton} of \textit{Quarkslab} \cite{Quarkslab}, and fits closer to the goal of this report. It targets C++ code, and utilises \verb|clang| \cite{clang} as the compiler, and therefore can make use of the LLVM's intermediate representation. \textit{easy::JIT} differs does also from this project however, as it utilises code generation at runtime, and a cache of code to ensure this does not need to be done on every execution. The OP2 implementation discussed in this report will generated the majority of the code ahead of time, as this is a slow process.
+\subsubsection{Related Work}
+
+\hspace{\parindent}\tinytitle{easy::JIT} \textit{easy::JIT} \cite{eJIT} is a library created by Juan Manuel Martinez Caamaño and Serge Guelton of \textit{Quarkslab} \cite{Quarkslab}, and is a closer fit to the goal of this report. It targets C++ code, and utilises \verb|clang| \cite{clang} as the compiler, and therefore can make use of the LLVM's intermediate representation, where other C compilers like \verb|gcc| cannot. \textit{easy::JIT} does also differ from this project however, as it utilises code generation at run-time, and a cache of code to ensure this does not need to be done on every execution. The OP2 implementation discussed in this report will generated the majority of the code ahead of time, as this is a slow process.
 \par
 Applications developed for OP2 are not currently limited to only LLVM-based C compilers, although a translator using LLVM Intermediate Representation to replace the current Python translator is in development \cite{op2clang}. The implementation completed for this report will also seek to be compiler agnostic, and therefore will not utilise LLVM.

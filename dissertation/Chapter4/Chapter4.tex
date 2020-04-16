@@ -32,7 +32,7 @@ The code generator first performs a quick check across all kernels to see if any
 \vspace{-1em}
 \item{\verb|JIT: cuda/[name]_kernel_rec.cu|}
 \end{itemize}
-The AOT file is generated such that it doesn't just call the runtime compiler, but has the ability to execute without JIT as well. This is so that the JIT feature can be enabled or disabled by a compiler flag. A master kernels file Is also generated:
+The AOT file is generated such that it doesn't just call the run-time compiler, but has the ability to execute without JIT as well. This is so that the JIT feature can be enabled or disabled by a compiler flag. A master kernels file Is also generated:
 \begin{itemize}
 \vspace{-1em}
 \item{\verb|cuda/[application]_kernels.cu|}
@@ -63,7 +63,7 @@ The first part generated is simply the include directives required for the JIT c
  //global_constants
  #include `jit_const.h'
 \end{lstlisting}
-The \verb|jit_const.h| file is also included, which will be generated at runtime (before the compiler is invoked) to contain a \verb|#define| for all constants, to be processed by the preprocessor.
+The \verb|jit_const.h| file is also included, which will be generated at run-time (before the compiler is invoked) to contain a \verb|#define| for all constants, to be processed by the preprocessor.
 
 \begin{wrapfigure}[12]{r}{.33\textwidth}
   \vspace{-2em}
@@ -78,7 +78,7 @@ The User Function is the kernel operation specified by the user to be carried ou
 The \verb|__device__| descriptor is used so that it will be compiled for the GPU, and can only be called from other device code.
 The kernel function found is checked to ensure it has the correct number of parameters, and, if requested, parameters are modified to utlise the struct of arrays layout.
 \par
-The User Function is where any runtime assertions need to be made in order to benefit from the additional computation once inputs are known. In this report the assertion applied is using a \verb|#define| for constants, so wherever the User Function references a constant it needs to be modifed.
+The User Function is where any run-time assertions need to be made in order to benefit from the additional computation once inputs are known. In this report the assertion applied is using a \verb|#define| for constants, so wherever the User Function references a constant it needs to be modifed.
 
 \tinytitle{AOT}
 In the Ahead-Of-Time kernel, only executed if JIT is not being used, the constant will need to read from the device's memory - having been copied there when it is defined constant. The copied version will have the identifier \verb|[id]_cuda| to prevent a name collision, so all constant in the AOT kernel must be replaced with this pattern.
@@ -204,7 +204,7 @@ Contrasting this with the code generated for the JIT kernel file:
 Firstly, since this function needs to be linked to the exisiting code as part of a dynamically loaded library, it is placed inside an \verb|extern "C"| scope, to ensure C linkage, and prevent the compiler from "mangling" the name. Following that, the function, which is named\\
 \verb|op_par_loop_[name]_rec_execute| ("rec" short for recompiled), will come to reside in the address of the \verb|[name]_function| function pointer.
 \par
-It will be executed after the runtime compiler has been invoked, as the replacement JIT-compiled host function, and make calls to the kernel and user functions in the same file as iteself, rather than those in the AOT file - allowing the optimisations made to be used.
+It will be executed after the run-time compiler has been invoked, as the replacement JIT-compiled host function, and make calls to the kernel and user functions in the same file as iteself, rather than those in the AOT file - allowing the optimisations made to be used.
 
 \minititle{Loop Function}
 The last section to be generated in the kernel files is the Loop Function, which is the entry point for the parallel loop:
@@ -243,7 +243,7 @@ The \verb|jit_compile()| function has not yet been defined, but this will be cov
 \clearpage
 \subsubsection{Master Kernels File}
 \label{sss:mkf}
-The Master Kernels File: \verb|cuda/[application]_kernels.cu| is the last file to be generated, once the kernels for each parallel loop have been completed. It ties up most of the remaining loose ends, as it contains shared functions for invoking the runtime compiler, and declaring constants. It also contains \verb|#include| statements for each of the AOT kernel files, so that the application file can be linked against this file only at compile-time, and the linker will be able to find definitions for all the functions declared extern. The Makefile and compile process will be covered further in Section TODO.
+The Master Kernels File: \verb|cuda/[application]_kernels.cu| is the last file to be generated, once the kernels for each parallel loop have been completed. It ties up most of the remaining loose ends, as it contains shared functions for invoking the run-time compiler, and declaring constants. It also contains \verb|#include| statements for each of the AOT kernel files, so that the application file can be linked against this file only at compile-time, and the linker will be able to find definitions for all the functions declared extern. The Makefile and compile process will be covered further in Section TODO.
 \par
 At the top, the master kernels file includes the requried OP2 library files. It then defines a CUDA constant for each constant the user has defined, generated using the following python code:
 \begin{lstlisting}[backgroundcolor = \color{lightgray!20}, language=Python]
@@ -265,7 +265,7 @@ for nc in range (0,len(consts)):
 \vspace{-1em}
 \hspace*{\fill}\footnotesize{translator/c/python/jit/op2\_gen\_cuda\_jit.py [974-985]
 \\
-Following this, the file contains definitions for two functions. The first is \verb|op_decl_const_char|, which will be called from the application file to declare a constant identifier and value; and the second is \verb|jit_compile| which will invoke the runtime compiler, load the generated DLL and create a function pointer for each re-compiled loop.
+Following this, the file contains definitions for two functions. The first is \verb|op_decl_const_char|, which will be called from the application file to declare a constant identifier and value; and the second is \verb|jit_compile| which will invoke the run-time compiler, load the generated DLL and create a function pointer for each re-compiled loop.
 
 \minititle{op\_decl\_const\_char}
 This function is an OP2 library function which allows users to declare a value that will not change over the course of execution. It has the following signature, defined by the OP2 API\cite[p9]{manual}:
@@ -331,7 +331,7 @@ Once this has been done for all loops, the wall clock time since the start of th
 \subsection{Makefile}
 This implementation relies on GNU Make\cite{make} to determine which compiler should be used, which parameters should be passed, and other options. There are a number of libraries required to build an OP2 binary, as covered in Appendix \ref{app:getStart}, so only the recompilation target will be discussed here.
 \par
-The binary expects there to be a Makefile in the directory it executes in, with a target: \verb|[application]_cuda_rec| in order to work correctly. This is the target which will be compiled at runtime. As mentioned in the previous section, the result of making this target needs to be a a shared object file named \verb|cuda/airfoil_kernel_rec.so|, which contains the recompiled loop functions.
+The binary expects there to be a Makefile in the directory it executes in, with a target: \verb|[application]_cuda_rec| in order to work correctly. This is the target which will be compiled at run-time. As mentioned in the previous section, the result of making this target needs to be a a shared object file named \verb|cuda/airfoil_kernel_rec.so|, which contains the recompiled loop functions.
 \par
 The library object is produced by compiling each of the kernels individually, using the NVidia compiler \verb|nvcc| from the NVidia CUDA Toolkit\cite{nvcc,toolkit} as the code contains CUDA, then linking them into a single object. It is necessary that the compiler flags include \verb|--compiler-options -fPIC|. This passes a list of arguments to the underlying compiler, since nvcc only handles the CUDA code, and passes all host code compilation on to a C compiler. The argument to be passed down is \verb|-fPIC|, to generate Position Independant Code, to allow the library function to execute correctly, regardless of the address at which it is loaded in memory.
 \subsubsection{Optional Functionality}
