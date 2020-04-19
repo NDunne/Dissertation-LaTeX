@@ -7,7 +7,7 @@
 \section*{Abstract}
 \addcontentsline{toc}{section}{Abstract}
 \normalsize
-The OP2 Domain Specific Language was created to simplify the process of writing unstructured mesh solver applications for High Performance Computing uses. This report details the implementation of a new optimisation to the code generation, which re-compiles at runtime when the inputs to the program are known, as well as the benchmarking of this optimisation on a representative example application. 
+The OP2 Domain Specific Language was created to simplify the process of writing unstructured mesh solver applications for High Performance Computing. This report details the implementation of a new optimisation to the code generation, which re-compiles at runtime when the inputs to the program are known, as well as the benchmarking of this optimisation on a representative example application. For this implementation the only assertion made at runtime was to define input values declared constant as pre-processor literals in the re-compiled code, however further runtime optimisation are also discussed. The finished JIT compilation platform will aid in adding additional optimisations in the future, which could provide speed-up where defining constants could not.
 \section*{Key Words}
 \addcontentsline{toc}{section}{Key Words}
 High Performance Computing, Unstructured Mesh, Just-In-Time Compilation
