@@ -5,8 +5,8 @@ ProgRep: Dissertation.tex
 	biber Dissertation
 	pdflatex Dissertation
 	pdflatex Dissertation
-	pdftotext Dissertation.pdf
-	wc -w Dissertation.txt
+	echo ""
+	texcount -inc Dissertation.tex | grep "File(s) total:" -A 7
 
 edit:
 	atom .
