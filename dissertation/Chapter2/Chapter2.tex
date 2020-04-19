@@ -100,9 +100,6 @@ A further benefit is that such applications could be ported onto a new generatio
 \par
 Later in this report we will see Airfoil used as a benchmark, to determine whether the new optimisation presented in the report is likely to provide benefit to other OP2 applications.
 
-\subsubsection{Related Work}
-TODO
-
 \subsection{Just-In-Time Compilation}
 \label{ss:rw_JIT}
 
@@ -114,7 +111,7 @@ The term "Just-In-Time Compilation" is most commonly associated with the Java Ru
   \caption{\label{fig:javaJIT} JIT Compilation in the JVM. Diagram from \cite{javaJITsrc}}
 \end{figure}
 
-\noindent Chapter 4 of \textit{Java Performance: The Definitive Guide} \cite{javaPerf} contains further detail on the JIT compiler.and its impact on the performance of Java. 
+\noindent Chapter 4 of \textit{Java Performance: The Definitive Guide} \cite{javaPerf} contains further detail on the JIT compiler.and its impact on the performance of Java.
 
 This approach is not exactly equivalent to the approach taken in this report, as will be discussed further in Section \ref{s:spec} (Specification), however the key idea of recompiling code at run-time to obtain performance remains. In the implementation presented here, there is no intermediate code, but rather an alternative source file which is able to utilise assertions made using the input data is compiled and used, in place of equivalent but unoptimsed functions compiled ahead of time.
 

@@ -3,12 +3,12 @@
 \section{Conclusion}
 \label{s:conc}
 
-This project was developed as an investigation into a new optimisation for the GPU code generation of the OP2 framework. As part of this investigation, an implementation of the technique was produced, and the results benchmarked to determine if the optimisation is able to provide benefit.
+This project was developed as an investigation into a new optimisation for the GPU code generation of the OP2 framework. As part of this investigation, an fully functioning implementation of the technique was designed and completed, and the results benchmarked to determine if the optimisation is able to provide benefit.
 \par
-The implementation was completed, producing the functionality for execution of JIT compiled code, and applied an optimisation made based on the inputs of the program, which can only be done at runtime - defining the constant values for the pre-processor.
+The implementation successfuly provides the ability to execute JIT compiled code, and applied an optimisation made based on the inputs of the program, which could only be done at run-time and would not be possible ahead of time: defining the constant values from the input for the pre-processor.
 \par
-The results from this benchmarking were unfortunate, in that there was no benefit from the runtime, however it is important to draw the distinction that the defining of constants was not able to provide speedup, and not that JIT compilation as a technique does not have potential to speedup.
+The results from benchmarking were that there was no speedup to the run-time, however it is important to draw the distinction that it was the run-time optimisation of defining of constants which was not able to provide speedup; and not that JIT compilation as a technique does not have potential to speedup.
 \par
-It is likely that adding loop blocking as a runtime optimisation would produce better results, and adding this feature will have been made easier by the work completed for this project. It is unfortunate that there was not enough time to implement loop blocking, and benchmark it suffiently.
+It is likely that adding loop blocking as a run-time optimisation would produce better results, and adding this feature will have been made easier by the work completed for this project. It is unfortunate that there was not enough time to implement it and benchmark it suffiently as part of this project.\\
 \par
-Overall,
+Overall, the project was a successful investigation, which has provided a useful contribution to an open source library. The results gathered will inform and benefit future contributions, and the implementation completed will become part of a framework which provides benefit to many industrial HPC applications.

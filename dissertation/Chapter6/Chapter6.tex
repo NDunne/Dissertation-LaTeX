@@ -9,7 +9,7 @@ This project was intended as an investigation, and therefore it can certainly be
 \label{ss:fw}
 
 \subsubsection{Run-Time Assertions}
-As previously mentioned, it seems necessary for more to be assertions to be made at runtime in order to produce actual speed-up after JIT compilation. There are a number of possible loop optimisations which could be made, including identifying a loop inside a kernel, and at run-time having the loop bound be hard-coded to remove the need to evaluate the expression of every iteration; or more complex optimisation where two seperate parallel loops might be provably able to be fused into a single loop, but only if the inputs allow for it - meaning this could only be done at run-time.
+As previously mentioned, it seems necessary for more to be assertions to be made at run-time in order to produce actual speed-up after JIT compilation. There are a number of possible loop optimisations which could be made, including identifying a loop inside a kernel, and at run-time having the loop bound be hard-coded to remove the need to evaluate the expression of every iteration; or more complex optimisation where two seperate parallel loops might be provably able to be fused into a single loop, but only if the inputs allow for it - meaning this could only be done at run-time.
 
 \begin{wrapfigure}[8]{l}{.4\textwidth}
   \vspace{-2em}
