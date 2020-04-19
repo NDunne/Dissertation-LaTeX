@@ -68,11 +68,8 @@ As discussed in Section \ref{ss:rw_JIT} on Just-In-Time Compilation, the perform
 Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with the addition of Just-In-Time compilation. As before, code generation takes the application and loop files as input, and generates the Kernels and Modified Application Files. It also generates Optimised Kernels, where the code will only compile once the constants are known and defined by the pre-processor. These Kernel files are not used by the ahead of time compiler.
 
 The OP2 API function:
-\begin{center}
-\lstinline{void op_decl_const(int dim, char *type, T *dat, char *name)}
-\\\vspace{-1em}
-\hspace*{\fill}\cite[p9]{manual}
-\end{center}
-\vspace{-1em}
+
+\codeline{void op_decl_const(int dim, char *type, T *dat, char *name)}{\cite[p9]{manual}}
+
 Will be modified so that when called by the Program Binary it will generate a header file, where each of the constant values is added as a C \verb|#define| directive, where previously it needed to copy these values to the GPU device's memory.
 \par At run-time, the executable invokes the \textit{nvcc} compiler again, to compile the Optimised Kernels which semantically include the constants header file, and link them into a Shared Object (Dynamically Loaded Library). This object is then loaded by the running executable, and the functions it provides are used instead of the unoptimised versions.
