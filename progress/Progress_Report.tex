@@ -115,18 +115,6 @@ The main tool used in development is GitHub as a remote repository. OP2 has a nu
   \path [line, line width=2pt, color=green!50!black] (binary) -- (result);
 
 \end{tikzpicture}
-
-\begin{tikzpicture}[node distance=2.8cm, auto]
-  \node [file] (body) {Kernel Body};
-  \node [file, right of=body] (args) {Kernel\\Args};
-  \node [file, right of=args] (attr) {Kernel Attributes};
-  \node [block, below of=args] (op2py) {CodeGen script};
-  
-  \path [line, dashed,line width=2pt, color=blue!50!black] (body) -- (op2py);
-  \path [line, dashed,line width=2pt, color=blue!50!black] (args) -- (op2py);
-  \path [line, dashed,line width=2pt, color=blue!50!black] (attr) -- (op2py);
-
-\end{tikzpicture}
 \end{center}
 \par To write a new code generator script, the arguments passed to existing code generator scripts for each backend:
 \begin{enumerate}
