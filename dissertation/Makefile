@@ -6,7 +6,8 @@ ProgRep: Dissertation.tex
 	pdflatex Dissertation
 	pdflatex Dissertation
 	echo ""
-	texcount -inc Dissertation.tex | grep "File(s) total:" -A 7
+	texcount -inc Dissertation.tex | grep -E 'Words in text|^Included file|File\(s\) total' | sed "s#Included file: ./Chapter[0-9]/##" | sed "s/Words in text://" | tail -n +2
+
 
 edit:
 	atom .

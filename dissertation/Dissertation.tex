@@ -58,9 +58,9 @@
 % Use the margin size here to adjust text width!
 \usepackage[margin=3cm]{geometry}
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows, fit, matrix, positioning}
+\usetikzlibrary{shapes,arrows.meta, fit, matrix, positioning}
 
-\tikzstyle{line} = [draw, -latex']
+\tikzstyle{line} = [draw, -{Latex[length=5mm,width=3mm]}, line width=2pt]
 
 \tikzstyle{block} = [rectangle, draw, fill=blue!10,%black!10,
   text width=5em, text centered, rounded corners, minimum height=4em]
@@ -110,9 +110,11 @@
  {} %ignore if empty
  {
    \vspace{-1em}
-   \hspace*{\fill}\footnotesize{#2}\\
+   \begin{footnotesize}
+     \hfill#2
+   \end{footnotesize}
  }
- \noindent
+ \par
 }
 
 \newcommand{\pyline}[2]{

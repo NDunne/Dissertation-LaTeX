@@ -3,12 +3,12 @@
 \section{Specification}
 \label{s:spec}
 
-In order to clearly explain the new system with the addition that will be made to the OP2 framework, it is important to first describe the exisiting work-flow.
+In order to clearly explain the new system, with the addition that will be made to the OP2 framework, it is important to first describe the exisiting work-flow. The new system model on page \pageref{fig:jit_sys} may seem complex at first, but understanding the sections that already exisited in the codebase before the start of the project should make it clearer.
 
 \subsection{Existing System}
 \begin{figure}[h!]
 \makebox[\textwidth][c]{
- \resizebox{1.2\textwidth}{!}{
+ \resizebox{1.1\textwidth}{!}{
   \begin{tikzpicture}[node distance=4cm, auto]
     \node [file] (source) {Source Files};
     \node [block, below of=source] (op2py) {CodeGen script};
@@ -21,8 +21,8 @@ In order to clearly explain the new system with the addition that will be made t
     \node [rfile, above of=binary] (input) {Input Map};
     \node [rblock, right of=binary] (result) {Program Result};
 
-    \tikzset{dotted box1/.style={draw=black!100, line width=2pt, dash pattern=on 4pt off 4pt,
-      inner sep=8mm, rectangle, rounded corners}};
+    \tikzset{dotted box1/.style={draw=black!100, dash pattern=on 4pt off 4pt,
+      inner sep=8mm, rectangle, rounded corners, line width=2pt}};
 
     \node (run-time) [dotted box1, fit = (input) (result), color=green!50!black] {};
     \node at (run-time.north east) [above left=2mm] (rtbox) {\textbf{Run-time}};
@@ -30,53 +30,48 @@ In order to clearly explain the new system with the addition that will be made t
     \node (code-gen) [dotted box1, fit = (source) (sourceOp), color=blue!50!black] {};
     \node at (code-gen.north west) [above right=2mm] (rtbox) {\textbf{Code Generation}};
 
-    \path [line,line width=2pt, color=blue!50!black] (source) -- (op2py);
-    \path [line, line width=2pt, color=blue!50!black] (op2py) -- (sourceOp);
-    \path [line, line width=2pt, color=blue!50!black] (op2py) -- (Kernels);
-    \path [line,line width=2pt, color=blue!50!black] (sourceOp) -- (aot);
-    \path [line,line width=2pt, color=blue!50!black] (Kernels) -- (aot);
-    \path [line,line width=2pt, color=black] (op2lib) -- (aot);
-    \path [line, line width=2pt, color=green!50!black] (aot) -- (binary);
-    \path [line,line width=2pt, color=green!50!black] (input) -- (binary);
-    \path [line, line width=2pt, color=green!50!black] (binary) -- (result);
+    \path [line, color=blue!50!black] (source) -- (op2py);
+    \path [line, color=blue!50!black] (op2py) -- (sourceOp);
+    \path [line, color=blue!50!black] (op2py) -- (Kernels);
+    \path [line, color=blue!50!black] (sourceOp) -- (aot);
+    \path [line, color=blue!50!black] (Kernels) -- (aot);
+    \path [line, color=black] (op2lib) -- (aot);
+    \path [line, color=green!50!black] (aot) -- (binary);
+    \path [line, color=green!50!black] (input) -- (binary);
+    \path [line, color=green!50!black] (binary) -- (result);
 
   \end{tikzpicture}
   }}
   \caption{OP2 System Diagram}
   \label{fig:aot_sys}
 \end{figure}
-The pre-exisiting OP2 workflow is shown in Figure \ref{fig:aot_sys}. In this system the Source Files are comprised of a master application file, which contains the OP2 API calls for definition of sets, maps, constants, and the structure of the application; as well as optional header files containing the operation to be the contents of each parallel loop.
+
+The pre-exisiting OP2 workflow is shown in Figure \ref{fig:aot_sys}. In this system the Source Files are contains a master application file, which is a normal C program containing the OP2 API calls for definition of sets, maps, constants, and the structure of the application. The optional C header files containing the operations to be the body of each parallel loop are also part the set of input files.
 \par
-This forms the input to the code generation Python script, from which the output is a modified version of the master appliation file, and a kernel file for each parallel loop. These are compiled, and linked against the OP2 library for the desired hardware platform to produce the executable Program Binary. The expectation is that this binary will execute on the target hardware, taking a map as an input to produce the result desired by the application programmer.
+These Source files form the input to the code generation Python script, from which the output is a modified version of the master appliation file, and a kernel file for each parallel loop. The output is compiled, and linked against the OP2 library for the desired hardware platform to produce an executable Program Binary. The expectation is that this binary will run without error on the target hardware, taking a map as an input to produce the result desired by the application programmer.
 \par
 The existing system is able to generate optimised code for the target platform from the high level application code, and apply compiler optimisations ahead of time, including optimisations like \verb|-O3| and \verb|--use_fast_math|. It is not, however, able to optimise based on the inputs at all. This is where the implementation for this project comes in: to provide the ability to use the input data when optimising.
 \vspace{-1.5cm}
 \subsection{New System}
-The implementation will require work in two main areas: the Python code generation script, and the OP2 library itself which is implemented in both C and Fortran. Only the C library will be modified, due to developer familiarity with C. OP2 does also include code generation using MatLab. The Python script is preferable, due to its flexibility and conveniant string manipulation capabilities.
+Implementing the new system will require work in two main areas: the Python code generation script, and the OP2 library itself which is implemented in both C and Fortran. Only the C library will be modified, due to developer familiarity with C. OP2 does also include code generation using MatLab. The Python script is preferable, due to its flexibility and conveniant string manipulation capabilities.
 \par
-The Python script will need to perform the similar source-to-source translation to the pre-exisiting code generation script, but modified to generate modified code that will be compiled at run-time as well as the code that is compiled ahead of time. These must of course be valid C files, to be compiled by a normal C compiler. In the case of this project the compiler will be wrapped by the NVidia C Compiler (\textit{nvcc}), as the code generated will be include CUDA, so the generated CUDA code must also be valid.
-The code will also need to actually invoke the JIT compiler as part of execution.
+The code generation script will need to perform the similar source-to-source translation to the pre-exisiting script, but modified to also generate an altered codebase that will be compiled at run-time, as well as the original code that is compiled ahead of time. These must of course all be valid C files, to be compiled by a normal C compiler. In the case of this project the compiler will be wrapped by the NVidia C Compiler (\textit{nvcc}), as the code generated will be include CUDA. The generated CUDA code must also be valid, and not produce errors when compiled. Finally, the generated code will need to actually invoke the JIT compiler as part of its execution.
 \par
-The resulting executable compiled from the generated code must produce an output within some tolerance of executing parallel loop iterations in an arbitrary sequential order. OP2 makes an important restriction that the order in which elements are processed must not affect the final result, to within the limits of finite precision floating-point arithmetic\cite[p3]{op2main}, for example through data dependencies. This constraint allows the code generator freedom to not consider the ordering of iterations, and select an ordering based on performance. As with all compilers, correctness will always be a priority over performance.
+The resulting executable compiled from the generated code must produce an output within some tolerance of the result if the parallel loop iterations are executued in an arbitrary sequential order. OP2 enforces a restriction that the order in which elements are processed must not affect the final result, to within the limits of finite precision floating-point arithmetic\cite[p3]{op2main}, for example through data dependencies. This constraint allows the code generator freedom to not consider the ordering of iterations, and select an ordering based on performance. As with all compilers, correctness will always be a priority over performance.
 \par
-Finally, some OP2 API functions may need to be implemented differently to provide code that will make assertions based on the inputs at run-time. It will be ensured that the OP2 API itself is not be altered by any modifications to the library, to ensure that any and all exisiting programs using the API are able to seemless use the updated version.
+Outside the code generation script, some OP2 API functions may need to be implemented differently in the OP2 library files, as the functions may need extra information to be stored and retrieved. It is a requirement that the OP2 API itself is not altered by any modifications to the library, so that any and all exisiting programs using the API are able to seemless use the updated version.
 
 \subsection{Run-time Assertions}
-The application's input will be an unstructured mesh over which to operate, made up of a large amount of data points. The optimisation that will be made for this project is "Constant Definition", which is turning values specified in the input as constants into \verb|#define| directives for the C-Preprocessor in the recompiled code. Other possible optimisations will be discussed in Section \ref{ss:fw} (Future Work).
+The application's input will be an unstructured mesh over which to operate, made up of a large amount of data points. The optimisation that will be made for this project is "Constant Definition", which will involve turning values specified in the input as remaining constant into \verb|#define| directives for the C-Preprocessor in the recompiled code. This will make remove the need to store them in memory, and allow them to be read as a literal value, removing the retrieval time when they are required. Other possible optimisations will be discussed in Section \ref{ss:fw} (Future Work).
 
 \subsection{System Model}
-Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with the addition of Just-In-Time compilation. As before, code generation takes the application and loop files as input, and generates the Kernels and Modified Application Files. It also generates Optimised Kernels, where the code will only be compiled once the constants are known, and defined for the pre-processor as literal values. These Kernel files are not known to the ahead of time compiler.
-\\\noindent
-The OP2 API function:
-\codeline{void op_decl_const(int dim, char *type, T *dat, char *name)}{\cite[p9]{manual}}
-Will be modified so that when called by the Program Binary it will generate a header file, where each of the constant values is added as a C \verb|#define| directive, where previously it needed to copy these values to the GPU device's memory.
-\par
-At run-time, the executable invokes the \textit{nvcc} compiler again, to compile the Optimised Kernels which semantically include the constants header file, and link them into a Shared Object (Dynamically Loaded Library). This object is then loaded by the running executable, and the functions it provides are used instead of the unoptimised versions.
+Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation. As before, code generation takes the application and loop files as input, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kernels, which contain code that will only be compiled once the constants from the Input Map are known to the program. These Kernel files are not seen by the ahead of time compiler.
+
 \begin{figure}[h!]
 \caption{OP2 System Diagram with JIT Addition}
 \label{fig:jit_sys}
 \makebox[\textwidth][c]{
-\resizebox{1.2\textwidth}{!}{
+\resizebox{1.1\textwidth}{!}{
   \begin{tikzpicture}[node distance=4cm, auto]
     \node [file] (source) {Source Files};
     \node [block, below of=source] (op2py) {CodeGen script};
@@ -93,37 +88,46 @@ At run-time, the executable invokes the \textit{nvcc} compiler again, to compile
     \node [jbin, right of= consts] (so) {Shared Object};
     \node [rblock, right of=binary] (result) {Program Result};
 
-    \tikzset{dotted box1/.style={draw=black!100, line width=2pt, dash pattern=on 4pt off 4pt,
-      inner sep=8mm, rectangle, rounded corners}};
-    \tikzset{dotted box2/.style={draw=black!100, line width=2pt, dash pattern=on 4pt off 4pt,
-      inner sep=6mm, rectangle, rounded corners}};
+    \tikzset{dotted box1/.style={draw=black!100, dash pattern=on 4pt off 4pt,
+      inner sep=8mm, rectangle, rounded corners, line width=2pt}};
+    \tikzset{dotted box2/.style={draw=black!100, dash pattern=on 4pt off 4pt,
+      inner sep=6mm, rectangle, rounded corners, line width=2pt}};
 
     \node (run-time) [dotted box1, fit = (input) (jit) (result), color=green!50!black] {};
     \node (jitbox) [dotted box2, fit = (recKernels) (so) (jit), color=red!50!black] {};
 
     \node at (run-time.north east) [above left=2mm] (rtbox) {\textbf{Run-time}};
-    \node at (jitbox.south west) [below right=2mm] (corner) {\textbf{OP2 "JIT"}};
+    \node at (jitbox.south west) [below right=2mm] (corner) {\textbf{OP2 JIT Compilation}};
 
     \node (code-gen) [dotted box1, fit = (source) (recKernels), color=blue!50!black] {};
     \node at (code-gen.north west) [above right=2mm] (rtbox) {\textbf{Code Generation}};
 
-    \path [line,line width=2pt, color=blue!50!black] (source) -- (op2py);
-    \path [line, line width=2pt, color=blue!50!black] (op2py) -- (recKernels);
-    \path [line, line width=2pt, color=blue!50!black] (op2py) -- (sourceOp);
-    \path [line, line width=2pt, color=blue!50!black] (op2py) -- (Kernels);
-    \path [line,line width=2pt, color=blue!50!black] (sourceOp) -- (aot);
-    \path [line,line width=2pt, color=blue!50!black] (Kernels) -- (aot);
-    \path [line,line width=2pt, color=black] (op2lib) -- (aot);
-    \path [line,line width=2pt, color=red!70!black] (op2lib) -- (jit);
-    \path [line, line width=2pt, color=green!50!black] (aot) -- (binary);
-    \path [line,line width=2pt, color=green!50!black] (input) -- (binary);
-    \path [line,line width=2pt, color=green!50!black] (binary) -- (consts);
-    \path [line,line width=2pt, color=red!70!black] (recKernels) |- (jit);
-    \path [line,line width=2pt, color=green!50!black] (consts) -- (jit);
-    \path [line, line width=2pt, color=green!50!black] (jit) -| (so);
-    \path [line,line width=2pt, color=green!50!black] (so) -- (binary);
-    \path [line, line width=2pt, color=green!50!black] (binary) -- (result);
+    \path [line, color=blue!50!black] (source) -- (op2py);
+    \path [line, color=blue!50!black] (op2py) -- (recKernels);
+    \path [line, color=blue!50!black] (op2py) -- (sourceOp);
+    \path [line, color=blue!50!black] (op2py) -- (Kernels);
+    \path [line, color=blue!50!black] (sourceOp) -- (aot);
+    \path [line, color=blue!50!black] (Kernels) -- (aot);
+    \path [line, color=black] (op2lib) -- (aot);
+    \path [line, color=red!70!black] (op2lib) |- ($(jit.west)!0.2!(jit.north west)$);
+    \path [line, color=green!50!black] (aot) -- (binary);
+    \path [line, color=green!50!black] (input) -- (binary);
+    \path [line, color=green!50!black] (binary) -- (consts);
+    \path [line, color=red!70!black] (recKernels) |- ($(jit.west)!0.2!(jit.south west)$);
+    \path [line, color=green!50!black] (consts) -- (jit);
+    \path [line, color=green!50!black] (jit) -| (so);
+    \path [line, color=green!50!black] (so) -- (binary);
+    \path [line, color=green!50!black] (binary) -- (result);
 
   \end{tikzpicture}
   }}
 \end{figure}
+
+The JIT compiler also needs to link the Optimised Kernels against the OP2 Library Files, so they must be stored in a location that is also accessible at run-time, not just when the executable is compiled. This compilation will take place during the execution of the binary, and will therefore make up part of the program's execution duration. It will result in a Shared Object or Dynamically Loaded Library (DLL) file, with a standardised name, which the program can load, and utilise the functions it makes available.
+\par
+The exported functions will be the recompiled versions of each parallel loop, which as black boxes are equivalent (i.e. they have the same inputs and outputs), however hopefully they are faster to execute than the original versions.
+\subsection{Library Modifications}
+In the OP2 library, the main API function that will need to be modified is:
+\codeline{void op_decl_const(int dim, char *type, T *dat, char *name)}{\cite[p9]{manual}}
+\noindent This function is used to declare a constant value, its dimension, data type, and identifier.
+Previously this function copied the value to a device symbol, so that when required it could be read from device memory. In this implementation in needs to maintain a de-duplicated list of constants' values and data types, which will be used when the first parallel loop is invoked to generate the head file. At this point it is known that no more constants can be declared. In the header file each of the constant values will have a \verb|#define| directive making the value available as a literal value.
