@@ -2,21 +2,104 @@
 
 \section{Implementation}
 \label{s:impl}
-The OP2 library is hosted open source on GitHub\cite{OP2rep}. Instructions for obtaining the implementation completed for this report, and getting started with OP2 can be found in Appendix \ref{app:getStart}.
+The source code for the OP2 Framework is hosted open source as a GitHub\cite{OP2rep} repository. Instructions for obtaining the implementation described in the following section, and for getting started with OP2, are provided be found in Appendix \ref{app:getStart}.
+\subsection{Git Repository}
+The feature branch for this project is named \verb|feature/jit|, and was branched from \verb|feature/lazy-execution| on 13th November 2019. The last commit on the \verb|lazy-execution| was in April 2018, and therefore lagged behind the \verb|master| branch somewhat. It was rebased onto \verb|master| before any other changes were made.
 \par
-The feature branch for this project, \verb|feature/jit| was branched from \\\verb|feature/lazy-execution| on 13th November 2019. The \verb|lazy-execution| branch's last commit was in April 2018, and lagged behind the \verb|master| branch somewhat. It was rebased onto \verb|master| before any other changes were made.
+In git terminology, a rebase involves making copies of a branch's commits, and "re-playing" the changes made in them to the top of another branch \cite{scm-rebase}. In this case, making copies of all commits made to \verb|feature/lazy-execution| and applying them to the latest commit of \verb|master|. The result once any merge conflicts are resolved will be a codebase with all the features of both branches available.
+\begin{figure}[h!]
+  \caption{Rebase vs. Merge. Diagram reproduced from \cite{scm-rebase}}
+  \label{fig:git_merge}
+  \makebox[\textwidth][c]{
+  \resizebox{1.1\textwidth}{!}{
+    \begin{tikzpicture}[node distance=3.5cm, auto]
+
+      %
+      % Initial
+      %
+
+      \tikzstyle{label} = [rblock, text width=7em, minimum height=2em, fill=green!30]
+
+      \node [wfile] (C0) {C0};
+      \node [wfile, right of=C0] (C1) {C1};
+      \node [wfile, right of=C1] (C2) {C2};
+      \node [jfile, above=1cm of C2] (C3) {C3};
+      \node [label, above=1cm of C3] (fhead) {feature/HEAD};
+      \node [label,  below=1cm of C2] (mhead) {master/HEAD};
+
+      \node [above=2em of C0] (initial) {\LARGE Initial State};
+
+      \path [line] (C1) -- (C0);
+      \path [line] (C2) -- (C1);
+      \path [line] (C3.south west) -- (C1.north east);
+      \path [thinline] (fhead) -- (C3);
+      \path [thinline] (mhead) -- (C2);
+
+      %
+      % Rebase
+      %
+
+      \node [wfile, below=6cm of C0] (fC0) {C0};
+      \node [wfile, right of=fC0] (fC1) {C1};
+      \node [wfile, right of=fC1] (fC2) {C2};
+      \node [jfile, above=1cm of fC2, opacity=0.2] (fC3) {C3};
+      \node [label, below=1cm of fC2] (fmhead) {master/HEAD};
+
+      \node [above=2em of fC0] (rebase) {\LARGE Rebased Commits};
+
+      \node [jfile, right of=fC2] (fC3prime) {C3'};
+      \node [label, above=1cm of fC3prime] (ffhead) {feature/HEAD};
+
+      \path [line] (fC1) -- (fC0);
+      \path [line] (fC2) -- (fC1);
+      \path [line, opacity=0.2] (fC3.south west) -- (fC1.north east);
+      \path [thinline] (ffhead) -- (fC3prime);
+      \path [line] (fC3prime) -- (fC2);
+      \path [thinline] (fmhead) -- (fC2);
+
+      %
+      % Merge
+      %
+
+      \node [wfile, right=3cm of fC3prime] (mC0) {C0};
+      \node [wfile, right of=mC0] (mC1) {C1};
+      \node [wfile, right of=mC1] (mC2) {C2};
+      \node [jfile, above=1cm of mC2] (mC3) {C3};
+      \node [label, above=1cm of mC3] (mfhead) {feature/HEAD};
+
+      \node [wfile, right of=mC2] (mC4) {C4};
+      \node [label, below=1cm of mC4] (mmhead) {master/HEAD};
+
+      \node [above=2em of mC0] (merge) {\LARGE Merged Commits};
+
+      \path [line] (mC1) -- (mC0);
+      \path [line] (mC2) -- (mC1);
+      \path [line] (mC3.south west) -- (mC1.north east);
+      \path [line] (mC4) -- (mC2);
+      \path [line] (mC4.north west) -- (mC3.south east);
+      \path [thinline] (mfhead) -- (mC3);
+      \path [thinline] (mmhead) -- (mC4);
+
+    \end{tikzpicture}
+    }}
+\end{figure}
 \par
-This branch was created for developing a system to execute parallel loops when values are required rather than when called. This is done through an internal library function:
+Rebasing is preferable to simply merging for integrating another branch's changes as the result is a linear branch history, rather than creating a diamond. Also, in the case of merge conflicts - where a change has been made in both branches and one needs to be selected - a rebase command will stop at the first conflicting commit and allow the conflict to be resolved \cite{rebase-doc}. Synchronising using merge would result in receiving all conflicts in one go, which can make it harder to resolve.
+\par
+The downside of rebasing is it can be harder to recover from an erroneous rebase, than an erroneous merge. This is due to the fact that merges are not destructive, since they do not re-write history in the same way as a rebase. This will not be an issue here however.
+\par
+The \verb|feature/lazy-execution| branch was created for developing a system to execute parallel loops when values are required, rather than when they are called. This functionality will be achieved using an internal library function:
 \codeline{void op_enqueue_kernel(op_kernel_descriptor *desc)}{op2/c/src/core/op\_lazy.cpp [71-89]}
-Currently this function generates the constants header file, then executes the queued loop straight away. This process for calling parallel loops is used similarly throughout work done to enable Just-In-Time Compilation for CUDA, so that future efforts towards lazy execution can continue in the future on top of the JIT implementation.
+Currently this function executes the queued loop as soon as it is invoked, but there is ongoing work into determining when the result of the loop will be needed, and potentially compressing multiple queued actions into fewer at this time. Lazy execution will not be the focus of this project, however the process for invoking parallel loops will be utilised throughout the work done to enable Just-In-Time Compilation for CUDA, so that future efforts towards lazy execution can continue on top of the JIT compilation implementation.
 
 \subsection{Code Generation}
 \label{ss:codegen}
-The Python code generation script which forms the main body of the implementation can be found in: \verb|translator/c/python/jit/op2_gen_cuda_jit.py|
+As described in the Specification before, the majority of the implementation is made up of a Python code generation script which can be found inthe folder: \verb|translator/c/python/jit/op2_gen_cuda_jit.py| of the OP2 repository.
 \\
 Its entry point function is:
 \pyline{def op2_gen_cuda_jit(master, date, consts, kernels)}{translator/c/python/jit/op2\_gen\_cuda\_jit.py [102]}
-Which is called from \verb|op2.py| in the parent directory - the same as the other code generation scripts, and its parameters are:\\
+This function is called from another Python script \verb|op2.py| which is in the parent directory: \verb|translator/c/python/|\\
+The arguments passed to it when it is called are:\\
 \begin{tabular}{>{\bfseries}l l}
   master: & The name of the Application's master file \\
   date: & The exact date and time of code generation \\
@@ -25,63 +108,75 @@ Which is called from \verb|op2.py| in the parent directory - the same as the oth
 \end{tabular}
 \\
 \\
-The code generator first performs a quick check across all kernels to see if any use the Struct of Arrays feature \cite[p13]{manual}, or if all are using the default data layout. Then, it iterates over each kernel and generates both the Ahead-Of-Time (AOT) kernel file, and the Just-In-Time (JIT) kernel file simultaneously. A folder \verb|cuda/| is created if it doesn't exist, and the files are generated with the following naming scheme:
+The code generator first performs a check across all kernels to see if any use the Struct of Arrays data layout \cite[p13]{manual}, or if all are using the default Array of Structs. Then, a folder \verb|cuda/| is created if it doesn't exist, and the script will iterate over each kernel, generating both the Ahead-Of-Time (AOT) kernel file, and the Just-In-Time (JIT) kernel file simultaneously. In the System Digram from Section \ref{s:spec} (Figure \ref{fig:jit_sys}) these files were referred to as "Kernels" and "Optimised Kernels" respectively. \par
+The generation of the Modified Application File is handled by \verb|op2.py|, and does not need to change to meet the requirements of this project.
+\clearpage For each parallel loop, the two kernel files are generated with the following naming scheme:
 \begin{itemize}
 \vspace{-1em}
 \item{\verb|AOT: cuda/[name]_kernel.cu|}
 \vspace{-1em}
 \item{\verb|JIT: cuda/[name]_kernel_rec.cu|}
 \end{itemize}
-The AOT file is generated such that it doesn't just call the run-time compiler, but has the ability to execute without JIT as well. This is so that the JIT feature can be enabled or disabled by a compiler flag. A master kernels file Is also generated:
+
+The AOT kernel file is generated such that it doesn't just invoke the run-time compiler, but has the ability to execute the loop without requiring JIT compilation as well. The compiler invokation is wrapped in a pre-processor conditional, so that the feature can be enabled or disabled using a compiler argument to define a flag.
+\\A single master kernels file Is also generated, which is shared by all parallel loops:
 \begin{itemize}
 \vspace{-1em}
 \item{\verb|cuda/[application]_kernels.cu|}
 \end{itemize}
-It contains shared functions, and include statements for each of the parallel loops' kernels.
+It will contain function definitions required by all loops, or by the master application file; as well as include statements for each of the parallel loops' AOT kernels so they are collated into a single file by the compiler.
 
 \subsubsection{Kernel Files}
 \label{ss:krnl_files}
-As mentioned above, the code generator creates two files: AOT and JIT for each parallel loop. The following section details the functions generated, and examples in Figures \ref{fig:jit_include}-\ref{fig:loop_func} show the progression of each file for an example kernel. There is a summary on page \pageref{impl_summary} if this is not of interest.
+As mentioned above, the code generator creates two kernel files for each parallel loop. The following section details each of the functions that will be generated, and Figures \ref{fig:jit_include}-\ref{fig:loop_func} show the progression of each of the kernel files for an parallel loop. There is a summary on page \pageref{impl_summary} if the detail is superfluous for your needs.
+\par
+It is recommended to follow this section with either the translations script, or a generated kernel file, since it is not practical to include full code listings on each page. The inclusion of Figures \ref{fig:jit_include}-\ref{fig:loop_func} is only for purposes of highlighting the relevant sections of each file, and the generated code in the figures is not intended to be a legible size.
 
 % May need to move
-%\clearpage
+\clearpage
 %
-\begin{wrapfigure}[10]{r}{.33\textwidth}
-  \vspace{-2em}
+\begin{wrapfigure}[21]{r}{.33\textwidth}
   \centering
   \caption{JIT includes}
   \label{fig:jit_include}
   \includegraphics[width=.3\textwidth]{jit_include}
 \end{wrapfigure}
 \minititle{JIT includes}
-The first part generated is simply the include directives required for the JIT compiled kernel. These are needed for JIT since they will be compiled individually, but aren't needed by the AOT kernel, as they will be included in the master kernels file:
+The first piece of C code generated by the Python script is simply the include directives required for the JIT compiled kernel. These are needed for JIT compiled kernels since they will be processed individually by the compiler, so each requires a reference to the OP2 library files. They are not needed by the AOT kernel, as they will be included in the master kernels file, which in turn includes each of the AOT kernel files to produce a single file with all of the AOT kernels and these same \verb|#include| statements:
 \begin{lstlisting}[backgroundcolor = \color{green!20}, language=C]
  #include `op_lib_cpp.h'
  #include `op_cuda_rt_support.h'
  #include `op_cuda_reduction.h'
-
+ ...
+\end{lstlisting}
+The \verb|jit_const.h| file is also included, which will be generated at run-time (before the compiler is invoked) to contain a \verb|#define| for all input constants, to be handled by the pre-processor.
+\begin{lstlisting}[backgroundcolor = \color{green!20}, language=C]
+ ...
  //global_constants
  #include `jit_const.h'
 \end{lstlisting}
-The \verb|jit_const.h| file is also included, which will be generated at run-time (before the compiler is invoked) to contain a \verb|#define| for all constants, to be processed by the preprocessor.
+
+\minititle{User Function}
+The User Function is the kernel operation specified by the user to be carried out on each iteration of the loop, so this function will run on the device (GPU) at least once for each set item.
 
 \begin{wrapfigure}[12]{r}{.33\textwidth}
-  \vspace{-2em}
   \centering
   \caption{User Function}
   \label{fig:usr_func}
   \includegraphics[width=.3\textwidth]{user_function}
 \end{wrapfigure}
-\minititle{User Function}
-The User Function is the kernel operation specified by the user to be carried out on each iteration of the loop, so this function will run on the device (GPU) at least once for each set item. This function is given the signiture:
-\codeline{__device__ void [name]_gpu( [args] )}{}
-The \verb|__device__| descriptor is used so that it will be compiled for the GPU, and can only be called from other device code.
-The kernel function found is checked to ensure it has the correct number of parameters, and, if requested, parameters are modified to utlise the struct of arrays layout.
+The User Function is given the \verb|__device__| function  descriptor, so that it will be compiled for execution on a GPU device, and can only be called from other device code - which will be the next function generated. The whole signature for the function will be:
+\codeline{__device__ void [name]_gpu ( [args] )}{}
+\noindent The function body will be pulled from either the application file or a header file, and is checked to ensure it has the correct number of parameters. Any include statements are replaced by the contents of the file, exactly as the pre-processor would.
 \par
-The User Function is where any run-time assertions need to be made in order to benefit from the additional computation once inputs are known. In this report the assertion applied is using a \verb|#define| for constants, so wherever the User Function references a constant it needs to be modifed.
+\tinytitle{Data Layout} If the Struct of Arrays data layout is not requested, the function body will remain largly the same as defined by the application programmer. If it is enabled however there are modifications that need to be made to support this. The code to do this is pulled from the AOT CUDA code generation script: \\\verb|translator/c/python/aot/op2_gen_cuda_simple.py|.
+\par
+Since the modifications involve constant values for the stride of different data structures, an attempt to streamline this process using the same constant definition optimisation was made during this project. It was unsuccessful, with a longer discussion on why later in the report.
+\par
+\tinytitle{Optimisations} The constant definition optimisation only needs to be applied to the user function, as it is the only one containing code written by the application developer. Wherever an input constant is referenced it needs to be modified in both the AOT and JIT kernel, but in different ways.
 
 \tinytitle{AOT}
-In the Ahead-Of-Time kernel, only executed if JIT is not being used, the constant will need to read from the device's memory - having been copied there when it is defined constant. The copied version will have the identifier \verb|[id]_cuda| to prevent a name collision, so all constant in the AOT kernel must be replaced with this pattern.
+In the Ahead-Of-Time kernel, which will only be executed if JIT compilation is disabled, the constant will need to read from the device's memory - having been copied there when it is defined constant. The copied version will have the identifier \verb|[id]_cuda| to prevent a name collision, so all constants in the AOT kernel must be replaced with this pattern, using the following lines from the translator script:\\
 \begin{lstlisting}[backgroundcolor = \color{lightgray!20}, language=Python]
 for nc in range(0,len(consts)):
   varname = consts[nc]['name']
@@ -89,11 +184,12 @@ for nc in range(0,len(consts)):
                               varname + '_cuda',
                               aot_user_function)
 \end{lstlisting}
-\vspace{-1em}
-\hspace*{\fill}\footnotesize{translator/c/python/jit/op2\_gen\_cuda\_jit.py [905-907]}
+\codelabel{translator/c/python/jit/op2\_gen\_cuda\_jit.py [905-907]}
 
 \tinytitle{JIT}
-The JIT kernel is a little different: contants with a dimension of 1 (i.e. they contain only 1 value) can be left the unchanged, as the value will be defined under that same identifier. Multi-Value constants are slightly trickier - since values cannot be declared both \verb|__constant__| and defined as external using \verb|extern|\cite[p126]{guide}.
+The JIT kernel is a little different: contants with a dimension of 1 (i.e. they contain only 1 value) can be left the unchanged, as the value will be defined under that same identifier. There is no chance of a name collision here since the idenifier will never be allocated memory, only replaced by a literal value.
+\par
+Multi-Value proved more of a challenge - since values cannot be declared both \verb|__constant__| and defined as external using \verb|extern| \cite[p126]{guide}, which is how they are handled for the sequential JIT implementation.
 \par
 The eventual solution to this challenge was in two parts. For each index \verb|N| of the constant array, a 1 dimensional constant would be defined with the name: \verb|op_const_[id]_[N]|. All references to the constant where the index is a literal number can be replaced with the new identifier:
 \begin{lstlisting}[backgroundcolor = \color{lightgray!20}, language=Python]
@@ -104,10 +200,26 @@ for nc in range(0,len(consts)):
                                `op_const_' + varname + `_\g<1>',
                                 jit_user_function)}
 \end{lstlisting}
-\vspace{-1em}
-\hspace*{\fill}\footnotesize{translator/c/python/jit/op2\_gen\_cuda\_jit.py [931-934]}
+\codelabel{translator/c/python/jit/op2\_gen\_cuda\_jit.py [931-934]}
 
-If the constant is accessed using a variable, expression, or anything other than a literal number, this system won't work however. In this case, an array is defined at the top of the function (only if required) with the identifier \verb|op_const_[name]|, and the accesses are changed to match, so the access expression can remain and function as expected. This is only done where necessary, since allocating a new array can take time.
+If the constant is accessed using any expression other than a integer literal, this system will run into an issue, as the result of processing:
+\begin{lstlisting}[frame=none,backgroundcolor=\color{white}]
+
+int A = c_array[1+2]
+\end{lstlisting}
+Will be:
+\begin{lstlisting}[frame=none,backgroundcolor=\color{white}]
+int A = op_const_c_array_1+2
+\end{lstlisting}
+\noindent Which will not (in this case) result in an undefined indentifier, but the whole meaning has changed.
+To resolve this, an array is defined at the top of the function with the identifier \verb|op_const_[name]|, with each index being the constant for that position. The accesses still use the expression for an index, but are modified to instead access the new array, so that the meaning is preserverd. This is only done when an expression index is found and the process becomes necessary, since allocating a new array can take time.
+\begin{lstlisting}[frame=none,backgroundcolor=\color{white}]
+
+__constant__ int op_const_c_array = { op_const_c_array_1, ...}
+ ...
+int A = op_const_c_array[1+2]
+\end{lstlisting}
+Below rest of the Python code for handling constants in the JIT compiled kernel.
 \begin{lstlisting}[backgroundcolor = \color{lightgray!20}, language=Python]
 for nc in range(0,len(consts)):
   ...

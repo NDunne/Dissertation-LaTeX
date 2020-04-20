@@ -61,6 +61,7 @@
 \usetikzlibrary{shapes,arrows.meta, fit, matrix, positioning}
 
 \tikzstyle{line} = [draw, -{Latex[length=5mm,width=3mm]}, line width=2pt]
+\tikzstyle{thinline} = [draw, -{Latex[length=3mm,width=2mm]}, line width=1pt]
 
 \tikzstyle{block} = [rectangle, draw, fill=blue!10,%black!10,
   text width=5em, text centered, rounded corners, minimum height=4em]
@@ -98,6 +99,13 @@
 \setlength{\parskip}{.5em}
 \linespread{1.75}
 
+\newcommand{\codelabel}[1]{
+\vspace{-1em}
+\begin{footnotesize}
+  \hfill#1
+\end{footnotesize}
+}
+
 \newcommand{\codeline}[2]{
 \begin{adjustwidth}{-.5in}{-.5in}
  \begin{center}
@@ -109,10 +117,7 @@
  \ifthenelse{\equal{#2}{}}
  {} %ignore if empty
  {
-   \vspace{-1em}
-   \begin{footnotesize}
-     \hfill#2
-   \end{footnotesize}
+   \codelabel{#2}
  }
  \par
 }
