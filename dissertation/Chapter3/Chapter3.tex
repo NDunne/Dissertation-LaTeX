@@ -126,6 +126,8 @@ Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Jus
 The JIT compiler also needs to link the Optimised Kernels against the OP2 Library Files, so they must be stored in a location that is also accessible at run-time, not just when the executable is compiled. This compilation will take place during the execution of the binary, and will therefore make up part of the program's execution duration. It will result in a Shared Object or Dynamically Loaded Library (DLL) file, with a standardised name, which the program can load, and utilise the functions it makes available.
 \par
 The exported functions will be the recompiled versions of each parallel loop, which as black boxes are equivalent (i.e. they have the same inputs and outputs), however hopefully they are faster to execute than the original versions.
+\par
+The Kernels compiled Ahead of Time could be altered such that their sole purpose is to invoke the compiler at runtime, then hand off execution to the JIT compiled function. It seems more sensible, however, for them to have the ability to execute the loop body without requiring JIT compilation, as well as being able to re-compiled. Therefore the compiler invokation will be wrapped in a pre-processor conditional, so that the feature can be enabled or disabled using a compiler argument to define a flag, allowing executables with JIT compilation enabled or disabled to be compiled from the same source code.
 \subsection{Library Modifications}
 In the OP2 library, the main API function that will need to be modified is:
 \codeline{void op_decl_const(int dim, char *type, T *dat, char *name)}{\cite[p9]{manual}}
