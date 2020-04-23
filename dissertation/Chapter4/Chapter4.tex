@@ -394,25 +394,27 @@ As previously mentioned, the kernel descriptor and enqueue function were part of
 
 \clearpage
 
-\begin{wrapfigure}[13]{l}{.4\textwidth}
+\subsubsection{Kernel Files Summary}
+\label{impl_summary}
+
+To summerise, for every parallel loop two seperate kernel files containing C code are generated, one for Ahead of Time compilation, and one for Just in Time compilation. The code will to be executed when that loop is invoked in the application file, which has been modified to match the function signatures, so the compiler can link the two together.
+
+\begin{wrapfigure}{r}{.42\textwidth}
   \centering
   \includegraphics[width=.39\textwidth]{krnl_flow}
   \caption{Kernel Flow}
   \label{fig:krnl_flow}
 \end{wrapfigure}
 
-\subsubsection{Kernel Files Summary}
-\label{impl_summary}
-
-To summerise, for every parallel loop two seperate kernel files containing C code are generated, one for Ahead of Time compilation, and one for Just in Time compilation. The code will to be executed when that loop is invoked in the application file, which has been modified to match the function signatures, so the compiler can link the two together. Figure \ref{fig:krnl_flow} has been included to clarify the data flow through the two files: starting in the Loop Function at the bottom, which calls the AOT Host Function, where either the re-compiled JIT version is invoked, or the original version is used if JIT is not enabled at compile time. In the host function the GPU device is invoked, creating many parallel threads, each executing the Kernel and User functions simultaneously.
+Figure \ref{fig:krnl_flow} has been included to clarify the data flow through the two files: starting in the Loop Function at the bottom, which calls the AOT Host Function, where either the re-compiled JIT version is invoked, or the original version is used if JIT compilation is not enabled at when the application is compiled. In the host function the GPU device is invoked, creating many parallel threads, each executing the Kernel and User functions simultaneously.
 
 The \verb|jit_compile()| function, which is called by the AOT compiled kernel's Host Function when the run-time compilation should happen, has not yet been defined. This will be covered in the next section on the final source file to be generated: the central kernels file.
 \clearpage
-\subsubsection{central kernels File}
+\subsubsection{Central Kernels File}
 \label{sss:mkf}
-The central kernels File: \verb|cuda/[application]_kernels.cu| is the last file to be generated, once the kernels for each parallel loop have been completed. It ties up most of the remaining loose ends, as it contains shared functions for invoking the run-time compiler, and declaring constants. It also contains \verb|#include| statements for each of the AOT kernel files, so their contents is imported to make a single file.
+The Central Kernels File: \verb|cuda/[application]_kernels.cu| is the last file to be generated, once the kernels for each parallel loop have been completed. It ties up most of the remaining loose ends, as it contains shared functions for invoking the run-time compiler, and declaring constants. It also contains \verb|#include| statements for each of the AOT kernel files, so their contents is imported to make a single file.
 \par
-When this file is included by the application, the linker will be able to find definitions for each of the parallel loop functions, which will have been declared extern in the modified Application file. The compile process for generated code will be covered in greater detail in Section \ref{ss:make}.
+When this file is included by the application, the linker will be able to find definitions for each of the parallel loop functions, which were declared extern in the Modified Application File. The compilation process for generated code will be covered further in Section \ref{ss:make} on the Makefile.
 \par
 At the top, the central kernels file includes the requried OP2 library files. It then defines a CUDA constant for each constant the user has defined, which is generated using the following python code:\\
 \begin{lstlisting}[backgroundcolor = \color{lightgray!20}, language=Python]
@@ -433,6 +435,7 @@ for nc in range (0,len(consts)):
 \end{lstlisting}
 \codelabel{translator/c/python/jit/op2\_gen\_cuda\_jit.py [974-985]}
 \clearpage
+
 \begin{lstlisting}
 __constant__ double gam_cuda;
 __constant__ double gm1_cuda;
@@ -442,6 +445,7 @@ __constant__ double mach_cuda;
 __constant__ double alpha_cuda;
 __constant__ double qinf_cuda[4];
 \end{lstlisting}
+\vspace{-1cm}
 \codelabel{example output of previous code segment}
 
 Following this, the file contains definitions for two functions. The first is the OP2 API function \verb|op_decl_const_char|, which will be called from the application file to declare a constant identifier and value; and the second is \verb|jit_compile| which will invoke the run-time compiler, load the generated shared object file, and assign a function pointer for each re-compiled loop exported by the DLL so it can be found an executed when required.
