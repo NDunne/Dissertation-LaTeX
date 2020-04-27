@@ -30,7 +30,7 @@ This test is considered a pass if these files exist, as their contents is valida
 \subsubsection{Ahead-of-Time Compilation}
 Compilation with both JIT enabled, and JIT disabled needs to be tested.
 
-\minititle{JIT Enabled}\\
+\minititle{JIT Enabled}
 Ahead of time compalation is considered a success if the compilation completes successful, without any errors. In the \verb|airfoil_JIT| folder this is done using the Makefile and the \verb|airfoil_cuda| target, and JIT is enabled in the Makefile by default, so the command to compile the JIT enabled version is simply:
 \begin{verbatim}
 > make airfoil_cuda
@@ -45,7 +45,7 @@ nvcc -gencode arch=compute_60,code=sm_60 -m64 -Xptxas=-v --use_fast_math -O3
 \end{verbatim}
 \testresult{Some warnings are generated, but there are no compilation errors. Figure \ref{fig:files_c} shows the folder after running the above command}{pass}
 
-\minititle{JIT DISABLED}\\
+\minititle{JIT DISABLED}
 To build the executable with JIT compilation disabled a parameter needs to be added to the make command:
 \begin{verbatim}
 > make airfoil_cuda JIT=FALSE

@@ -42,8 +42,6 @@ In order to clearly explain the new system, with the addition that will be made 
 
   \end{tikzpicture}
   }}
-  \caption{OP2 System Diagram}
-  \label{fig:aot_sys}
 \end{figure}
 
 The pre-exisiting OP2 workflow is shown in Figure \ref{fig:aot_sys}. In this system the Source Files are contains a master application file, which is a normal C program containing the OP2 API calls for definition of sets, maps, constants, and the structure of the application. The optional C header files containing the operations to be the body of each parallel loop are also part the set of input files.
@@ -51,7 +49,7 @@ The pre-exisiting OP2 workflow is shown in Figure \ref{fig:aot_sys}. In this sys
 These Source files form the input to the code generation Python script, from which the output is a modified version of the master appliation file, and a kernel file for each parallel loop. The output is compiled, and linked against the OP2 library for the desired hardware platform to produce an executable Program Binary. The expectation is that this binary will run without error on the target hardware, taking a map as an input to produce the result desired by the application programmer.
 \par
 The existing system is able to generate optimised code for the target platform from the high level application code, and apply compiler optimisations ahead of time, including optimisations like \verb|-O3| and \verb|--use_fast_math|. It is not, however, able to optimise based on the inputs at all. This is where the implementation for this project comes in: to provide the ability to use the input data when optimising.
-\vspace{-1.5cm}
+
 \subsection{New System}
 Implementing the new system will require work in two main areas: the Python code generation script, and the OP2 library itself which is implemented in both C and Fortran. Only the C library will be modified, due to developer familiarity with C. OP2 does also include code generation using MatLab. The Python script is preferable, due to its flexibility and conveniant string manipulation capabilities.
 \par
@@ -125,7 +123,7 @@ Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Jus
 
 The JIT compiler also needs to link the Optimised Kernels against the OP2 Library Files, so they must be stored in a location that is also accessible at run-time, not just when the executable is compiled. This compilation will take place during the execution of the binary, and will therefore make up part of the program's execution duration. It will result in a Shared Object or Dynamically Loaded Library (DLL) file, with a standardised name, which the program can load, and utilise the functions it makes available.
 \par
-The exported functions will be the recompiled versions of each parallel loop, which as black boxes are equivalent (i.e. they have the same inputs and outputs), however hopefully they are faster to execute than the original versions.
+The exported functions will be the recompiled versions of each parallel loop, which as black boxes are equivalent (i.e.\ they have the same inputs and outputs), however hopefully they are faster to execute than the original versions.
 \par
 The Kernels compiled Ahead of Time could be altered such that their sole purpose is to invoke the compiler at runtime, then hand off execution to the JIT compiled function. It seems more sensible, however, for them to have the ability to execute the loop body without requiring JIT compilation, as well as being able to re-compiled. Therefore the compiler invokation will be wrapped in a pre-processor conditional, so that the feature can be enabled or disabled using a compiler argument to define a flag, allowing executables with JIT compilation enabled or disabled to be compiled from the same source code.
 \subsection{Library Modifications}

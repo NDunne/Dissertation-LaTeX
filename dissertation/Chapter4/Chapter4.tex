@@ -95,7 +95,7 @@ Currently this function executes the queued loop as soon as it is invoked, but t
 \subsection{Code Generation}
 \label{ss:codegen}
 As described in the Specification before, the majority of the implementation work can be found in a Python code generation script which can be found inthe folder: \verb|translator/c/python/jit/op2_gen_cuda_jit.py| of the OP2 repository.
-\noindent The code generator for CUDA with JIT compilation is called from another Python script named \verb|op2.py|, which can be found in the parent directory: \verb|translator/c/python/|. This script handles the generation of the Modified Application File, which does not need to change to meet the requirements of this project. The following section will summerise the functionality of \verb|op2.py|, to assist in understanding the context for the CUDA code generation script.
+\noindent The code generator for CUDA with JIT compilation is called from another Python script named \verb|op2.py|, which can be found in the parent directory: \verb|translator/c/python/|. This script handles the generation of the Modified Application File, which does not need to change to meet the requirements of this project. The following section will summarise the functionality of \verb|op2.py|, to assist in understanding the context for the CUDA code generation script.
 
 \subsubsection{op2.py}
 \verb|op2.py| is a pre-existing script in the OP2 Framework, which processes application files to gather information to pass to each of the platform specific code generator scripts. It uses Python Regular Expressions to identify OP2 API calls, and ensures certain conditions are met - for example that \verb|op_init| and \verb|op_exit| are called at least once.
@@ -201,7 +201,7 @@ for nc in range(0,len(consts)):
 \codelabel{translator/c/python/jit/op2\_gen\_cuda\_jit.py [905-907]}
 
 \tinytitle{JIT}
-The JIT kernel is a little different: contants with a dimension of 1 (i.e. they contain only 1 value) can be left the unchanged, as the value will be defined under that same identifier. There is no chance of a name collision here since the idenifier will never be allocated memory, only replaced by a literal value.
+The JIT kernel is a little different: contants with a dimension of 1 (i.e.\ they contain only 1 value) can be left the unchanged, as the value will be defined under that same identifier. There is no chance of a name collision here since the idenifier will never be allocated memory, only replaced by a literal value.
 \par
 Multi-Value proved more of a challenge - since values cannot be declared both \verb|__constant__| and defined as external using \verb|extern| \cite[p126]{guide}, which is how they are handled for the sequential JIT implementation.
 \par
@@ -397,7 +397,7 @@ As previously mentioned, the kernel descriptor and enqueue function were part of
 \subsubsection{Kernel Files Summary}
 \label{impl_summary}
 
-To summerise, for every parallel loop two seperate kernel files containing C code are generated, one for Ahead of Time compilation, and one for Just in Time compilation. The code will to be executed when that loop is invoked in the application file, which has been modified to match the function signatures, so the compiler can link the two together.
+To summarise, for every parallel loop two separate kernel files containing C code are generated, one for Ahead of Time compilation, and one for Just in Time compilation. The code will to be executed when that loop is invoked in the application file, which has been modified to match the function signatures, so the compiler can link the two together.
 
 \begin{wrapfigure}{r}{.42\textwidth}
   \centering
