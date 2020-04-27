@@ -2,16 +2,16 @@
 
 \section{Research}
 \label{s:research}
-
+\vspace{-2em}
 \subsection{NVidia CUDA Programming Model}
 Since this project will require the automatic generation of GPU code source files from sequential code, it is important to introduce the NVidia hardware, and the C Application Programming Interface (API) which will be utilised. NVidida's Compute Unified Device Architecture (CUDA) is used to program their GPUs, which is a proprietary language. Relevant information for this project from the \textit{NVidia CUDA C Programming Guide} \cite{guide} has been summarised below, and it will continue to be used for reference throughout this report.
 
 \subsubsection{Hardware}
-The GPU is a computer component that exisits alongside the CPU, and communicates on the PCI express bus. The CPU is able to pass workloads over to the GPU for it to execute, particularly compute-heavy workloads which would bottleneck the CPU. As can be seen in Figure \ref{fig:pci}, the GPU has its own onboard memory, and cannot access the computer's RAM, so any data that the GPU will process must be copied across the PCIe bus and stored in the GPU's local memory, at the expense of time.
+The GPU is a computer component that exisits alongside the CPU, and communicates on the PCI express bus. The CPU is able to pass workloads over to the GPU for it to execute, particularly compute-heavy workloads which would bottleneck the CPU. As can be seen in Figure \ref{fig:pci}, the GPU has its own onboard memory, and cannot access the computer's RAM directly, so any data that the GPU will process must be copied across the PCIe bus and stored in the GPU's local memory, at the expense of time.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.5\textwidth]{pci}
+  \includegraphics[width=0.4\textwidth]{pci}
   \caption{\label{fig:pci} CPU - GPU communication. Diagram from \cite{nvlink}}
 \end{figure}
 
