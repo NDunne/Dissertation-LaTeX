@@ -4,10 +4,10 @@
 \section{Introduction}
 %The introduction should provide content for the report, discuss relevant background material and state the main aims of the work. Clearly establishing the aims of the work is important for this coursework, since you have a great deal of freedom in what you will seek to achieve.
 
-In the field of High Performance Computing (HPC), computers with processing power hundreds of times greater than conventially available machines are used to solve or approximate complex problems. Such computers have been required for some time to utilise parallelism, in order to find solutions within a reasonable run-time.
+In the field of High Performance Computing (HPC), computers with processing power hundreds of times greater than conventionally available machines are used to solve or approximate complex problems. Such computers have been required for some time to utilise parallelism, in order to find solutions within a reasonable run-time.
 \par Many paradigms for executing parallel workloads have emerged over time. Recently, General Purpose Graphical Processing Units (GPUs) have become an increasingly popular hardware architecture, having originally been conceived as specialised hardware for graphical shader calculations. GPU's high number of parallel processing units allow a high degree of parallelism, as well as being able to execute operations usually done by the CPU. Passing work to the GPU device can provide very significant speed-up over sequential execution.
 \par
-Commonly, a single developer or team is unlikely to have both the necessary expertise in a niche area of physics with a non-trivial problem to be solved; and also sufficient depth of knowledge in computer science to understand the latest generation of parallel hardware. For this reason the OP2 framework was created: to provide a high level abstraction in which HPC applications can be written, and separate the application code from the optimisation requirements. OP2 is already able to generate optimised code for a number of backends from an application file.
+Commonly, a single developer or team is unlikely to have both the necessary expertise in a niche area of physics with a non-trivial problem to be solved; and also sufficient depth of knowledge in computer science to understand the latest generation of parallel hardware. For this reason the OP2 framework was created: to provide a high level abstraction in which HPC applications can be written, and separate the application code from the optimisation requirements. OP2 is already able to generate optimised code for a number of back-ends from an application file.
 \par
 This report details an investigation into applying a new optimisation to the GPU code generation in OP2, and the process of benchmarking the performance gain, if any, it is able to provide.
 This optimisation is named ``Just-In-Time Compilation" for its similarities to a comparable process often performed by compilers when run-time efficiency is desired.
@@ -22,7 +22,7 @@ Since OP2 is Open Source and freely available, the implementation I produce woul
 
 In order to become comfortable with the OP2 framework and provide a useful contribution, it is important to understand the domain of problems for which it was created: Unstructured Mesh Solvers.
 \par
-A large proportion of HPC workloads involve approximating Partial Differential Equations (PDEs) to simulate complex interactions in physics problems, for example the Navier-Stokes equations for computational fluid dynamics, or prediciting weather patterns. It is usually necessary to discretise such problems, dividing 2D or 3D space into a number of cells.
+A large proportion of HPC workloads involve approximating Partial Differential Equations (PDEs) to simulate complex interactions in physics problems, for example the Navier-Stokes equations for computational fluid dynamics, or predicting weather patterns. It is usually necessary to discretise such problems, dividing 2D or 3D space into a number of cells.
 \begin{figure}[h!]
   \begin{minipage}{.5\textwidth}
     \centering
@@ -69,7 +69,7 @@ A large proportion of HPC workloads involve approximating Partial Differential E
   \label{fig:2dmesh}
 \end{figure}
 \clearpage
-Depending on its structure, a mesh can be described as either structured (regular) or unstructured. Structured meshes such as Figure \ref{fig:struct} are made up of cells following a regular pattern, while unstructed meshes use connectivity information to specify the mesh topology, as Figure \ref{fig:umesh}. OP2 is designed for unstructured mesh solvers, but since a structured mesh can be represented using connectivity information, it is a "stronger" category that includes structured meshes.
+Depending on its structure, a mesh can be described as either structured (regular) or unstructured. Structured meshes such as Figure \ref{fig:struct} are made up of cells following a regular pattern, while unstructured meshes use connectivity information to specify the mesh topology, as Figure \ref{fig:umesh}. OP2 is designed for unstructured mesh solvers, but since a structured mesh can be represented using connectivity information, it is a "stronger" category that includes structured meshes.
 \vspace{.5cm}
 \begin{figure}[h!]
   \begin{minipage}{.5\textwidth}
@@ -90,7 +90,7 @@ Depending on its structure, a mesh can be described as either structured (regula
   \begin{minipage}{.5\textwidth}
     \centering
     \includegraphics[width=.55\textwidth]{umesh}
-    \caption{Airfoil Tri-Unstructed Mesh}
+    \caption{Airfoil Tri-Unstructured Mesh}
     \label{fig:umesh}
   \end{minipage}
 \end{figure}
@@ -122,6 +122,6 @@ A particular simulation might, for example, be approximating the velocity of a f
 
 \clearpage
 \subsection{Report Structure}
-The rest of this report is structured as follows: In Section \ref{s:research} (p\pageref{s:research}) the research done to inform the work in this project is discussed, along with relavent similar academic work. This is followed by a Project Specification in Section \ref{s:spec} (p\pageref{s:spec}), which includes the requirements of the project, and a high level plan of the implementation to be completed, its components, and how they will interact.
-Section \ref{s:impl} (p\pageref{s:impl}) details the Implemention itself, and the expected results of code generation with JIT compilation enabled, and Section \ref{s:test} (p\pageref{s:test}) explains the plan for, and outcome of, Testing and Benchmarking using an example application on a HPC cluster.
+The rest of this report is structured as follows: In Section \ref{s:research} (p\pageref{s:research}) the research done to inform the work in this project is discussed, along with relevant similar academic work. This is followed by a Project Specification in Section \ref{s:spec} (p\pageref{s:spec}), which includes the requirements of the project, and a high level plan of the implementation to be completed, its components, and how they will interact.
+Section \ref{s:impl} (p\pageref{s:impl}) details the Implementation itself, and the expected results of code generation with JIT compilation enabled, and Section \ref{s:test} (p\pageref{s:test}) explains the plan for, and outcome of, Testing and Benchmarking using an example application on a HPC cluster.
 \par Section \ref{s:eval} (p\pageref{s:eval}) contains an Evaluation of the work completed, including a discussion of Future Work (p\pageref{ss:fw}), and a reflection on Project Management (p\pageref{ss:pm}) which could build on top of what was done for this report, and lastly Section \ref{s:conc} (p\pageref{s:conc}) provides an overall Conclusion
