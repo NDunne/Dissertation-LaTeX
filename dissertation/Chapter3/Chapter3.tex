@@ -3,7 +3,7 @@
 \section{Specification}
 \label{s:spec}
 
-In order to clearly explain the new system, with the addition that will be made to the OP2 framework, it is important to first describe the exisiting work-flow. The new system model on page \pageref{fig:jit_sys} may seem complex at first, but understanding the sections that already exisited in the codebase before the start of the project should make it clearer.
+In order to clearly explain the design of the new system, namely an extension that will be made to the OP2 framework, it is important to first describe the existing work-flow. Understanding the existing in the codebase before the start of the project should make it clearer what addition has been made.
 
 \subsection{Existing System}
 \begin{figure}[h!]
@@ -15,7 +15,7 @@ In order to clearly explain the new system, with the addition that will be made 
     \node [file, right of=op2py, text width=6em] (sourceOp) {Modified Application File};
     \node [file, above of=sourceOp] (Kernels) {Kernels};
     \node [wblock, right of=sourceOp] (aot) {AOT Compiler};
-    \node [wfile, below of=aot] (op2lib) {OP2 Library Files};
+    \node [wfile, below=1cm of aot] (op2lib) {OP2 Library Files};
 
     \node [rbin, right of=aot] (binary) {Program Binary};
     \node [rfile, above of=binary] (input) {Input Map};
@@ -42,32 +42,43 @@ In order to clearly explain the new system, with the addition that will be made 
 
   \end{tikzpicture}
   }}
+  \caption{Existing OP2 System Diagram}
+  \label{fig:aot_sys}
 \end{figure}
 
-The pre-exisiting OP2 workflow is shown in Figure \ref{fig:aot_sys}. In this system the Source Files are contains a master application file, which is a normal C program containing the OP2 API calls for definition of sets, maps, constants, and the structure of the application. The optional C header files containing the operations to be the body of each parallel loop are also part the set of input files.
+The pre-existing OP2 workflow is shown in Figure \ref{fig:aot_sys}. In this system the input is a set of Source Files which must contain at least one file, called the Master Application file. The Master Application file is a normal C program; containing OP2 API calls to define of sets, maps, constants; and describing the structure of the application.
 \par
-These Source files form the input to the code generation Python script, from which the output is a modified version of the master appliation file, and a kernel file for each parallel loop. The output is compiled, and linked against the OP2 library for the desired hardware platform to produce an executable Program Binary. The expectation is that this binary will run without error on the target hardware, taking a map as an input to produce the result desired by the application programmer.
+The input Source Files can optionally contain addition C source and header files, included in the normal way with \verb|#include| statements, to assist with organising a complex application with a large codebase. An examaple usage of these files would be a header file for each parallel loop,  containing a function to be executed as the body of the loop.
 \par
-The existing system is able to generate optimised code for the target platform from the high level application code, and apply compiler optimisations ahead of time, including optimisations like \verb|-O3| and \verb|--use_fast_math|. It is not, however, able to optimise based on the inputs at all. This is where the implementation for this project comes in: to provide the ability to use the input data when optimising.
+These Source files are parsed by the code generation Python script, from which the output is: a modified version of the master application file, and a kernel file for each parallel loop. The output files are compiled, and linked against the OP2 library files for the desired hardware platform to produce an executable Program Binary. The expectation is that this binary will run without error on the target hardware, taking a map as an input to produce the result desired by the application programmer.
+\par
+The existing system is able to generate optimised code for the target platform from the high level application code, and apply compiler optimisations ahead of time, including optimisations like \verb|-O3| and \verb|--use_fast_math|. It is not, however, able to optimise based on the inputs at all, as they are only known at runtime, after the compiler has completed and the binary is being executed. This is where the implementation for this project comes in: to provide the ability to use the input data when optimising.
 
-\subsection{New System}
-Implementing the new system will require work in two main areas: the Python code generation script, and the OP2 library itself which is implemented in both C and Fortran. Only the C library will be modified, due to developer familiarity with C. OP2 does also include code generation using MatLab. The Python script is preferable, due to its flexibility and conveniant string manipulation capabilities.
-\par
-The code generation script will need to perform the similar source-to-source translation to the pre-exisiting script, but modified to also generate an altered codebase that will be compiled at run-time, as well as the original code that is compiled ahead of time. These must of course all be valid C files, to be compiled by a normal C compiler. In the case of this project the compiler will be wrapped by the NVidia C Compiler (\textit{nvcc}), as the code generated will be include CUDA. The generated CUDA code must also be valid, and not produce errors when compiled. Finally, the generated code will need to actually invoke the JIT compiler as part of its execution.
-\par
-The resulting executable compiled from the generated code must produce an output within some tolerance of the result if the parallel loop iterations are executued in an arbitrary sequential order. OP2 enforces a restriction that the order in which elements are processed must not affect the final result, to within the limits of finite precision floating-point arithmetic\cite[p3]{op2main}, for example through data dependencies. This constraint allows the code generator freedom to not consider the ordering of iterations, and select an ordering based on performance. As with all compilers, correctness will always be a priority over performance.
-\par
-Outside the code generation script, some OP2 API functions may need to be implemented differently in the OP2 library files, as the functions may need extra information to be stored and retrieved. It is a requirement that the OP2 API itself is not altered by any modifications to the library, so that any and all exisiting programs using the API are able to seemless use the updated version.
+\subsection{New System Requirements}
 
-\subsection{Run-time Assertions}
-The application's input will be an unstructured mesh over which to operate, made up of a large amount of data points. The optimisation that will be made for this project is "Constant Definition", which will involve turning values specified in the input as remaining constant into \verb|#define| directives for the C-Preprocessor in the recompiled code. This will make remove the need to store them in memory, and allow them to be read as a literal value, removing the retrieval time when they are required. Other possible optimisations will be discussed in Section \ref{ss:fw} (Future Work).
+Implementing the new system will require work in two main areas: the Python code generation script, and the OP2 library itself which is implemented in both C and Fortran. Only the C library will be modified, due to developer familiarity with the C language. OP2 does also include code generation using MatLab, however the Python script is preferable for new developments, since Python is now ubiquitous, and provides very convenient string manipulation capabilities. The following are the necessary requirements to consider this project a success.
 
-\subsection{System Model}
-Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation. As before, code generation takes the application and loop files as input, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kernels, which contain code that will only be compiled once the constants from the Input Map are known to the program. These Kernel files are not seen by the ahead of time compiler.
+\subsubsection{Python Script}
+The code generation script will need to perform similar source-to-source translation to the pre-existing script. It must be modified to also generate a second, altered codebase that will be compiled at run-time, as well as the original code that is compiled ahead of time. All generated code must form valid C files, and compile using a normal C compiler without errors. Since the project will involve generation of NVidia CUDA as well, the generated CUDA code must also be valid, and compile with the NVidia C Compiler (\verb|nvcc|) without producing errors. Finally, the generated code will need to actually invoke a re-compilation stage, and execute code that has been compiled during its runtime as part of its execution.
+\par
+When the resulting executable compiled from the generated code is executed, it must produce an output within some tolerance of the expected result, obtained from executing the parallel loop iterations sequentially in an arbitrary order. The order is not significant, as OP2 enforces a restriction that the order in which elements are processed must not affect the final result, within the limits of finite-precision floating-point arithmetic \cite[p3]{op2main}. There cannot be any dependencies between iterations in the application, otherwise the result may vary when translated by OP2. This constraint allows the OP2 code generator the freedom to not consider the ordering of iterations, and instead select an ordering based on performance.
+
+\subsubsection{Run-time Assertions}
+The application's input will be an unstructured mesh over which to operate, made up of a large amount of data points. The optimisation that will be made for this project is "Constant Definition", built on the assertion that values declared as OP2 constants are certainly not going to change during the course of execution. Applying this will involve turning values constant values provided as part of the input into \verb|#define| directives for the C-Preprocessor in the recompiled code. The will result in all references to the variable's identifier in the code being transformed into the literal value the variable holds.
+\par
+An example of how this is normally used can be seen in the CUDA example program from before (Appendix \ref{app:cudaEx}), where the size of the arrays to be added together is defined as \verb|N|, and everywhere \verb|N| appears in the code the literal value \verb|32| will be substituted before compilation.
+\par
+Consequently, the need to store constant values in memory has been removed, and when a constant value is required, retrieval time from memory has been eliminated as the literal value is immediatly available. Other possible optimisations will be discussed in Section \ref{ss:fw} (Future Work).
+
+\subsubsection{OP2 Library}
+Outside the code generation script, some OP2 API functions may need to be implemented differently in the OP2 library files, as the functions may require additional information to be stored and retrieved at runtime. It is a requirement that the OP2 API itself is not altered in any way by modifications to the library, so that all existing programs currently using the API will be able to seemlessly update to using the modified version.
+
+\subsection{Testing \& Benchmarking}
+Once the code generation stage has been completed, and the Python Script is able to generate valid C and CUDA code that can be compiled without error for an example OP2 Application, the resulting binary needs to be tested to ensure the result is correct, and benchmarked to determine if there is performance gain. The easiest thing to compare to performance against is the same application generated for graphics cards, without JIT compilation, and see if there is any benefit. Benchmarking results will include the time taken to recompile at runtime for the JIT compiled version, and the time taken to copy constant values to device memory for the AOT compiled version.
+
+\subsection{New System Model}
 
 \begin{figure}[h!]
-\caption{OP2 System Diagram with JIT Addition}
-\label{fig:jit_sys}
 \makebox[\textwidth][c]{
 \resizebox{1.1\textwidth}{!}{
   \begin{tikzpicture}[node distance=4cm, auto]
@@ -75,16 +86,17 @@ Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Jus
     \node [block, below of=source] (op2py) {CodeGen script};
     \node [file, right of=op2py, text width=6em] (sourceOp) {Modified Application Files};
     \node [file, above of=sourceOp] (Kernels) {Kernels};
-    \node [file, below of=sourceOp] (recKernels) {Optimised Kernels};
     \node [wblock, right of=sourceOp] (aot) {AOT Compiler};
-    \node [wfile, below of=aot] (op2lib) {OP2 Library Files};
+    \node [wfile, below=1cm of aot] (op2lib) {OP2 Library Files};
 
     \node [rbin, right of=aot] (binary) {Program Binary};
     \node [rfile, above of=binary] (input) {Input Map};
-    \node [jfile, below of=binary] (consts) {Constants};
+    \node [rblock, right of=binary] (result) {Program Result};
+
+    \node [file, below=4cm of sourceOp] (recKernels) {Optimised Kernels};
+    \node [jfile, below=4cm of binary] (consts) {Constants};
     \node [jblock, below of=consts] (jit) {JIT Compiler};
     \node [jbin, right of= consts] (so) {Shared Object};
-    \node [rblock, right of=binary] (result) {Program Result};
 
     \tikzset{dotted box1/.style={draw=black!100, dash pattern=on 4pt off 4pt,
       inner sep=8mm, rectangle, rounded corners, line width=2pt}};
@@ -119,8 +131,12 @@ Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Jus
 
   \end{tikzpicture}
   }}
+  \caption{OP2 System Diagram with JIT Addition}
+  \label{fig:jit_sys}
 \end{figure}
 
+Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation. As before, code generation takes the application and loop files as input, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kernels, which contain code that are only be compiled inside the green box denoting `run-time', at which point the constants from the Input Map are known to the program. These Kernel files are not seen by the ahead of time compiler.
+\par
 The JIT compiler also needs to link the Optimised Kernels against the OP2 Library Files, so they must be stored in a location that is also accessible at run-time, not just when the executable is compiled. This compilation will take place during the execution of the binary, and will therefore make up part of the program's execution duration. It will result in a Shared Object or Dynamically Loaded Library (DLL) file, with a standardised name, which the program can load, and utilise the functions it makes available.
 \par
 The exported functions will be the recompiled versions of each parallel loop, which as black boxes are equivalent (i.e.\ they have the same inputs and outputs), however hopefully they are faster to execute than the original versions.
