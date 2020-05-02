@@ -8,8 +8,8 @@ This project was developed as an investigation into a new optimisation for the G
 \par
 The implementation successfully augments the existing code generation with the ability to execute JIT compiled code, and applies an optimisation that is made based on the inputs of the program, which could only be done at run-time and would not be possible ahead of time: defining the constant values from the input as literal values.
 \par
-The results from benchmarking were that there was no speedup to the run-time, however it is important to draw the distinction that it was the run-time optimisation of defining of constants which was not able to provide speedup; and not that JIT compilation as a technique does not have potential to speedup.
+The results from benchmarking were that there was only a small speedup to the run-time, but the speedup is linear and the cost is constant with problem size. It is important to draw the distinction that it was the run-time optimisation of defining of constants which was providing limited speedup; and that this does prove that there is benefit to be gained from applying JIT compilation in this context.
 \par
-It is likely that adding loop blocking as a run-time optimisation would produce better results, and adding this feature will have been made easier by the work completed for this project. It is unfortunate that there was not enough time to implement it and benchmark it sufficiently as part of this project.\\
+It is likely that adding a further optimisation such as loop blocking will be implemented on top of this implementation in the future, and adding loop blocking to OP2 will have been made easier by the work completed for this project.
 \par
 Overall, the project was a successful investigation, which has provided a useful contribution to an open source library. The results gathered will inform and benefit future contributions, and the implementation completed will become part of a framework which provides benefit to many industrial HPC applications.
