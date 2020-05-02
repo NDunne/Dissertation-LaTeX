@@ -14,7 +14,8 @@ Through the contributions made to the OP2 project while completing this project,
 \label{ss:fw}
 
 \subsubsection{Run-Time Assertions}
-As previously mentioned, it seems necessary for more to be assertions to be made at run-time in order to produce more effective speed-up after JIT compilation. There are a number of possible loop optimisations which could be made, including identifying a loop inside a kernel, and at run-time having the loop bound be hard-coded to remove the need to evaluate the expression of every iteration; or more complex optimisation where two separate parallel loops might be provably able to be fused into a single loop, but only if the inputs allow for it - meaning this could only be done at run-time. \clearpage
+As previously mentioned, it seems necessary for more to be assertions to be made at run-time in order to produce more effective speed-up after JIT compilation. \par
+There are a number of possible loop optimisations which could be made, including identifying a loop inside a kernel, and at run-time having the loop bound be hard-coded to remove the need to evaluate the expression of every iteration; or more complex optimisation where two separate parallel loops might be provably able to be fused into a single loop, but only if the inputs allow for it - meaning this could only be done at run-time.
 
 \noindent There is also research into applying loop tiling to the generated code, which is dividing the iterations of a loop into sub-regions where both temporal and spatial locality in memory can be exploited. \par
 
@@ -184,7 +185,7 @@ today label font=\itshape,
 \hspace{\parindent} \minititle{Research}
 The research section of my project involved reading scientific papers, many produced by contributors to the OP2 framework; as well as working hands-on with both CUDA and OP2 to try to build familiarity before the actual implementation began. On reflection, my research was mostly focused on the existing OP2 work, and many of my sources were from the same authors. Once I had already decided on my approach and begin implementation I discovered some similar work which might have influenced the direction of the project if I had been aware of them earlier on.
 \par
-Considering that I had never written code for a graphics card before starting this project, I am happy with the confidence in using the CUDA programming model I have built. The time I had alloted to research did need to be extended from the plan at the outset of the project, as after three weeks I was not confident enough with the existing OP2 code base to begin making an addition. The additional two weeks were sufficient more me to feel able to begin the implementation.
+Considering that I had never written code for a graphics card before starting this project, I am happy with the confidence in using the CUDA programming model I have built. The time I had allotted to research did need to be extended from the plan at the outset of the project, as after three weeks I was not confident enough with the existing OP2 code base to begin making an addition. The additional two weeks were sufficient more me to feel able to begin the implementation.
 
 \minititle{Implementation}
 The Implementation progressed largely as expected, with progress made at a good pace for the time allocated. I did find that while the timetable above listed a total of 3 full weeks for testing, partial solutions were difficult to test fully by as there was no executable generated to ensure the result was correct or perform much benchmarking until towards the end of the implementation.
