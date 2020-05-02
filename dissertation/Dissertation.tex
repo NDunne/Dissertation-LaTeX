@@ -32,6 +32,21 @@
 \usepackage[export]{adjustbox}
 \usepackage{pgfgantt}       % Gantt chart package
 \usepackage{titlesec}       % section spacing
+\usepackage{outlines}       % itemize hierarchu
+\usepackage{physics}        % abs maths
+\usepackage{hhline}         % double hline
+\usepackage{tabularx}       % table cell line break
+
+\usepackage{pgfplotstable}
+\pgfplotsset{
+    name nodes near coords/.style={
+        every node near coord/.append style={
+            name=#1\coordindex,
+            alias=#1last,
+        },
+    },
+    name nodes near coords/.default=coordnode
+}
 
 \titlespacing*{\subsection}{0pt}{1em}{0.5em}
 \titlespacing*{\subsubsection}{0pt}{1em}{0.25em}
@@ -137,29 +152,26 @@
 
 \newcounter{mini}[subsubsection]
 
-\newcommand{\minititle}[1]{\refstepcounter{mini}\vspace{\parskip}\hspace{-1\parindent}\textbf{~\themini. #1:}\\}
+\newcommand{\minititle}[1]{\refstepcounter{mini}\vspace{\parskip}\hspace{-1\parindent}\textbf{~\themini. #1}\\}
 
 \newcommand{\tinytitle}[1]{\vspace{\parskip}\hspace{-1\parindent}\textbf{#1:}\hspace{3pt}}
 
 \newcommand{\testresult}[2]{
-\vspace{4pt}
-\begin{adjustwidth}{-.5in}{-.5in}
+  \vfill
   \begin{center}
    \setlength{\fboxsep}{1em}
    \fbox{%
     \parbox{\textwidth}{%
-      \ifthenelse{\equal{#2}{pass}}
+      \ifthenelse{\equal{#1}{pass}}
       {
-        #1. The test is considered \textbf{\textcolor{green!20!black}{PASSED}}.
+        \hspace*{\fill}Test \textbf{\textcolor{green!20!black}{PASSED}}. #2\hspace*{\fill}
       }
       {
-        #1 The test is considered \textbf{\textcolor{red!20!black}{FAILED}}.
+        \hspace*{\fill}Test \textbf{\textcolor{red!20!black}{FAILED}}.\hspace*{\fill}
       }
     }%
   }
   \end{center}
-\end{adjustwidth}
-\vspace{2pt}
 }
 
 \newenvironment{minipageparskip}
@@ -178,7 +190,7 @@ frame=tlbr,
 backgroundcolor=\color{lightgray!15},
 showspaces=false, showstringspaces=false,
 commentstyle=\ttfamily\footnotesize\color{gray},
-escapechar=|,
+%escapechar=|,
 emph={
        cudaMalloc, cudaFree,
        __global__, __shared__, __device__, __host__,

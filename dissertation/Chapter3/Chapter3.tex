@@ -4,9 +4,9 @@
 \section{Specification}
 \label{s:spec}
 
-In order to clearly explain the design of the extension that will be made to the OP2 framework, it is important to first understand the existing work-flow. The following is a high level overview of the components of OP2 that pre-date this project, so that when the new system is described in Section \ref{ss:reqs} it is easier to understand.
+In order to clearly explain the design of the extension that will be made to the OP2 framework, it is important to first understand the pre-existing work-flow. The following is a high level overview of the components of OP2 that pre-date this project, so that when the new system is described in Section \ref{ss:reqs} it is easier to understand.
 
-\subsection{Existing System}
+\subsection{Pre-Existing System}
 \begin{figure}[h!]
 \makebox[\textwidth][c]{
  \resizebox{1.1\textwidth}{!}{
@@ -43,17 +43,17 @@ In order to clearly explain the design of the extension that will be made to the
 
   \end{tikzpicture}
   }}
-  \caption{Existing OP2 System Diagram}
+  \caption{Pre-existing OP2 System Diagram}
   \label{fig:aot_sys}
 \end{figure}
 
 The pre-existing OP2 workflow is shown in Figure \ref{fig:aot_sys}. The diagram starts in the top left with the Code Generation stage, beginning at the system's input: a set of Source Files. The set of Source Files cannot be empty, and must contain at least one file, called the Master Application file. The Master Application file is a normal C program, containing OP2 API calls to define of sets, maps, and constants, as well as initialising and cleaning up the OP2 execution with the \verb|op_init()| and \verb|op_exit()| Library functions. It describes the structure of the application.
 \par
-The input Source Files can optionally contain addition C source and header files, included in the normal way with \verb|#include| statements, to assist with the organisation of a complex application with a large code-base. An example usage of these files would be a header file for each parallel loop, containing the function to be executed as the body of the loop.
+The input Source Files can optionally contain additional C source and header files, included in the normal way with \verb|#include| statements, to assist with the organisation of a complex application with a large code-base. An example usage of these files would be a header file for each parallel loop, containing the function to be executed as the body of the loop.
 \par
 These Source files are parsed by the code generation Python script, from which the output is: a modified version of the master application file, and a kernel file for each parallel loop. The output files are compiled, and linked against the OP2 library files for the desired hardware platform to produce an executable Program Binary. The expectation is that this binary will run without error on the target hardware, taking a map as an input to produce the result desired by the application programmer.
 \par
-The existing system is able to generate optimised code for the target platform from the high level application code, and apply compiler optimisations ahead of time, including optimisations like \verb|-O3| and \verb|--use_fast_math|. It is not, however, able to optimise based on the inputs at all, as they are only known at runtime, after the compiler has completed and the binary is being executed. This is where the implementation for this project comes in: to provide the ability to use the input data when optimising.
+The pre-existing system is able to generate optimised code for the target platform from the high level application code, and apply compiler optimisations ahead of time, including optimisations like \verb|-O3| and \verb|--use_fast_math|. It is not, however, able to optimise based on the inputs at all, as they are only known at runtime, after the compiler has completed and the binary is being executed. This is where the implementation for this project comes in: to provide the ability to use the input data when optimising.
 
 \subsubsection{op2.py}
 \label{ss:impl_op2}
@@ -63,9 +63,9 @@ It also gathers information about each parallel loop, including the number of th
 \par
 Once the Application has been analysed, \verb|op2.py| produces a modified copy of the Application File, named \verb|[application]_op.cpp|, which is largely the same as the file provided by the application programmer, but with the addition of \verb|extern| declarations for the function each parallel loop will call: \verb|op_par_loop_[name]|. Defining a function \verb|extern| means it has external linkage, and therefore the definition of the function may be found during the linking stage of compilation, not in the current pass.
 \par
-The generator scripts for each platform will receive the list of loop details gathered using RegEx as its parameters, then generates a definition of each parallel loop's execute function will be generated for each hardware platform, in the form of Kernel files. At compile time these Kernel files will be linked to the extern definition in the Modified Application File by the linker.
+The generator scripts for each platform will receive the list of loop details gathered using RegEx as its parameters, then generates a definition of each parallel loop's execute function for each hardware platform, in the form of Kernel files. At compile time these Kernel files will be linked to the extern definition in the Modified Application File by the linker.
 \par
-The requirements for the code generation script that will be created as part of this project to produce kernels containing CUDA code with JIT compilation, will discussed in the following section.
+The requirements for the code generation script that will be created as part of this project to produce kernels containing CUDA code with JIT compilation, will be discussed in the following section.
 
 \subsection{New System Requirements}
 \label{ss:reqs}
@@ -73,11 +73,11 @@ The requirements for the code generation script that will be created as part of 
 Implementing the new system will require work in two main areas: a new Python code generation script, and some modifications to the OP2 library itself. The OP2 Library is currently implemented in both C and Fortran, but only the C library will be modified, due to developer familiarity with the C language. OP2 does also include code generation using MatLab, however the Python script is preferable for new developments, since Python is now ubiquitous, and provides very convenient string manipulation capabilities. The following are the necessary requirements to consider this project a success.
 
 \subsubsection{Python Script}
-The new code generation script will be named \verb|op2_gen_cuda_jit.py|, and will need to perform a somewhat similar source-to-source translation process to pre-existing CUDA script for Ahead-of-Time compiled code. The extension required is the ability to also generate a second, altered code-base that will be compiled at run-time, as well as the original code that is compiled prior to running the executable.
+The new code generation script will be named \verb|op2_gen_cuda_jit.py|, and will need to perform a somewhat similar source-to-source translation process to pre-existing CUDA script for Ahead-of-Time (AoT) compiled code. The extension required is the ability to also generate a second, altered code-base that will be compiled at run-time, as well as the original code that is compiled prior to running the executable.
 \par
 All code generated by the new code generation script must form valid C files, and compile using a the Intel C compiler \cite{icc} without errors. Since the project will involve generation of NVidia CUDA as well, the generated CUDA code must also be valid, and compile with the NVidia C Compiler (\verb|nvcc|) from the NVidia CUDA Toolkit \cite{nvcc,toolkit} without errors.
 \par
-When the resulting executable has been compiled from the generated code is executed, it will need to invoke a re-compilation stage while it is running, and execute code that has been compiled during its runtime as part of its execution. It must produce an output within some tolerance of the expected result, obtained from executing the parallel loop iterations sequentially in an arbitrary order. The order is not significant, as OP2 enforces a restriction that the order in which elements are processed must not affect the final result, within the limits of finite-precision floating-point arithmetic \cite[p3]{op2main}. There cannot be any dependencies between iterations in the application, otherwise the result may vary when translated by OP2. This constraint allows the OP2 code generator the freedom to not consider the ordering of iterations, and instead select an ordering based on performance.
+When the resulting executable which has been compiled from the generated code is executed, it will need to invoke a re-compilation stage while it is running, and execute code that has been compiled during its runtime as part of its execution. It must produce an output within some tolerance of the expected result, obtained from executing the parallel loop iterations sequentially in an arbitrary order. The order is not significant, as OP2 enforces a restriction that the order in which elements are processed must not affect the final result, within the limits of finite-precision floating-point arithmetic \cite[p3]{op2main}. There cannot be any dependencies between iterations in the application, otherwise the result may vary when translated by OP2. This constraint allows the OP2 code generator the freedom not to consider the ordering of iterations, and instead select an ordering based on performance.
 \par
 Lastly, the above requirements must be met for both Array-of-Structs and Struct\\-of-Arrays data layouts, especially when automatic SoA conversion is enabled, as this alters the generated code.
 
@@ -92,10 +92,10 @@ The overall goal of this project is to investigate whether this technique does p
 
 
 \subsubsection{OP2 Library}
-Outside the code generation script, some OP2 API functions may need to be implemented differently in the OP2 library files, as the functions may require additional information to be stored and retrieved at runtime. It is a requirement that the OP2 API itself is not altered in any way by modifications to the library, so that all existing programs currently using the API will be able to seamlessly update to using the modified version.
+Outside the translation script, some OP2 API functions may need to be implemented differently in the OP2 library files, as the functions may require additional information to be stored and retrieved at runtime. It is a requirement that the OP2 API itself is not altered in any way by modifications to the library, so that all existing programs currently using the API will be able to seamlessly update to using the modified version.
 
 \subsection{Testing \& Benchmarking}
-Once the code generation stage has been completed, and the Python Script is able to generate valid C and CUDA code that can be compiled without error for an example OP2 Application, the resulting binary needs to be tested to ensure the result is correct, and benchmarked to determine if there is performance gain. The easiest thing to compare to performance against is the same application generated for graphics cards, without JIT compilation, and see if there is any benefit. Benchmarking results will include the time taken to recompile at runtime for the JIT compiled version, and the time taken to copy constant values to device memory for the AOT compiled version.
+Once the code generation stage has been completed, and the Python Script is able to generate valid C and CUDA code that can be compiled without error for an example OP2 Application, the resulting binary needs to be tested to ensure the result is correct, and benchmarked to determine if there is performance gain. The runtime will be compared against the same application generated for graphics cards without JIT compilation, to see if there is any benefit. Benchmarking results will include the time taken to recompile at runtime for the JIT compiled version, and the time taken to copy constant values to device memory for the AoT compiled version.
 
 \clearpage
 \subsection{New System Model}
@@ -157,13 +157,13 @@ Once the code generation stage has been completed, and the Python Script is able
   \label{fig:jit_sys}
 \end{figure}
 
-\noindent Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation. As before, code generation takes an input of the application and optional additional files, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kernels, which contain code that are only be compiled inside the green box denoting `run-time', at which point the constants from the Input Map are known to the program. These Kernel files are not seen by the ahead of time compiler.
+\noindent Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation. As before, code generation takes an input of the application and optional additional files, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kerneit'sls, which contain code that will only be compiled inside the green box denoting `run-time', at which point the constants from the Input Map are known to the program. These Kernel files are not seen by the Ahead-of-Time compiler.
 \par
 The JIT compiler also needs to link the Optimised Kernels against the OP2 Library Files, so it is necessary that they are stored in a location that is also accessible at run-time, not just when the executable is compiled. This compilation will take place during the execution of the binary, and will therefore make up part of the program's execution duration. It will result in a Shared Object or Dynamically Loaded Library (DLL) file, with a standardised name, which the program can load, and utilise the functions it makes available.
 \par
 The exported functions will be the recompiled versions of each parallel loop, which as black boxes are equivalent (i.e.\ they have the same inputs and outputs), however theoretically they are faster to execute than the original versions.
 \par
-The Kernels compiled Ahead of Time could be altered such that their sole purpose is to invoke the compiler at runtime, then pass execution over to the JIT compiled function. It could be beneficial, however, to allow executables with the JIT compilation feature enabled or disabled to be compiled from the same source code. This requires the Ahead of Time Kernels to have retain the ability to execute the loop body without requiring JIT compilation, as well as being able to initiate the runtime compilation of the optimised kernels. Therefore the compiler invocation will be wrapped in a pre-processor conditional, so that the feature can be enabled or disabled using a compiler argument: \verb|-DOP2_JIT|.
+The Kernels compiled Ahead of Time could be altered such that their sole purpose is to invoke the compiler at runtime, then pass execution over to the JIT compiled function. It could be beneficial, however, to allow executables with the JIT compilation feature enabled or disabled to be compiled from the same source code. This requires the Ahead-of-Time Kernels to retain the ability to execute the loop body without requiring JIT compilation, as well as being able to initiate the runtime compilation of the optimised kernels. Therefore the compiler invocation will be wrapped in a pre-processor conditional, so that the feature can be enabled or disabled using a compiler argument: \verb|-DOP2_JIT|.
 
 \subsection{Library Modifications}
 In the OP2 library, the main API function that will need to be modified is:

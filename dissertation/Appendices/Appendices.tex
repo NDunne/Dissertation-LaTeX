@@ -20,13 +20,14 @@ emph={
    }
 }
 \lstinputlisting[language=C]{code/thread_add.cu}
-
+\vspace{-1em}
 \begin{adjustwidth}{-.5in}{-.5in}
 \textbf{Compilation:}
 \begin{verbatim}
 > nvcc thread_add.cu -o thread_add
 \end{verbatim}
 \textbf{Result:}
+\begin{footnotesize}
 \begin{verbatim}
 > ./thread_add
   03 06 07 05 03 05 06 02 09 01 02 07 00 09 03 06 00 06 02 06 01 08 07 09 02 00 02 03 07 05 09 02
@@ -34,6 +35,7 @@ emph={
 
   05 14 16 12 06 11 07 04 18 04 03 16 04 16 11 10 05 06 05 12 02 08 13 12 04 00 08 04 12 10 13 09
 \end{verbatim}
+\end{footnotesize}
 \end{adjustwidth}
 \section{Getting Started with OP2}
 \label{app:getStart}

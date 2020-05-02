@@ -99,7 +99,7 @@ The paper also introduces the consideration of data layout in memory. Figure \re
   \caption{\label{fig:SoA_v_AoS} Data layouts. Diagram reproduced from \cite{gpudesign}}
 \end{figure}
 
-\noindent The SoA layout is enabled by setting the value of an environment variable:\\ \verb|OP_AUTO_SoA=1|
+\noindent The SoA layout is enabled by setting the value of an environment variable:\\ \verb|OP_AUTO_SOA=1|
 The environment must be set prior to code generation \cite[p13]{manual}, as it modifies the output of the code generation stage. In the Implementation section (Section \ref{s:impl}) the differences in generated code when this is enabled will be explained in greater detail.
 \par
 The existing solution is able to generate optimised CUDA code for a parallel loop where the resulting code can map set elements to a GPU thread processed by which it will be processed, therefore operating on many set elements at once in parallel. It is important to note that the existing implementation for CUDA code generation produces a solution that is compiled entirely ahead of time, i.e.\ prior to the inputs being known, and therefore is not able to make optimisations based on the mesh input. This project aims to bridge this gap, and determine if there is benefit to be gained from such optimisations.
@@ -116,7 +116,7 @@ A further benefit is that such applications can be ported onto a new generation 
 Later in this report we will see Airfoil used for benchmarking runtime, to determine whether the new optimisation presented in the report is likely to provide benefit to other OP2 applications.
 
 \subsubsection{OP2 Results}
-The optimisation of the Hydra turbo-machinery simulator was presented in a 2016 paper titled \textit{Acceleration of a Full-scale Industrial CFD Application with OP2} \cite{hydrapaper}. This paper compares the newer OP2 framework with it's predecessor OPS \cite{ops}, as well as benchmarking the application against OP2 code generated utilising OpenMP \cite{OpenMP} and MPI \cite{MPI} for thread and process level parallelism respectively. Initially, OP2's GPU code generation was outperformed by both OPS generating MPI, and most of the OP2 MPI implementations - completing 45\% slower than the best CPU performance (2 CPUs, 24 MPI processes).
+The optimisation of the Hydra turbo-machinery simulator was presented in a 2016 paper titled \textit{Acceleration of a Full-scale Industrial CFD Application with OP2} \cite{hydrapaper}. This paper compares the newer OP2 framework with its predecessor OPS \cite{ops}, as well as benchmarking the application against OP2 code generated utilising OpenMP \cite{OpenMP} and MPI \cite{MPI} for thread and process level parallelism respectively. Initially, OP2's GPU code generation was outperformed by both OPS generating MPI, and most of the OP2 MPI implementations - completing 45\% slower than the best CPU performance (2 CPUs, 24 MPI processes).
 \par However, after some parameters had been tweaked including modifying the block sizes and enabling the Struct-Of-Arrays data layout, a single K20 GPU was able to achieve nearly $1.8\times$ speedup over the original OPlus version, and close to $1.5\times$ over the MPI version of Hydra with OP2. It is worth noting that these MPI implementations are already optimised parallel versions, not sequential implementations, so a speedup of 150\% is a very significant result.
 \clearpage
 
