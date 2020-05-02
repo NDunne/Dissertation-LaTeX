@@ -162,8 +162,10 @@ kernels: & \parbox[t]{.8\textwidth}{list of kernel descriptors, where each eleme
     \path [line, color=blue!50!black] (op2py) -- (Kernels);
   \end{tikzpicture}
   }
+  \caption{\label{fig:mini_sys}Subsection of System Diagram}
 \end{wrapfigure}
-\noindent In the JIT filename ``\verb|_rec|" is short for ``recompiled". These files were referred to as ``Kernels" and ``Optimised Kernels" respectively in the System Model from Section \ref{s:spec}.
+\noindent In the JIT filename ``\verb|_rec|" is short for ``recompiled". These files were referred to as ``Kernels" and ``Optimised Kernels" respectively in the System Model from Section \ref{s:spec}.\\
+An excerpt of the diagram is shown in Figure \ref{fig:mini_sys}.
 
 \clearpage
 A single \textbf{central kernels file} is also generated in the same folder, which is shared between all parallel loops:
@@ -332,7 +334,7 @@ for nc in range(0,len(consts)):
 \tinytitle{JIT}
 The JIT kernel needs to be modified differently. Constants with a dimension of 1 (i.e.\ they contain only 1 value) can be left unchanged, as the literal value will be defined under that same identifier. There is no possibility of a name collision here since the identifier will never be allocated memory, only replaced by a literal value.
 \par
-Constants with multiple values (i.e.\ with a dimension greater than one) cannot be defined as a macro, since macro values cannot have multiple values, and cannot be indexed. It also CUDA does not allow variables to be declared both \verb|__constant__|, and given external linkage using \verb|extern| \cite[p126]{guide}, which is how they are handled for the sequential JIT implementation.
+Constants with multiple values (i.e.\ with a dimension greater than one) cannot be defined as a macro, since macro values cannot have multiple values, and cannot be indexed. Also, CUDA does not allow variables to be declared both \verb|__constant__|, and given external linkage using \verb|extern| \cite[p126]{guide}, which is how they are handled for the sequential JIT implementation.
 \par
 The solution to this challenge comes in two parts. For each index \verb|N| of the constant array, a 1 dimensional constant would be defined with the name:\\ \verb|op_const_[id]_[N]|. All references to the constant where the index is a literal number can be replaced with the new identifier:
 \begin{lstlisting}[backgroundcolor = \color{lightgray!20}, language=Python]
@@ -345,7 +347,7 @@ for nc in range(0,len(consts)):
 \end{lstlisting}
 \codelabel{op2\_gen\_cuda\_jit.py [931-934]}
 
-However, if the constant is accessed using any expression other than a integer literal, this system will run into an issue.
+However, if the constant is accessed using any expression other than an integer literal, this system will run into an issue.
 \par As an example, see the result of processing the following statement, where \verb|c_array| is a defined constant with dimension greater than 1:
 \begin{center}
 \lstinline|int A = c_array[1 + 2]| \hspace{1cm}$\Rightarrow$\hspace{1cm} \lstinline |int A = op_const_c_array_1 + 2|
@@ -416,7 +418,7 @@ Since the modifications to enable the Struct-of-Arrays data layout involve const
 \end{wrapfigure}
 \minititle{Kernel Function}
 From this section onwards, all code generated is based only on the kernel descriptor, and does not contain any code written by the application developer.
-\par The kernel function is the same in both files, and is also executed on the GPU across all the parallel threads. It is declared \verb|__global__| so that is executed on the device, but can be called from host (CPU) code:
+\par The kernel function is the same in both files, and is also executed on the GPU across all the parallel threads. It is declared \verb|__global__| so that it will be executed on the device, but can be called from host (CPU) code:
 \begin{lstlisting}[language=C, backgroundcolor=\color{red!20}]
 __global__ void op_cuda_'+name+'( [args] )
 {
@@ -559,7 +561,7 @@ For this reason, the data structure strides remain as a device constant which is
 \minititle{Loop Function}
 The last section to be added to the kernel files for each parallel loop is the Loop Function, which serves as the entry point for the whole loop operation.
  \par
-The Application File will be modified by \verb|op2.py| to contain an declaration for this function marked \verb|extern|, to be linked against this definition in the CUDA version of the executable. Only the AOT kernel requires this function, as the Host Function acts as the entry point for the JIT compiled kernel The function signature is:
+The Application File will be modified by \verb|op2.py| to contain a declaration for this function marked \verb|extern|, to be linked against this definition in the CUDA version of the executable. Only the AOT kernel requires this function, as the Host Function acts as the entry point for the JIT compiled kernel. The function signature is:
 \begin{lstlisting}[backgroundcolor=\color{blue!20}, language=C]
 void op_par_loop_[name](char* name, op_set set, ...)
 {
@@ -577,7 +579,7 @@ void op_par_loop_[name](char* name, op_set set, ...)
 \subsubsection{Kernel Files Summary}
 \label{impl_summary}
 
-To summarise, for every parallel loop two separate kernel files containing C and CUDA code are generated, one for Ahead of Time compilation, and one for Just in Time compilation. The generated code in a particular pair of kernel files will to be executed when the corresponding loop is invoked in the Application File, which has been modified so that the compiler will link its function calls to the function definitions generated above.
+To summarise, for every parallel loop two separate kernel files containing C and CUDA code are generated, one for Ahead of Time compilation, and one for Just in Time compilation. The generated code in a particular pair of kernel files will be executed when the corresponding loop is invoked in the Application File, which has been modified so that the compiler will link its function calls to the function definitions generated above.
 
 \begin{wrapfigure}{r}{.42\textwidth}
   \centering
@@ -586,7 +588,7 @@ To summarise, for every parallel loop two separate kernel files containing C and
   \label{fig:krnl_flow}
 \end{wrapfigure}
 
-Figure \ref{fig:krnl_flow} has been included to clarify the data flow through the two files, where an arrow from Function A to Function B indicates that B is called from the body of A. The diagram starts with the Loop Function at the bottom which is called from the Application File, and executed by a single thread on the host. The AOT Host Function is eventually called, where either the re-compiled JIT version is invoked, or the original version is used if JIT compilation is not enabled when the application is first compiled. In the host function the GPU device is configured, and Kernel Function is executed simultaneously on many parallel threads. Each thread in turn executes the User function to perform an operation on elements of a set, as per the design of the application programmer.
+Figure \ref{fig:krnl_flow} has been included to clarify the data flow through the two files, where an arrow from Function A to Function B indicates that B is called from the body of A. The diagram starts with the Loop Function at the bottom which is called from the Application File, and executed by a single thread on the host. The AOT Host Function is eventually called, where either the re-compiled JIT version is invoked, or the original version is used if JIT compilation is not enabled when the application is first compiled. In the host function the GPU device is configured, and the Kernel Function is executed simultaneously on many parallel threads. Each thread in turn executes the User function to perform an operation on elements of a set, as per the design of the application programmer.
 
 The \verb|jit_compile()| function, which will handle actually performing a compilation stage at runtime, has not yet been defined. This will be covered in the next section on the final source file to be generated: the Central Kernels file.
 \clearpage
@@ -606,7 +608,7 @@ At the top, the central kernels file includes the required OP2 library files, as
 \codelabel{generated by TODO}
 As mentioned in that section, these serve as a reference to the OP2 library files for all of the AOT kernels, and their inclusion here is the reason the AOT kernels do not each individually require these statements.
 
-A declaration of a CUDA constant for each input constant in the user's dependingn is generated next. An example of what this might look like is shown below.
+A declaration of a CUDA constant for each input constant in the user's application is generated next. An example of what this might look like is shown below.
 \begin{lstlisting}[backgroundcolor=\color{red!20}, language=C]
 __constant__ double single_cuda;
 __constant__ double value_cuda;
@@ -634,7 +636,7 @@ for nc in range (0,len(consts)):
 \end{lstlisting}
 \codelabel{op2\_gen\_cuda\_jit.py [1026-1037]}
 
-Following this, the file contains definitions for two functions. The first is the OP2 API function \verb|op_decl_const_char|, which will be called from the Application File when the programmer wishes to declare a constant identifier and value in the input; and the second is \verb|jit_compile| which will invoke the run-time compiler, load the generated shared object file, and assign a function pointer for each re-compiled loop exported by the DLL so it can be retrieved and executed when required.
+Following this, the file contains definitions for two functions. The first is the OP2 API function \verb|op_decl_const_char|, which will be called from the Application File when the programmer wishes to declare a constant identifier and value in the input; and the second is \verb|jit_compile| which will invoke the run-time compiler, load the generated Shared Object file, and assign a function pointer for each re-compiled loop it exports. This allows the newly compiled loop functions to be found in memory, and executed when required.
 
 \minititle{op\_decl\_const\_char}
 This function is an OP2 API function which allows users to declare an input value that will not change over the course of execution. It currently has the following signature, as defined in the OP2 User Guide \cite[p9]{manual}:
@@ -748,7 +750,7 @@ if (op_is_root()) {
 \end{lstlisting}
 \codelabel{generated by op2\_gen\_cuda\_jit.py [1139-1146]}
 \par
-\noindent It is expected that the result of the compilation will be a shared object file named\\ \verb|cuda/airfoil_kernel_rec.so|, which exports functions for each parallel loop. If this file does not exist the application binary will exit with an error, otherwise the recompiled function for each parallel loop is dynamically loaded into the application, using: \verb|void *dlsym(void *restrict handle, const char *restrict name)|\\ from \textit{dlfcn.h}.
+\noindent It is expected that the result of the compilation will be a Shared Object file named\\ \verb|cuda/airfoil_kernel_rec.so|, which exports functions for each parallel loop. If this file does not exist the application binary will exit with an error, otherwise the recompiled function for each parallel loop is dynamically loaded into the application, using: \verb|void *dlsym(void *restrict handle, const char *restrict name)|\\ from \textit{dlfcn.h}.
 \par
 \noindent For every parallel loop, the function \verb|op_par_loop_[name]_rec_execute| is imported, with its address stored in the void pointer declared in global scope: \verb|[name]_function|. We have seen this pointer before, in Section \ref{ss:krnl_files}, where is was used to call the JIT kernel Host Function from the AOT kernel Host Function.
 \par
@@ -767,7 +769,7 @@ if ((error = dlerror()) != NULL) {
 \end{lstlisting}
 \codelabel{generated by op2\_gen\_cuda\_jit.py [1160-1169]}
 \par
-\noindent Once all the exported functions from the shared object file have been imported, the wall clock time since the start of the \verb|jit_compile| function is printed to the terminal. The time will be used later when analysing the optimised application runtime.\\
+\noindent Once all the exported functions from the Shared Object file have been imported, the wall clock time since the start of the \verb|jit_compile| function is printed to the terminal. The time will be used later when analysing the optimised application runtime.\\
 \\
 The final part of this Section on the project Implementation is on the Makefile. While this is not generated by the Python script, and would need to be recreated by an application programmer, it was part of the process to create and therefore needs to be covered.
 
@@ -775,7 +777,7 @@ The final part of this Section on the project Implementation is on the Makefile.
 \label{ss:make}
 This implementation relies on GNU Make to control Ahead of Time compilation, as well as Just in Time compilation during runtime. This includes setting parameters that will be passed to the compiler process, and other options. A number of other libraries were required to build an OP2 binary even before JIT compilation was added, as described in Appendix \ref{app:getStart} - \textit{Getting Started with OP2}, so here only the recompilation target will be discussed, as it was the target developed for this project.
 \par
-The binary expects there to be a Makefile in the directory it is executing in, with a target: \verb|[application]_cuda_rec| that controls re-compilation, in order to work correctly. This is the target which will be compiled at run-time. As mentioned in the previous section, the result of making this target needs to be a shared object file named \verb|cuda/airfoil_kernel_rec.so|, which exports the recompiled loop functions.
+The binary expects there to be a Makefile in the directory it is executing in, with a target: \verb|[application]_cuda_rec| that controls re-compilation, in order to work correctly. This is the target which will be compiled at run-time. As mentioned in the previous section, the result of making this target needs to be a Shared Object file named \verb|cuda/airfoil_kernel_rec.so|, which exports the recompiled loop functions.
 \par
 The library object is produced by compiling each of the kernels individually, using the NVidia compiler \verb|nvcc| as the code contains CUDA code, then linking them into a single object. It is necessary that the compiler flags include \verb|--compiler-options -fPIC|. The flag \verb|--compiler options| passes a list of arguments to the underlying C compiler which handles all non-CUDA sections of the code, in this case passing the argument \verb|-fPIC|, which is for forcing generation of Position Independent Code. The result is that the library function will execute correctly regardless of the address at which it is loaded in memory, which is important for dynamically loaded functions.
 \par

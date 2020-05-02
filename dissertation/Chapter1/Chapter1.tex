@@ -15,14 +15,14 @@ This optimisation is named ``Just-In-Time Compilation" for its similarities to a
 \subsection{Motivations}
 The idea for this project was provided by my supervisor, Dr Gihan Mudalige - an Associate Professor in the University of Warwick Computer Science Department. It was pulled from the pool of uncompleted features for the OP2 project, and was selected because it aligned with my interest in High Performance Computing, and previous experience with optimising existing codes.
 \par
-Since OP2 is Open Source and freely available, the implementation I produce would become part of the framework, allowing future contributors to build on my work.
+Since OP2 is Open Source and freely available, the implementation I produce will become part of the framework, allowing future contributors to build on my work.
 
 \subsection{Background Work}
 \label{s:bgwork}
 
 In order to become comfortable with the OP2 framework and provide a useful contribution, it is important to understand the domain of problems for which it was created: Unstructured Mesh Solvers.
 \par
-A large proportion of HPC workloads involve approximating Partial Differential Equations (PDEs) to simulate complex interactions in physics problems, for example the Navier-Stokes equations for computational fluid dynamics, or predicting weather patterns. It is usually necessary to discretise such problems, which means dividing a continuous space into a number of discrete cells.
+A large proportion of HPC workloads involve approximating Partial Differential Equations (PDEs) to simulate complex interactions in physics problems, for example the Navier-Stokes equations for computational fluid dynamics, or predicting weather patterns. It is usually necessary to discretise such problems, which means dividing a continuous space into a number of discrete cells such as in Figure \ref{fig:2dmesh}.
 \begin{figure}[h!]
   \begin{minipage}{.5\textwidth}
     \centering
@@ -69,7 +69,7 @@ A large proportion of HPC workloads involve approximating Partial Differential E
   \label{fig:2dmesh}
 \end{figure}
 \clearpage
-Depending on its structure, a mesh can be described as either structured (regular) or unstructured. Structured meshes such as Figure \ref{fig:struct} are made up of cells following a regular pattern, while unstructured meshes use connectivity information to specify the mesh topology, as Figure \ref{fig:umesh}. OP2 is designed for unstructured mesh solvers, but since a structured mesh can be represented using connectivity information, it is a "stronger" category that includes structured meshes.
+Depending on its structure, a mesh can be described as either structured (regular) or unstructured. Structured meshes such as in Figure \ref{fig:struct} are made up of cells following a regular pattern, while unstructured meshes use connectivity information to specify the mesh topology, as Figure \ref{fig:umesh}. OP2 is designed for unstructured mesh solvers, but since a structured mesh can be represented using connectivity information, it is a "stronger" category that includes structured meshes.
 \vspace{.5cm}
 \begin{figure}[h!]
   \begin{minipage}{.5\textwidth}
@@ -95,7 +95,7 @@ Depending on its structure, a mesh can be described as either structured (regula
   \end{minipage}
 \end{figure}
 \par
-A particular simulation might, for example, be approximating the velocity of a fluid in each cell, and at every time step re-calculate this value based on the values of cells around it. Programs which make use of this repeating pattern to calculate value are commonly referred to as a stencil codes \cite{stencil}. An example of a 2D stencil is shown in Figure \ref{fig:stencil}.
+A particular simulation might, for example, be approximating the velocity of a fluid in each cell, and at every time step re-calculate this value based on the values of cells around it. Programs which make use of this repeating pattern to calculate value are commonly referred to as a `stencil code' \cite{stencil}. An example of a 2D stencil is shown in Figure \ref{fig:stencil}.
 \vspace{.5cm}
 \begin{figure}[h!]
   \centering

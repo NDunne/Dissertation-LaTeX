@@ -63,7 +63,7 @@ It also gathers information about each parallel loop, including the number of th
 \par
 Once the Application has been analysed, \verb|op2.py| produces a modified copy of the Application File, named \verb|[application]_op.cpp|, which is largely the same as the file provided by the application programmer, but with the addition of \verb|extern| declarations for the function each parallel loop will call: \verb|op_par_loop_[name]|. Defining a function \verb|extern| means it has external linkage, and therefore the definition of the function may be found during the linking stage of compilation, not in the current pass.
 \par
-The generator scripts for each platform will receive the list of loop details gathered using RegEx as its parameters, then generates a definition of each parallel loop's execute function for each hardware platform, in the form of Kernel files. At compile time these Kernel files will be linked to the extern definition in the Modified Application File by the linker.
+The generator scripts for each platform will receive the list of loop details gathered using RegEx as its parameters, then will generate a definition of each parallel loop's execute function for each hardware platform, in the form of Kernel files. At compile time these Kernel files will be linked to the extern definition in the Modified Application File by the linker.
 \par
 The requirements for the code generation script that will be created as part of this project to produce kernels containing CUDA code with JIT compilation, will be discussed in the following section.
 
@@ -157,9 +157,9 @@ Once the code generation stage has been completed, and the Python Script is able
   \label{fig:jit_sys}
 \end{figure}
 
-\noindent Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation. As before, code generation takes an input of the application and optional additional files, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kerneit'sls, which contain code that will only be compiled inside the green box denoting `run-time', at which point the constants from the Input Map are known to the program. These Kernel files are not seen by the Ahead-of-Time compiler.
+\noindent Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation. As before, code generation takes an input of the application and optional additional files, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kernels, which contain code that will only be compiled inside the green box denoting `run-time', at which point the constants from the Input Map are known to the program. These Kernel files are not seen by the Ahead-of-Time compiler.
 \par
-The JIT compiler also needs to link the Optimised Kernels against the OP2 Library Files, so it is necessary that they are stored in a location that is also accessible at run-time, not just when the executable is compiled. This compilation will take place during the execution of the binary, and will therefore make up part of the program's execution duration. It will result in a Shared Object or Dynamically Loaded Library (DLL) file, with a standardised name, which the program can load, and utilise the functions it makes available.
+The JIT compiler also needs to link the Optimised Kernels against the OP2 Library Files, so it is necessary that they are stored in a location that is also accessible at run-time, not just when the executable is compiled. This compilation will take place during the execution of the binary, and will therefore make up part of the program's execution duration. It will result in a Shared Object or Dynamically Loaded Library (DLL) file, with a standardised name. The program can load this Shared Object, and utilise the functions it makes available.
 \par
 The exported functions will be the recompiled versions of each parallel loop, which as black boxes are equivalent (i.e.\ they have the same inputs and outputs), however theoretically they are faster to execute than the original versions.
 \par
