@@ -1,0 +1,32 @@
+#OP2 env variables
+
+unset LD_LIBRARY_PATH
+
+export OP2_COMPILER=intel
+export OP2_INSTALL_PATH=/home/ndunne/Documents/OP2-Common/op2/
+
+alias op2="python2 $OP2_INSTALL_PATH/../translator/c/python/op2.py"
+
+export PARMETIS_INSTALL_PATH=/opt/parmetis-intel/
+export PTSCOTCH_INSTALL_PATH=/opt/scotch-intel/
+export MPI_INSTALL_PATH=/opt/mpich/
+export HDF5_INSTALL_PATH=/opt/phdf5-intel/
+export CUDA_INSTALL_PATH=/opt/cuda/
+
+export LD_LIBRARY_PATH=/opt/parmetis-intel/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/opt/scotch-intel/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/opt/phdf5-intel/lib:$LD_LIBRARY_PATH
+
+#CUDA
+export PATH=/opt/cuda/bin:$PATH
+export LD_LIBRARY_PATH=/opt/cuda/lib64:$LD_LIBRARY_PATH
+export CUDA_INSTALL_PATH=/opt/cuda
+
+#INTEL MPI
+export MPI_INSTALL_PATH=/opt/intel/impi_latest/intel64/
+source /opt/intel/bin/compilervars.sh intel64
+source $MPI_INSTALL_PATH/bin/mpivars.sh intel64
+
+export INTEL_PATH=/opt/intel
+export MPICH_CXX=$INTEL_PATH/bin/icpc
+export MPICH_CC=$INTEL_PATH/bin/icc
