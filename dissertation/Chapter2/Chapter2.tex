@@ -107,13 +107,13 @@ The existing solution is able to generate optimised CUDA code for a parallel loo
 Since OP2 enforces that the order in which the function is applied to the members of the set must not affect the final result \cite[p4]{manual}, the consideration for not violating data dependencies between iterations is removed in the generated code, and therefore loop iterations can be scheduled in any order, based on best performance.
 
 \subsubsection{OP2 Applications}
-There are a number of industrial applications that have been implemented using the OP2 active library framework, which would immediately benefit from further optimisation of the generated code, including: Airfoil \cite{airfoil} - a non-linear 2D inviscid airfoil code; Hydra \cite{hydra} - Rolls Royce’s turbo-machinery simulator; and Volna \cite{volna} - a finite-volume nonlinear shallow-water equation solver used to simulate tsunamis.
+There are a number of industrial applications that have been implemented using the OP2 active library framework, which would immediately benefit from further optimisation of the generated code, including: \textit{airfoil} \cite{airfoil} - a non-linear 2D inviscid \textit{airfoil} code; \textit{Hydra} \cite{hydra} - Rolls Royce’s turbo-machinery simulator; and \textit{Volna} \cite{volna} - a finite-volume nonlinear shallow-water equation solver used to simulate tsunamis.
 \par
 They make use of the abstraction provided by the OP2 API to allow scientists and engineers to focus on the description of the problem, and separates the consideration for parallelism, data-movements, and performance into the OP2 library and code generation.
 \par
 A further benefit is that such applications can be ported onto a new generation of hardware, which could be developed in the future. Only the OP2 back-end library would need to be modified to provide support for the new hardware, instead of every application individually. This portability can save both time and money in development of HPC applications if multiple different hardware platforms are desired to be used.
 \par
-Later in this report we will see Airfoil used for benchmarking runtime, to determine whether the new optimisation presented in the report is likely to provide benefit to other OP2 applications.
+Later in this report we will see \textit{airfoil} used for benchmarking runtime, to determine whether the new optimisation presented in the report is likely to provide benefit to other OP2 applications.
 
 \subsubsection{OP2 Results}
 The optimisation of the Hydra turbo-machinery simulator was presented in a 2016 paper titled \textit{Acceleration of a Full-scale Industrial CFD Application with OP2} \cite{hydrapaper}. This paper compares the newer OP2 framework with its predecessor OPS \cite{ops}, as well as benchmarking the application against OP2 code generated utilising OpenMP \cite{OpenMP} and MPI \cite{MPI} for thread and process level parallelism respectively. Initially, OP2's GPU code generation was outperformed by both OPS generating MPI, and most of the OP2 MPI implementations - completing 45\% slower than the best CPU performance (2 CPUs, 24 MPI processes).
