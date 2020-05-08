@@ -59,8 +59,9 @@ A further benefit is that such applications can be ported onto a new generation 
 Later in this report we will see \textit{airfoil} used for benchmarking runtime, to determine whether the new optimisation presented in the report is likely to provide benefit for other OP2 applications.
 
 \subsubsection{OP2 Results}
-The optimisation of the Hydra turbo-machinery simulator was presented in a 2016 paper titled \textit{Acceleration of a Full-scale Industrial CFD Application with OP2} \cite{hydrapaper}. This paper compares the newer OP2 framework with its predecessor OPS \cite{ops}, as well as benchmarking the application against OP2 code generated utilising OpenMP \cite{OpenMP} and MPI \cite{MPI} for thread and process level parallelism respectively. Initially, OP2's GPU code generation was outperformed by both OPS generating MPI, and most of the OP2 MPI implementations - completing 45\% slower than the best CPU performance (2 CPUs, 24 MPI processes).
-\par However, after some parameters had been tweaked including modifying the block sizes and enabling the Struct-Of-Arrays data layout, a single K20 GPU was able to achieve nearly $1.8\times$ speedup over the original OPlus version, and close to $1.5\times$ over the MPI version of Hydra with OP2. It is worth noting that these MPI implementations are already optimised parallel versions, not sequential implementations, so this speed-up from using a GPU is a very significant result. Hopefully this project can improve it even more, with the addition of Just-In-Time compilation.
+\label{sss:op2res}
+The optimisation of the \textit{Hydra} turbo-machinery simulator was presented in a 2016 paper titled \textit{Acceleration of a Full-scale Industrial CFD Application with OP2} \cite{hydrapaper}. This paper compares the newer OP2 framework with its predecessor OPS \cite{ops}, as well as benchmarking the application against OP2 code generated utilising OpenMP \cite{OpenMP} and MPI \cite{MPI} for thread and process level parallelism respectively. Initially, OP2's GPU code generation was outperformed by both OPS generating MPI, and most of the OP2 MPI implementations - completing 45\% slower than the best CPU performance (2 CPUs, 24 MPI processes).
+\par However, after some parameters had been tweaked including modifying the block sizes and enabling the Struct-of-Arrays data layout, a single K20 GPU was able to achieve nearly $1.8\times$ speedup over the original OPlus version, and close to $1.5\times$ over the MPI version of \textit{Hydra} with OP2. It is worth noting that these MPI implementations are already optimised parallel versions, not sequential implementations, so this speed-up from using a GPU is a very significant result. Hopefully this project can improve it even more, with the addition of Just-In-Time compilation.
 \clearpage
 
 \subsection{NVidia CUDA Programming Model}
@@ -117,19 +118,24 @@ Inside the function body built in variables \verb|threadIdx.x|, \verb|blockIdx.x
 \end{itemize}
 Both indicate that the function should be compiled to \textit{PTX}, the CUDA instruction set architecture \cite[p15]{guide}, and executed on an NVidia GPU device. The difference, however, is that a function declared \verb|__global__| can be invoked from host (CPU) code using the syntax above; whereas a \verb|__device__| function can only be called from code that is already executing on the device \cite[p81]{guide}.
 \par
-In the next section the new optimisation that will be applied to the existing OP2 framework GPU code generation will be discussed, along with similar implementations from other areas of the computer science field.
+In the next section the new optimisation that will be applied to the existing OP2 code generation for GPUs will be discussed, along with similar implementations from other areas of the computer science field.
 \clearpage
 \subsection{Just-In-Time Compilation}
 \label{ss:rw_JIT}
 
-The term ``Just-In-Time Compilation" is most commonly associated with the Java programming language, and particularly the Java Run-time Environment (JRE), as ``JIT" Compilation is an integral part of the design and usage of the Java Virtual Machine (JVM).
+``Just-In-Time Compilation" refers to the process of performing some compilation at run-time when the inputs to the program are known, and can be used to optimise the application. It is called ``Just-In-Time" as it is the last opportunity to optimise the application before it is actually executed.
+\par
+The optimisation itself is not specific to the GPU architecture, and could be applied to any of the platforms supported by OP2, however, since GPUs are leading on performance at the moment (see Section \ref{sss:op2res}), they are the most commonly used and therefore any benefit to that back-end could impact more actual users. It would also a be good indicator that JIT compilation does have potential across all platforms if it is able to provide speed-up to the GPU back-end.
+\par
+The term ``Just-In-Time Compilation" is most commonly associated with the Java programming language \cite{java}, and particularly the Java Run-time Environment (JRE), as ``JIT" Compilation is an integral part of the design and usage of the Java Virtual Machine (JVM).
+\subsection{Java}
 
 \par The Java compiler (\verb|javac|) compiles code into platform independent "bytecode" \cite{javac}, then at run-time this bytecode can be interpreted, or compiled a second time by the JVM into native code, and optimised specifically for the machine it is running on. It can also take the program's inputs into account, since they will be known and fixed at run-time.
 \par
 This re-compilation from bytecode to native code is only done for ``hot" sections which are dominating the runtime \cite{javac}, while the rest continues to be interpreted, as it is not worth the time cost to recompile. Chapter 4 of \textit{Java Performance: The Definitive Guide} \cite{javaPerf} contains further detail on the JIT compiler and its impact on the performance of Java.
 \par
 
-This core idea of recompiling code at run-time to obtain performance is the inspiration for the new optimisation investigated in this report, and the origin of its name. However, the Java approach does not exactly map onto OP2. In the existing framework, there is no possibility of intermediate code, and no Virtual Machine in which the binary will execute that can profile the running code and react to ``hot" sections.
+This core idea of recompiling ``hot" code at run-time to obtain performance is the inspiration for the new optimisation investigated in this report, and the origin of its name. However, the approach taken by Java does not exactly map onto OP2. In the existing framework, there is no possibility of intermediate code, and no Virtual Machine in which the binary will execute that can profile the running code and react to ``hot" sections.
 \par
 Instead, an alternative source file at the same ``level" above native code is created (see Figure \ref{fig:jit_compare}). This new source code that has been translated will be able to utilise assertions made using the input data, and so is compiled and used in place of the equivalent, but unoptimised functions compiled ahead of time. The design of the JIT compilation system for OP2 will be covered in greater detail in Section \ref{s:spec}.
 \begin{figure}[h!]
@@ -181,15 +187,15 @@ Instead, an alternative source file at the same ``level" above native code is cr
 
 \subsection{Related Work}
 
-While Java's JIT compilation gives a good indication that there is real benefit to be gained from using the technique, its implementation does not translate well on to the active library workflow. While researching more similar applications of the concept, the \textit{easy::JIT} library was discovered.
+While Java's popularity and success from using JIT compilation gives a good indication that there is real performance benefit to be gained from using the technique, its implementation does not translate well on to the existing OP2 active library workflow. While researching more similar applications of the concept, the \textit{easy::JIT} library was discovered.
 
 \tinytitle{easy::JIT}
 
-\noindent \textit{easy::JIT} \cite{eJIT} is a library created by Juan Manuel Martinez Caamaño and Serge Guelton of \textit{Quarkslab} \cite{Quarkslab}. It targets C++ code, and utilises \verb|clang| \cite{clang} as the compiler, which is built using the Low Level Virtual Machine (LLVM) framework. It therefore can make use of the LLVM's Intermediate Representation, where other C compilers like \verb|gcc| cannot.
+\noindent \textit{easy::JIT} \cite{eJIT} is a library created by Juan Manuel Martinez Caamaño and Serge Guelton of \textit{Quarkslab} \cite{Quarkslab}. It targets C++ code, and utilises \verb|clang| \cite{clang} as the compiler, which is built using the Low Level Virtual Machine (LLVM) framework. It therefore can make use of the LLVM's Intermediate Representation (IR), where other C compilers like \verb|gcc| cannot.
 \par
-\textit{easy::JIT} does also differ from this project however, as it utilises code generation at run-time, and a cache of code to ensure this does not need to be done on every execution.
-\par The OP2 implementation discussed in this report will generate all of the code ahead of time, as the code generation stage of OP2 is not an optimised process, so performing it a run-time would be a significant upfront cost.
+\textit{easy::JIT} utilises a code generation stage at run-time, and a cache of code to ensure this does not need to be done on every iteration. Performing code generation at run-time means it also needs to be an optimised process, as it will be contributing to the execution time of the application. This has not previously been a consideration for OP2, so the code generation stage is not so easy to integrate into the JIT compilation process.
+\par The OP2 implementation discussed in this report will generate all of the code prior to run-time, as the code generation stage of OP2 is not an optimised process.
 \par
-Applications developed for OP2 are not currently limited to only LLVM-based C compilers like \verb|clang|, although a translator using LLVM Intermediate Representation to replace the current Python and MatLab source-to-source translation scripts is currently in development \cite{op2clang}. This would bring it more in line with Java, having an original source, an intermediate representation, and then native code after the second compilation stage.
+Applications developers for OP2 are not currently limited to only LLVM-based C compilers like \verb|clang|, and can use any C compiler they prefer. A translator using LLVM Intermediate Representation to replace the current Python and MatLab source-to-source translation scripts is currently in development \cite{op2clang}, which would bring it more in line with Java, having an original source, an intermediate representation, and then native code after the second compilation stage. It is not the version of OP2 that is the focus of this project however.
 \par
-The implementation completed for this report is building on the compiler agnostic OP2 implementation, and therefore will not utilise LLVM. The next section is the Specification for the implementation, including the project requirements and system model.
+The implementation completed for this report is building on the compiler agnostic OP2 implementation, and therefore will not utilise LLVM IR. The next section details the Specification for the implementation, including the project requirements and a system model.

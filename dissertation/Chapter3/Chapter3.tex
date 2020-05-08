@@ -47,7 +47,7 @@ In order to clearly explain the design of the extension that will be made to the
   \label{fig:aot_sys}
 \end{figure}
 
-\noindent The pre-existing OP2 workflow is shown in Figure \ref{fig:aot_sys}. The diagram starts in the top left with the Code Generation stage, beginning at the system's input: a set of Source Files. The set of Source Files cannot be empty, and must contain at least one file, called the Master Application file. The Master Application file is a normal C program, containing OP2 API calls to define of sets, maps, and constants, as well as initialising and cleaning up the OP2 execution with \verb|op_init()| and \verb|op_exit()|. It describes the application structure, and when parallel loops should be executed.
+\noindent The pre-existing OP2 workflow is shown in Figure \ref{fig:aot_sys}. The diagram starts in the top left with the Code Generation stage, beginning at the system's input: a set of Source Files. The set of Source Files cannot be empty, and must contain a Master Application file. The Master Application file is a normal C program, which makes OP2 API calls to define of sets, maps, and constants, as well as for initialising and cleaning up the OP2 execution with \verb|op_init()| and \verb|op_exit()|. It describes the application structure, and when parallel loops should be executed.
 \par
 The input Source Files can optionally contain additional C source and header files, included in the normal way with \verb|#include| statements, to assist with the organisation of a complex application with a large code-base. An example usage of these files would be a header file for each parallel loop, containing the function to be executed as the loop body.
 \par
@@ -57,9 +57,9 @@ The pre-existing system is able to generate optimised code for GPUs from the hig
 
 \subsubsection{op2.py}
 \label{ss:impl_op2}
-The code generation is done using Python scripts, with the main script being \verb|op2.py|, which parses the input files to gather data, and provides this data to a number of other scripts. Each performs the code generation for a specific hardware platform. It uses the Python Regular Expressions (RegEx) library: \verb|re| \cite{re} to identify OP2 API calls in the Application File, and ensures certain conditions are met - for example that \verb|op_init| and \verb|op_exit| are both called at least once to initialise and clean up the OP2 execution environment.
+The code generation is done using Python scripts, with the main script being \verb|op2.py|, which parses the input files to gather data, and provides this data to a number of other scripts. Each of these other scripts performs the code generation for a specific hardware platform. \verb|op2.py| uses the Python Regular Expressions (RegEx) library: \verb|re| \cite{re} to identify OP2 API calls in the Application File, and ensures certain conditions are met - for example that \verb|op_init| and \verb|op_exit| are both called at least once to initialise and clean up the OP2 execution environment.
 \par
-It also gathers information about each parallel loop, including the number of the parameters and their types, and the details of the indirect data set if the loop is indirect. This stage includes some error checking, by ensuring types and dimensions are consistent throughout the application.
+Information is also gathered during the parse about each parallel loop, including the number of the parameters and their types, and the details of the indirect data set if the loop is indirect. This stage includes some error checking, by ensuring types and dimensions are consistent throughout the application.
 \par
 Once the Application has been analysed, \verb|op2.py| produces a modified copy of the Application File, named \verb|[application]_op.cpp|, which is largely the same as the file provided by the application programmer, but with the addition of \verb|extern| declarations for the function each parallel loop will call: \verb|op_par_loop_[name]|. Defining a function \verb|extern| means it has external linkage \cite{linkage}, and therefore the definition of the function may be found during the linking stage of compilation, not in the current pass.
 \par
@@ -160,7 +160,7 @@ The runtime will be compared against the same application generated for graphics
   \label{fig:jit_sys}
 \end{figure}
 
-\noindent Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation (denoted with a red dotted box). As before, code generation takes an input of the application and optional additional files, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kernels, which contain code that will only be compiled inside the green box denoting `run-time', at which point the constants from the Input Map are known to the program. These Kernel files are not seen by the Ahead-Of-Time compiler.
+\noindent Figure \ref{fig:jit_sys} describes the new workflow of the OP2 library, with Just-In-Time compilation (denoted with a dotted red box). As before, code generation takes an input of the application and optional additional files, and generates the Kernels and Modified Application Files. It also generates an additional set of Optimised Kernels, which contain code that will only be compiled inside the green box denoting `run-time', at which point the constants from the Input Map are known to the program. These Kernel files are not seen by the Ahead-Of-Time compiler.
 \par
 The JIT compilation will take place during the execution of the binary, and will therefore make up part of the program's execution duration. It will need to link the Optimised Kernels against the OP2 Library Files, so it is necessary that they are stored in a location that is also accessible at run-time, not just when the executable is compiled.
 \par
