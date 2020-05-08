@@ -8,7 +8,7 @@ This project was intended as an investigation, and therefore it can certainly be
 \par
 Since the space for optimisation by this technique is relatively small, the problem size does have to be very large to see benefit. However HPC applications do tend to be very large, hence why they are not run on normal computers. This is not a significant restriction.
 \par
-As a result of the contributions made to the OP2 Framework while completing this project, important groundwork has been laid for future contributors to build on top of. Further optimisations and run-time assertions can be implemented as extensions to this implementation, which might achieve further speedup at run-time for smaller problem sizes.
+It is very promising that this optimisation is able to provide any benefit at all, and as a result of the contributions made to the OP2 Framework while completing this project, important groundwork has been laid for future contributors to build on top of. Further optimisations and run-time assertions can be implemented as extensions to this implementation, which might achieve greater speedup at run-time, especially for smaller problem sizes.
 
 \subsection{Future Work}
 \label{ss:fw}
@@ -101,7 +101,7 @@ Finally, there are other hardware targets supported by OP2 which may be able to 
 \clearpage
 \subsection{Project Management}
 \label{ss:pm}
-This Section serves as a reflection on the project as a whole, and how I believe it went. A breakdown of the time spent on each task can be found in Appendix \ref{app:tracker}.
+This Section serves as a reflection on the project as a whole, and how I believe it went. A breakdown of the time investment distribution can be found in Appendix \ref{app:tracker} (p\pageref{app:tracker}).
 \par
 The Gantt chart in figure \ref{progGantt} was produced for the progress report submitted in November, 6 weeks into the project. Having now completed the project I can reflect on how well the timeline was followed, and the successes and challenges of each of the four periods.
 \newcommand\w{25}
@@ -178,6 +178,7 @@ today label font=\itshape,
 \end{ganttchart}
 }
 \end{figure}
+\vspace{-1.2cm}
 
 \subsubsection{Challenges and Reflection}
 \hspace{\parindent} \minititle{Research}
@@ -185,9 +186,9 @@ The research section of my project involved reading scientific papers, many prod
 \par
 Once I had already decided on my approach and begun the implementation I discovered some similar work which might have influenced the direction of the project if I had been aware of it earlier on. For example, the \textit{easy::JIT} approach of performing a code generation stage at runtime as well as compiling is an interesting direction.
 \par
-Considering that I had never written code for a graphics card before starting this project, I am happy with the confidence in using the CUDA programming model I have built.
-\par
 The time I had allotted to research did need to be extended from the plan at the outset of the project, as having originally given myself just three weeks I was not confident enough with the existing OP2 code base to begin to contribute. An additional two weeks from the Implementation period were sufficient for me to feel able to begin the implementation.
+\par
+Considering that I had never written code for a graphics card before starting this project, I am happy with the confidence in using the CUDA programming model I have built.
 
 \minititle{Implementation}
 The Implementation progressed largely as expected, with advancements made at a good pace for the time allocated. I did find that while the timetable above listed a total of 3 full weeks for testing, partial solutions were difficult to test fully, as there is no executable generated with which to ensure the result was correct, or perform much benchmarking, until towards the end of the implementation.
@@ -201,7 +202,7 @@ It was fortunate for the project as a whole that the decision to move on to benc
 \par
 The delay was mostly due to the desire to use a HPC cluster to gather proper benchmarking data. While the graphics card in my personal laptop was sufficient for validating the code executed correctly, the results would likely have been noisy and inconsistent if not gathered on a dedicated system. Finding a cluster that could allow me access to a Kepler generation GPU, and getting familiar with using the system once accepted took longer than expected. With the benefit of hindsight it is clear that this process should have begun at the start of the project, as it was always going to be necessary to have access to a HPC cluster, and be familiar with using it by the time the implementation was ready for benchmarking.
 \par
-Eventually the Cambridge Service for Data-Driven Discovery (CSD3) kindly approved for me to use their \textit{Wilkes2} GPU cluster, with workloads I submitted being placed in a low priority queue. This provided its own challenge, as I often had to wait overnight for results of a submitted job to be provided, or to find out it had failed with some error. I was already starting to become familiar with SLURM from using it as part of a High Performance Computing module, and my knowledge only improved for needing to make use of it here as well.
+Eventually the Cambridge Service for Data-Driven Discovery (CSD3) kindly approved for me to use their \textit{Wilkes2} GPU cluster, with workloads I submitted being placed in a low priority queue. This provided its own challenge, as I often had to wait overnight for results of a submitted job to be provided, or to find out it had failed with some error. As with many supercomputer clusters, \textit{Wilkes2} requires jobs to be submitted using SLURM \cite{slurm}. I was already starting to become familiar with SLURM from using it as part of a High Performance Computing module, and my knowledge only improved for needing to make use of it here as well.
 
 \minititle{Documentation}
 The last period of work is producing the documentation, which encompasses both creating and giving a presentation on the completed work, and writing this report. The presentation was made using Google Slides \cite{gslides}, and I believe it went well, although the demonstration was perhaps not as thorough as it should have been. The benchmarking results I collected for the presentation were only for 10,000 time steps, while the results in this report ran for 1,000,000 - which gave a much better indication of the outcome of applying the optimisation. The total execution time of the application increased from ~30 seconds to ~40 minutes, which clearly allows a small change to amplify into a noticeable difference.
@@ -211,8 +212,8 @@ This report was produced as the final submission and utilises LaTeX and BibTeX. 
 \subsubsection{Tools Selection}
 I am satisfied with my selection of tools for this project. There was certainly no need to diverge from using GitHub for version control as the rest of the OP2 Framework does, and there have been no issues with using it during this project as I was already very familiar with using \verb|git| prior to starting. Since there was no collaboration, the workflow is simple and there is only a single branch, with commits whenever a feature or fix is completed.
 \par
-For development, the use of GNU make for AOT compilation is sufficient,and very convenient to combine many commands into a single, simple one. However, using it for the JIT compile as well is not an ideal interface for an application developer using OP2, as they would need to recreate the contents of my Makefile themselves. It also relies on the OP2 library files, the generated code and the Makefile all being accessible by the binary at run-time, which might not always be the case.
+For development, the use of GNU make for AOT compilation is sufficient,and very convenient to combine many commands into a single, simple one. However, using it for the JIT compile as well is not an ideal interface for an application developer using OP2, as they would need to recreate the contents of my Makefile themselves. It also relies on the OP2 library files, the generated code and the Makefile all being accessible by the binary at run-time, which might not always be the case. This is definitely something that could be improved upon by using NVidia's native CUDA JIT compilation.
 \par
-Code was mostly written using Atom \cite{atom} as a text editor, or Vim \cite{vim} when working remotely on the HPC cluster. Atom's GUI is useful when working on a code-base with many files, especially when the output is also a set of files. I used Vim when only a terminal is available, because it is the editor I am most familiar with in that context, and because its popularity means it is usually already available on Linux systems.
+Code was mostly written using Atom \cite{atom} as a text editor, or Vim \cite{vim} when working remotely on the HPC cluster. Atom's GUI is useful when working on a code-base with many files, especially when the output is also a set of files. I used Vim when only a terminal is available, because it is the editor I am most familiar with, and because it is usually already available on Linux systems.
 \par
 Lastly, Google Slides was selected for the presentation because of familiarity, and to ensure changes are automatically saved to a remote in case of loss of data. I prefer LaTeX for producing reports as it allows greater control of the structure of the document than other editors, and provides access to TikZ \cite{tikz}: a powerful package used for producing diagrams.

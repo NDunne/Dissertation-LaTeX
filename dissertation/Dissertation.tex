@@ -37,6 +37,8 @@
 \usepackage{hhline}         % double hline
 \usepackage{tabularx}       % table cell line break
 \usepackage{multicol}
+\usepackage{upquote}        % backtick madness
+
 
 \usepackage{pgfplotstable}
 \pgfplotsset{
@@ -83,7 +85,41 @@
 % Use the margin size here to adjust text width!
 \usepackage[margin=3cm]{geometry}
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows.meta, fit, matrix, positioning}
+\usetikzlibrary{shapes,arrows.meta, fit, matrix, positioning, patterns}
+
+% defining the new dimensions and parameters
+\newlength{\hatchspread}
+\newlength{\hatchthickness}
+\newlength{\hatchshift}
+\newcommand{\hatchcolor}{}
+% declaring the keys in tikz
+\tikzset{hatchspread/.code={\setlength{\hatchspread}{#1}},
+         hatchthickness/.code={\setlength{\hatchthickness}{#1}},
+         hatchshift/.code={\setlength{\hatchshift}{#1}},% must be >= 0
+         hatchcolor/.code={\renewcommand{\hatchcolor}{#1}}}
+% setting the default values
+\tikzset{hatchspread=3pt,
+         hatchthickness=0.4pt,
+         hatchshift=0pt,% must be >= 0
+         hatchcolor=black}
+% declaring the pattern
+\pgfdeclarepatternformonly[\hatchspread,\hatchthickness,\hatchshift,\hatchcolor]% variables
+   {custom north west lines}% name
+   {\pgfqpoint{\dimexpr-2\hatchthickness}{\dimexpr-2\hatchthickness}}% lower left corner
+   {\pgfqpoint{\dimexpr\hatchspread+2\hatchthickness}{\dimexpr\hatchspread+2\hatchthickness}}% upper right corner
+   {\pgfqpoint{\dimexpr\hatchspread}{\dimexpr\hatchspread}}% tile size
+   {% shape description
+    \pgfsetlinewidth{\hatchthickness}
+    \pgfpathmoveto{\pgfqpoint{0pt}{\dimexpr\hatchspread+\hatchshift}}
+    \pgfpathlineto{\pgfqpoint{\dimexpr\hatchspread+0.15pt+\hatchshift}{-0.15pt}}
+    \ifdim \hatchshift > 0pt
+      \pgfpathmoveto{\pgfqpoint{0pt}{\hatchshift}}
+      \pgfpathlineto{\pgfqpoint{\dimexpr0.15pt+\hatchshift}{-0.15pt}}
+    \fi
+    \pgfsetstrokecolor{\hatchcolor}
+%    \pgfsetdash{{1pt}{1pt}}{0pt}% dashing cannot work correctly in all situation this way
+    \pgfusepath{stroke}
+   }
 
 \tikzstyle{line} = [draw, -{Latex[length=5mm,width=3mm]}, line width=2pt]
 \tikzstyle{thinline} = [draw, -{Latex[length=3mm,width=2mm]}, line width=1pt]
@@ -158,7 +194,7 @@
 
 \newcommand{\minititle}[1]{\refstepcounter{mini}\vspace{\parskip}\hspace{-1\parindent}\textbf{~\themini. #1}\\}
 
-\newcommand{\tinytitle}[1]{\vspace{\parskip}\hspace{-1\parindent}\textbf{#1:}\hspace{3pt}}
+\newcommand{\tinytitle}[1]{\vspace{\parskip}\hspace{-1\parindent}\textbf{#1}\hspace{3pt}}
 
 \newcommand{\testresult}[2]{
   \vfill
@@ -187,6 +223,10 @@
   }
   {\end{minipage}}
 
+  % Default fixed font does not support bold face
+  \DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{12} % for bold
+  \DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{12}  % for normal
+
 \begin{document}
 
 \lstset{language=C, basicstyle=\linespread{1.1}\ttfamily\footnotesize,
@@ -194,12 +234,16 @@ frame=tlbr,
 backgroundcolor=\color{lightgray!15},
 showspaces=false, showstringspaces=false,
 commentstyle=\ttfamily\footnotesize\color{gray},
-%escapechar=|,
+escapechar=@,
 emph={
        cudaMalloc, cudaFree,
        __global__, __shared__, __device__, __host__,
        __syncthreads,
-   }
+   },
+aboveskip=.75em,
+belowskip=0pt,
+stringstyle=\color{darkgray},
+keywordstyle=\ttb\footnotesize
 }
 
 %%TC:ignore

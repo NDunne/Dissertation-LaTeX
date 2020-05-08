@@ -7,8 +7,8 @@
 
 \section*{Abstract}
 \addcontentsline{toc}{section}{Abstract}
-The OP2 Domain Specific Language was originally developed to simplify the process of writing unstructured mesh solver applications for High Performance Computing. This report details the implementation of a new optimisation to the code generation portion of the OP2 Framework, which allows HPC applications to re-compile at run-time when the inputs to the program are known, making an assertion that input constants will remain constant, and can therefore be declared as pre-processor macro literals in the re-compiled code.
-\par It also covers benchmarking data gathered using the new optimisation on a representative example application. The results show that if the problem size is sufficiently large, there can be benefit, however the speed-up is not significant. Further run-time optimisations are discussed that could provide further benefit. The finished JIT compilation platform will aid in adding additional optimisations in the future.
+The OP2 Domain Specific Language was originally developed to simplify the process of writing unstructured mesh solver applications for High Performance Computing. This report details the implementation of a new optimisation to the code generation portion of the OP2 Framework, which allows HPC applications to re-compile at run-time when the inputs to the program are known. The inputs being fixed allows for more aggressive optimisations to be applied to the program, which would not be possible at compile-time.
+\par It also covers benchmarking data gathered using the new optimisation on a representative example application. The results show that if the problem size is sufficiently large, there can be benefit, however the speed-up is not significant. Further run-time optimisations are discussed that could provide further speed-up. The finished JIT compilation platform will aid in adding additional optimisations in the future.
 
 \section*{Key Words}
 \addcontentsline{toc}{section}{Key Words}
