@@ -108,7 +108,7 @@ Various Makefiles used by OP2 expect the below Environmental Variables to be set
 \noindent Once these have been set, you can compile the OP2 libraries and translate an application.
 \clearpage
 \subsubsection{OP2 Libraries}
-With environmental variables set the next stage is to compile the OP2 library files. There is a different target for each hardware platform, but for this implementation the required targets are \verb|core|, \verb|cuda|, and \verb|hdf5|. Other backends are required for the tool to convert the input mesh to HDF5, so the command will just be \verb|make|, to build them all.
+With environmental variables set the next stage is to compile the OP2 library files. There is a different target for each hardware platform, but for this implementation the required targets are \verb|core|, \verb|cuda|, and \verb|hdf5|. Other back-ends are required for the tool to convert the input mesh to HDF5, so the command will just be \verb|make|, to build them all.
 \begin{verbatim}
 > cd op2/c/
 > make
@@ -184,7 +184,7 @@ airfoil_cuda_rec: jit_const.h
 \end{lstlisting}
 
 % }
-\noindent The target compiles each of the JIT kernel files into an objecy file, then combines all the objects into a single Shared Object called \verb|cuda/airfoil_kernel_rec.so|. The name of the resultant DLL must follow this name pattern, otherwise it will not be found by the JIT enabled binary.
+\noindent The target compiles each of the JIT kernel files into an object file, then combines all the objects into a single Shared Object called \verb|cuda/airfoil_kernel_rec.so|. The name of the resultant DLL must follow this name pattern, otherwise it will not be found by the JIT enabled binary.
 
 \clearpage
 \section{Time Investment}
